@@ -1,0 +1,9 @@
+SEED = 1234
+
+EMBEDDING_LENGTH = 100
+
+WINDOW_SIZE = 5
+
+HIDDEN_SIZE = 100
+
+VOCAB_FILE = "data/raw/vocab.txt"
