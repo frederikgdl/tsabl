@@ -24,10 +24,10 @@ def main():
     if args.extension:
         logging.info("Loading raw tweet data from files with extension " +
             args.extension)
-        lines = utils.read_and_concatenate_files(args.dir, args.extension)
+        lines = utils.file_ops.read_and_concatenate_files(args.dir, args.extension)
     else:
         logging.info("Loading raw tweet data from file " + args.in_file)
-        lines = utils.read_file(args.in_file)
+        lines = utils.file_ops.read_file(args.in_file)
     logging.debug("Done. " + str(time() - t) + "s")
 
     ids = get_tweet_ids_from_raw(lines)
@@ -49,10 +49,10 @@ def main():
 
     logging.info("Saving processed tweets")
     t = time()
-    utils.save_json_tweets(tweets, args.out_file_json, annotations)
+    utils.file_ops.save_json_tweets(tweets, args.out_file_json, annotations)
 
     if args.out_file_text is not None:
-        utils.save_text_tweets(tweets, args.out_file_text, annotations)
+        utils.file_ops.save_text_tweets(tweets, args.out_file_text, annotations)
     logging.debug("Done. " + str(time() - t) + "s")
 
 def print_intro():

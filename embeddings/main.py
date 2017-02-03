@@ -1,8 +1,25 @@
 import numpy as np
 
-import utils
+from utils import file_ops
 import config
+import funcs
 import hybrid_ranking
+from twitter.api import TwitterApi
+
+twitter_api = TwitterApi()
+
+
+def init():
+    ids = file_ops.read_twitter_id_file(config.DATA_FILE, config.DATA_FILE_LABELED)
+    print("Fetching", len(ids), "tweets.")
+    tweets = twitter_api.bulk_get_statuses(ids)
+    print("Got ", len(tweets), "tweets.")
+    texts = list(map(lambda t: t["text"], tweets))
+
+    # TODO: Do preprocessing here (lowercasing, tokenizing, etc.)
+
+    vocab = funcs.get_vocab(texts, config.MIN_WORD_FREQUENCY)
+    print("Vocabulary size:", len(vocab))
 
 
 def train():
@@ -12,7 +29,7 @@ def train():
     hidden_size = config.HIDDEN_SIZE
     embedding_length = config.EMBEDDING_LENGTH
 
-    vocab = utils.get_vocab(config.VOCAB_FILE)
+    vocab, corpus = funcs.get_vocab(config.VOCAB_FILE)
     assert vocab
     vocab_size = len(vocab)
 
@@ -20,4 +37,5 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    init()
+    #train()
