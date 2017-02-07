@@ -35,3 +35,21 @@ def get_vocab(tweet_texts, min_freq):
             idx += 1
 
     return vocab_map
+
+
+def fill_window(begin_idx, data, window_size, vocab_map):
+    """
+    Build and return a context window from a list of words.
+    Each word is replaced by its index in the vocab map,
+    or by the index for "<unk>" if not found.
+    """
+    word_ins = []
+    for i in range(window_size):
+        word = data[begin_idx + i]
+
+        if word in vocab_map:
+            word_ins.append(vocab_map[word])
+        else:
+            word_ins.append(vocab_map["<unk>"])
+
+    return word_ins
