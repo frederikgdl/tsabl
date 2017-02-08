@@ -16,8 +16,10 @@ ADAGRAD_LR = 0.1
 
 # Tokenizer options
 
-MIN_WORD_FREQUENCY = 0
+# int or None
+MIN_WORD_FREQUENCY = 5
 
+# int or None
 MAX_NUMBER_WORDS = None
 
 LOWERCASE = True

@@ -1,9 +1,9 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import embeddings
-from keras.preprocessing.text import Tokenizer
+from keras.layers.embeddings import Embedding
 
 from utils import file_ops
+from tokenizer import Tokenizer
 import config
 import funcs
 
@@ -16,6 +16,7 @@ def main():
     data_file = config.DATA_FILE
     data_file_labeled = config.DATA_FILE_LABELED
 
+    min_freq = config.MIN_WORD_FREQUENCY
     max_nb_words = config.MAX_NUMBER_WORDS
     lowercase = config.LOWERCASE
 
@@ -28,7 +29,7 @@ def main():
 
     # TODO: Do preprocessing here (lowercasing, tokenizing, etc.)
 
-    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase)
+    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
     seqs = tokenizer.texts_to_sequences(texts)
 
@@ -39,15 +40,13 @@ def main():
     vocab_size = len(tokenizer.word_counts) + 1
 
     model = Sequential()
-    model.add(embeddings.Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
+    model.add(Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
 
     input_array = np.array(context_windows)
     model.compile('rmsprop', 'mse')
     output_array = model.predict(input_array)
 
     print(model.get_weights())
-
-
 
 
 if __name__ == "__main__":
