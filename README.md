@@ -12,6 +12,7 @@ cd tsabl
 virtualenv venv -p python3
 echo 'export TSABL_CONSUMER_KEY="<YOUR CONSUMER KEY HERE>"' >> venv/bin/activate
 echo 'export TSABL_CONSUMER_SECRET="<YOUR CONSUMER KEY SECRET>"' >> venv/bin/activate
+echo 'export PYTHONPATH="$PYTHONPATH:$PWD/tsabl"' >> venv/bin/activate
 source venv/bin/activate
 pip install -r requirements.txt
 ```

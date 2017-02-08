@@ -5,7 +5,7 @@ import logging
 from os import path
 from time import time
 
-import utils
+from utils import file_ops
 from api import TwitterApi
 
 twitter_api = TwitterApi()
@@ -24,10 +24,10 @@ def main():
     if args.extension:
         logging.info("Loading raw tweet data from files with extension " +
             args.extension)
-        lines = utils.file_ops.read_and_concatenate_files(args.dir, args.extension)
+        lines = file_ops.read_and_concatenate_files(args.dir, args.extension)
     else:
         logging.info("Loading raw tweet data from file " + args.in_file)
-        lines = utils.file_ops.read_file(args.in_file)
+        lines = file_ops.read_lines(args.in_file)
     logging.debug("Done. " + str(time() - t) + "s")
 
     ids = get_tweet_ids_from_raw(lines)
@@ -49,10 +49,10 @@ def main():
 
     logging.info("Saving processed tweets")
     t = time()
-    utils.file_ops.save_json_tweets(tweets, args.out_file_json, annotations)
+    file_ops.save_json_tweets(tweets, args.out_file_json, annotations)
 
     if args.out_file_text is not None:
-        utils.file_ops.save_text_tweets(tweets, args.out_file_text, annotations)
+        file_ops.save_text_tweets(tweets, args.out_file_text, annotations)
     logging.debug("Done. " + str(time() - t) + "s")
 
 def print_intro():
@@ -79,12 +79,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filter tweets and tokenizes.')
 
     # Input file
-    parser.add_argument('in_file', nargs='?', default="../data/raw/tweets.id",
-                        help='a text file containing tweets (default: ../data/raw/tweets.id)')
+    parser.add_argument('in_file', nargs='?', default="data/raw/tweets.id",
+                        help='a text file containing tweets (default: data/raw/tweets.id)')
 
     # Output file
-    parser.add_argument('out_file_json', nargs='?', default="../data/raw/tweets.json",
-                        help='file to save tweets to in json format (default: ../data/raw/tweets.json)')
+    parser.add_argument('out_file_json', nargs='?', default="data/raw/tweets.json",
+                        help='file to save tweets to in json format (default: data/raw/tweets.json)')
 
     parser.add_argument('out_file_text', nargs='?', default=None,
                         help='text file to save tweets to (default: None)')
