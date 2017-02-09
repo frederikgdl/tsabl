@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers.embeddings import Embedding
+from keras.layers import Embedding, Dense
 
 from utils import file_ops
 from tokenizer import Tokenizer
@@ -42,11 +42,22 @@ def main():
     model = Sequential()
     model.add(Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
 
+    # Linear layer
+    # Init from a uniform distribution U(-0.01/InputLength, 0.01/InputLength), see Tang16 3.6.2
+    model.add(Dense(hidden_size, activation='linear'))
+
+    # hTanh layer
+    model.add(Dense(hidden_size, activation='tanh'))
+
+    # Sentiment linear 2
+    model.add(Dense(2, activation='linear'))
+
     input_array = np.array(context_windows)
     model.compile('rmsprop', 'mse')
     output_array = model.predict(input_array)
 
-    print(model.get_weights())
+    # print(len(model.get_weights()))
+    print(output_array.shape)
 
 
 if __name__ == "__main__":

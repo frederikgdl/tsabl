@@ -2,9 +2,9 @@ import keras.preprocessing.text as keras_text
 
 
 class Tokenizer(keras_text.Tokenizer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         self.min_freq = kwargs.pop('min_freq', None)
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
     # Override
     def texts_to_sequences_generator(self, texts):
