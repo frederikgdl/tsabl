@@ -1,6 +1,6 @@
 import numpy as np
-# from keras.models import Sequential
-from keras.layers import Embedding, Dense
+from keras.models import Model, Sequential
+from keras.layers import Embedding, Dense, Reshape, Input
 
 from utils import file_ops
 from tokenizer import Tokenizer
@@ -34,43 +34,69 @@ def main():
     seqs = tokenizer.texts_to_sequences(texts)
 
     # TODO: Unknown words must be handled
-    # Add 1 for unknown words
+    # Add 1 for reserved index 0
     vocab_size = len(tokenizer.word_counts) + 1
 
     context_windows = funcs.get_context_windows(seqs, window_size)
     negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
 
+    input_array = np.array(context_windows)
+    # print(input_array.shape)
+    main_input = Input((window_size,))
+
+
     ## Model
 
     # Embedding layer
     embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size)
+    reshaped_embedding_layer = Reshape((embedding_length*window_size,))
     # model = Sequential()
     # model.add(Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
+    # merged_embeddings_layer = Merge(mode='concat')
 
     # Linear layer
     # Init from a uniform distribution U(-0.01/InputLength, 0.01/InputLength), see Tang16 3.6.2
-    pos_linear_layer = Dense(hidden_size, activation='linear')
-    neg_linear_layer = Dense(hidden_size, activation='linear')
+    linear_layer = Dense(hidden_size, activation='linear')
+    # pos_linear_layer = Dense(hidden_size, activation='linear')
+    # neg_linear_layer = Dense(hidden_size, activation='linear')
     # model.add(Dense(hidden_size, activation='linear'))
 
     # hTanh layer
     # TODO: tanh vs hTanh
-    pos_tanh_layer = Dense(hidden_size, activation='tanh')
-    neg_tanh_layer = Dense(hidden_size, activation='tanh')
+    tanh_layer = Dense(hidden_size, activation='tanh')
+    # pos_tanh_layer = Dense(hidden_size, activation='tanh')
+    # neg_tanh_layer = Dense(hidden_size, activation='tanh')
     # model.add(Dense(hidden_size, activation='tanh'))
 
     # Sentiment linear 2
-    pos_sentiment_layer = Dense(2, activation='linear')
-    neg_sentiment_layer = Dense(2, activation='linear')
+    sentiment_layer = Dense(2, activation='linear')
+    # pos_sentiment_layer = Dense(2, activation='linear')
+    # neg_sentiment_layer = Dense(2, activation='linear')
     # model.add(Dense(2, activation='linear'))
 
-    pos_input = np.array(context_windows)
-    neg_input = np.array()
-    # model.compile('rmsprop', 'mse')
-    # output_array = model.predict(input_array)
+    # pos_input = np.array(context_windows)
+    # neg_input = np.array()
+
+    # model = Sequential()
+    # model.add(embedding_layer)
+    # model.add(reshaped_embedding_layer)
+
+    # input_array = np.array(context_windows)
+
+    embeddings = embedding_layer(main_input)
+    reshaped_embeddings = reshaped_embedding_layer(embeddings)
+    lin_output = linear_layer(reshaped_embeddings)
+    tanh_output = tanh_layer(lin_output)
+    sent_output = sentiment_layer(tanh_output)
+
+    model = Model(input=main_input, output=sent_output)
+    model.compile(optimizer='sgd', loss='mse')
+    output_array = model.predict(input_array)
 
     # print(len(model.get_weights()))
-    # print(output_array.shape)
+    # print(vocab_size)
+    # print(len(context_windows))
+    print(output_array.shape)
 
 
 if __name__ == "__main__":
