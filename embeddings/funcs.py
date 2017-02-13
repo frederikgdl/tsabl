@@ -1,3 +1,5 @@
+import random
+
 # def get_vocab(tweet_texts, min_freq):
 #     """
 #     Build and return a map of word to a unique index.
@@ -75,3 +77,19 @@ def get_context_windows(text_sequences, window_size):
             context_windows.append(window)
 
     return context_windows
+
+
+def get_negative_samples(context_windows, vocab_size):
+    middle_idx = len(context_windows[0])//2
+    negative_samples = []
+    for window in context_windows:
+        neg_sample = list(window)
+        rand_idx = random.randint(1, vocab_size)
+
+        while rand_idx == middle_idx:
+            rand_idx = random.randint(1, vocab_size)
+
+        neg_sample[middle_idx] = rand_idx
+        negative_samples.append(neg_sample)
+
+    return negative_samples

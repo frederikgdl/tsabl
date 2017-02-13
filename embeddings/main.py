@@ -1,5 +1,5 @@
 import numpy as np
-from keras.models import Sequential
+# from keras.models import Sequential
 from keras.layers import Embedding, Dense
 
 from utils import file_ops
@@ -33,31 +33,44 @@ def main():
     tokenizer.fit_on_texts(texts)
     seqs = tokenizer.texts_to_sequences(texts)
 
-    context_windows = funcs.get_context_windows(seqs, window_size)
-
     # TODO: Unknown words must be handled
     # Add 1 for unknown words
     vocab_size = len(tokenizer.word_counts) + 1
 
-    model = Sequential()
-    model.add(Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
+    context_windows = funcs.get_context_windows(seqs, window_size)
+    negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
+
+    ## Model
+
+    # Embedding layer
+    embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size)
+    # model = Sequential()
+    # model.add(Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size))
 
     # Linear layer
     # Init from a uniform distribution U(-0.01/InputLength, 0.01/InputLength), see Tang16 3.6.2
-    model.add(Dense(hidden_size, activation='linear'))
+    pos_linear_layer = Dense(hidden_size, activation='linear')
+    neg_linear_layer = Dense(hidden_size, activation='linear')
+    # model.add(Dense(hidden_size, activation='linear'))
 
     # hTanh layer
-    model.add(Dense(hidden_size, activation='tanh'))
+    # TODO: tanh vs hTanh
+    pos_tanh_layer = Dense(hidden_size, activation='tanh')
+    neg_tanh_layer = Dense(hidden_size, activation='tanh')
+    # model.add(Dense(hidden_size, activation='tanh'))
 
     # Sentiment linear 2
-    model.add(Dense(2, activation='linear'))
+    pos_sentiment_layer = Dense(2, activation='linear')
+    neg_sentiment_layer = Dense(2, activation='linear')
+    # model.add(Dense(2, activation='linear'))
 
-    input_array = np.array(context_windows)
-    model.compile('rmsprop', 'mse')
-    output_array = model.predict(input_array)
+    pos_input = np.array(context_windows)
+    neg_input = np.array()
+    # model.compile('rmsprop', 'mse')
+    # output_array = model.predict(input_array)
 
     # print(len(model.get_weights()))
-    print(output_array.shape)
+    # print(output_array.shape)
 
 
 if __name__ == "__main__":
