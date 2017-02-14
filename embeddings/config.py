@@ -5,6 +5,10 @@ SEED = 1234
 
 # Embedding options
 
+EPOCHS = 50
+
+MARGIN = 1
+
 EMBEDDING_LENGTH = 50
 
 WINDOW_SIZE = 7

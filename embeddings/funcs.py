@@ -84,10 +84,10 @@ def get_negative_samples(context_windows, vocab_size):
     negative_samples = []
     for window in context_windows:
         neg_sample = list(window)
-        rand_idx = random.randint(1, vocab_size)
+        rand_idx = random.randint(1, vocab_size-1)
 
         while rand_idx == middle_idx:
-            rand_idx = random.randint(1, vocab_size)
+            rand_idx = random.randint(1, vocab_size-1)
 
         neg_sample[middle_idx] = rand_idx
         negative_samples.append(neg_sample)
