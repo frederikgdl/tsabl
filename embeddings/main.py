@@ -1,7 +1,8 @@
 import numpy as np
-from keras.models import Model, Sequential
+from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, merge
 import keras.backend as K
+import theano.tensor as T
 
 from utils import file_ops
 from tokenizer import Tokenizer
@@ -23,6 +24,7 @@ def main():
 
     nb_epochs = config.EPOCHS
     margin = config.MARGIN
+    batch_size = config.BATCH_SIZE
 
     # Read data
 
@@ -59,11 +61,14 @@ def main():
     def init_hidden_layer(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
 
-    # Model layers
+    # Model
 
     # Embedding layer
-    embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size, init=init_embeddings)
+    embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
+                                init=init_embeddings)
     reshaped_embedding_layer = Reshape((embedding_length*window_size,))
+
+    # PosMain
 
     # Linear layer
     linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
@@ -82,19 +87,16 @@ def main():
     # sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer)
     # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
 
-    # Model structure
-
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
-
-    # PosMain
-
     lin_output = linear_layer(reshaped_embeddings)
     tanh_output = tanh_layer(lin_output)
     context_output = context_layer(tanh_output)
     # sent_output = sentiment_layer(tanh_output)
 
     # NegMain
+
+    # Linear layer
     neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
 
     # hTanh layer
@@ -119,26 +121,18 @@ def main():
     # model = Model(input=main_input, output=context_output)
 
     def loss_function(y_true, y_pred):
-        # print('In loss function')
-        num_ex = y_pred.shape[0]
-        y_pos = y_pred[:num_ex]
-        y_neg = y_pred[num_ex:]
+        y_len = y_pred.shape[0]
+        y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
+        return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
 
-        # return K.mean(K.square(y_pred - y_true), axis=-1)
-        return K.sum(K.maximum(0, 1 - y_pos + y_neg), axis=-1)
+    model.compile(optimizer='sgd', loss=loss_function)
+    # model.compile(optimizer='sgd', loss='mse')
 
-    # model.compile(optimizer='sgd', loss=loss_function)
-    model.compile(optimizer='sgd', loss='mse')
-
-    # model.fit([input_array, neg_input_array], np.zeros(len(input_array)), nb_epoch=nb_epochs, batch_size=1)
-    output_array = model.predict([input_array, neg_input_array])
+    model.fit([input_array, neg_input_array], np.zeros(len(input_array)), nb_epoch=nb_epochs, batch_size=batch_size)
+    # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
-    # print(len(model.get_weights()))
-    # print(vocab_size)
-    # print(len(context_windows))
-    print(output_array.shape)
-    # print(len(embedding_layer.get_weights()[0]))
+    # print(output_array.shape)
     print('Done')
 
 
