@@ -59,7 +59,7 @@ import os
 
 
 def get_numeric_labels(labels):
-    return [1 if label == 'positive' else -1 if label == 'negative' else 0 for label in labels]
+    return [[1, -1, -1] if label == 'positive' else [-1, -1, 1] if label == 'negative' else [-1, 1, -1] for label in labels]
     # new_labels = []
     #
     # for label in labels:

@@ -58,6 +58,9 @@ def main():
     neg_input_array = np.array(negative_samples)
     input_labels = np.array(labels)
 
+    # print(input_labels)
+    # exit()
+
     # Init functions
 
     def init_embeddings(shape, name=None):
@@ -92,7 +95,8 @@ def main():
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
 
     # Sentiment linear 2
-    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer)
+    # sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
@@ -113,7 +117,7 @@ def main():
     neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
 
     # Sentiment linear 2
-    neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
+    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
 
     neg_embeddings = embedding_layer(neg_input)
     neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
@@ -127,8 +131,8 @@ def main():
     # merged_sentiment_output = merge([sentiment_output, neg_sentiment_output], mode='concat', concat_axis=-1,
     #                                 name='merged_sentiment_output')
 
-    # model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
-    model = Model(input=[main_input, neg_input], output=merged_context_output)
+    model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
+    # model = Model(input=[main_input, neg_input], output=merged_context_output)
     # model = Model(input=main_input, output=context_output)
 
     def context_loss_function(y_true, y_pred):
@@ -139,15 +143,16 @@ def main():
         return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
 
     def sentiment_loss_function(y_true, y_pred):
-        pass
-        # return K.sum(K.maximum(0., 1. - y_pred[0] + y_pred[1]))
+        # TODO: verify function
+        # y_true is [1, -1, -1] for positive, [-1, 1, -1] for negative etc.
+        return K.sum(K.maximum(0., 1. - y_true*y_pred))
 
-    # model.compile(optimizer='sgd', loss={'merged_context_output': context_loss_function,
-    #                                      'sentiment_output': sentiment_loss_function})
-    model.compile(optimizer='sgd', loss=context_loss_function)
+    model.compile(optimizer='sgd', loss={'merged_context_output': context_loss_function,
+                                         'sentiment_output': sentiment_loss_function})
+    # model.compile(optimizer='sgd', loss=context_loss_function)
     # model.compile(optimizer='sgd', loss='mse')
 
-    model.fit([input_array, neg_input_array], input_labels, nb_epoch=nb_epochs, batch_size=batch_size)
+    model.fit([input_array, neg_input_array], [input_labels, input_labels], nb_epoch=nb_epochs, batch_size=batch_size)
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
