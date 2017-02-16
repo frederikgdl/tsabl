@@ -56,16 +56,37 @@ import random
 #
 #     return word_ins
 
-def get_context_windows(text_sequences, window_size):
+
+def get_numeric_labels(labels):
+    return [1 if label == 'positive' else -1 if label == 'negative' else 0 for label in labels]
+    # new_labels = []
+    #
+    # for label in labels:
+    #     if label == 'positive':
+    #         new_label = 1
+    #     elif label == 'negative':
+    #         new_label = -1
+    #     else:
+    #         new_label = 0
+    #     new_labels.append(new_label)
+    #
+    # return new_labels
+
+
+def get_context_windows_labels(text_sequences, labels, window_size):
+    # TODO: padding?
     """
-    Create context windows from text sequences
+    Create context windows and labels lists from text sequences
     Ignores texts (tweets) shorter than the window size
     :param text_sequences: list of text sequences (vectors with word indices)
+    :param labels: list of labels (ints)
     :param window_size: int with size of context windows
-    :return: list with context windows, each windows a list of size window_size
+    :return: context_windows: list with context windows, each windows a list of size window_size
+             new_labels:
     """
     context_windows = []
-    for seq in text_sequences:
+    new_labels = []
+    for idx, seq in enumerate(text_sequences):
         if len(seq) < window_size:
             continue
 
@@ -75,8 +96,9 @@ def get_context_windows(text_sequences, window_size):
                 window.append(seq[i + j])
 
             context_windows.append(window)
+            new_labels.append(labels[idx])
 
-    return context_windows
+    return context_windows, new_labels
 
 
 def get_negative_samples(context_windows, vocab_size):
@@ -93,3 +115,9 @@ def get_negative_samples(context_windows, vocab_size):
         negative_samples.append(neg_sample)
 
     return negative_samples
+
+
+def dump_embed_file(output_file, inverse_vocab_map, embeddings):
+    with open(output_file, 'w+') as f:
+        for k in inverse_vocab_map.keys():
+            f.write(str(inverse_vocab_map[k]) + ' ' + ' '.join([str(num) for num in embeddings[k]]) + '\n')

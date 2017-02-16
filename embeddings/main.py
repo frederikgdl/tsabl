@@ -17,6 +17,7 @@ def main():
 
     data_file = config.DATA_FILE
     data_file_labeled = config.DATA_FILE_LABELED
+    output_file = config.OUTPUT_FILE
 
     min_freq = config.MIN_WORD_FREQUENCY
     max_nb_words = config.MAX_NUMBER_WORDS
@@ -28,29 +29,34 @@ def main():
 
     # Read data
 
-    if data_file_labeled:
-        texts, labels = file_ops.read_labeled_file(data_file)
-    else:
-        texts = file_ops.read_lines(data_file)
+    texts, labels = file_ops.read_labeled_file(data_file)
+
+    # if data_file_labeled:
+    #     texts, labels = file_ops.read_labeled_file(data_file)
+    # else:
+    #     texts = file_ops.read_lines(data_file)
 
     # TODO: Do preprocessing here (lowercasing, tokenizing, etc.)
 
     tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
     seqs = tokenizer.texts_to_sequences(texts)
+    vocab_map = tokenizer.word_index
+    inverse_vocab_map = {v: k for k, v in vocab_map.items()}
 
     # TODO: Unknown words must be handled
     # Add 1 for reserved index 0
     vocab_size = len(tokenizer.word_counts) + 1
 
-    context_windows = funcs.get_context_windows(seqs, window_size)
+    # Turn 'positive' to 1, etc.
+    labels = funcs.get_numeric_labels(labels)
+
+    context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
     negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
 
     input_array = np.array(context_windows)
     neg_input_array = np.array(negative_samples)
-
-    main_input = Input((window_size,))
-    neg_input = Input((window_size,))
+    input_labels = np.array(labels)
 
     # Init functions
 
@@ -63,6 +69,11 @@ def main():
 
     # Model
 
+    # Input
+
+    main_input = Input((window_size,))
+    neg_input = Input((window_size,))
+
     # Embedding layer
     embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
                                 init=init_embeddings)
@@ -72,27 +83,23 @@ def main():
 
     # Linear layer
     linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
-    # neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
 
     # hTanh layer
     # TODO: tanh vs hTanh
     tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
-    # neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
 
     # Context linear 2
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
-    # neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
 
     # Sentiment linear 2
-    # sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer)
-    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
+    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer)
 
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
     lin_output = linear_layer(reshaped_embeddings)
     tanh_output = tanh_layer(lin_output)
     context_output = context_layer(tanh_output)
-    # sent_output = sentiment_layer(tanh_output)
+    sentiment_output = sentiment_layer(tanh_output)
 
     # NegMain
 
@@ -106,33 +113,46 @@ def main():
     neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
 
     # Sentiment linear 2
-    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
+    neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
 
     neg_embeddings = embedding_layer(neg_input)
     neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
     neg_lin_output = neg_linear_layer(neg_reshaped_embeddings)
     neg_tanh_output = neg_tanh_layer(neg_lin_output)
     neg_context_output = neg_context_layer(neg_tanh_output)
-    # neg_sent_output = neg_sentiment_layer(neg_tanh_output)
+    # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
 
-    merged_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1)
+    merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
+                                  name='merged_context_output')
+    # merged_sentiment_output = merge([sentiment_output, neg_sentiment_output], mode='concat', concat_axis=-1,
+    #                                 name='merged_sentiment_output')
 
-    model = Model(input=[main_input, neg_input], output=merged_output)
+    # model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
+    model = Model(input=[main_input, neg_input], output=merged_context_output)
     # model = Model(input=main_input, output=context_output)
 
-    def loss_function(y_true, y_pred):
-        y_len = y_pred.shape[0]
+    def context_loss_function(y_true, y_pred):
+        # TODO: verify function
+        # y_len = y_pred.shape[0]
+        # TODO: sizes = 1? not y_len?
         y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
         return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
 
-    model.compile(optimizer='sgd', loss=loss_function)
+    def sentiment_loss_function(y_true, y_pred):
+        pass
+        # return K.sum(K.maximum(0., 1. - y_pred[0] + y_pred[1]))
+
+    # model.compile(optimizer='sgd', loss={'merged_context_output': context_loss_function,
+    #                                      'sentiment_output': sentiment_loss_function})
+    model.compile(optimizer='sgd', loss=context_loss_function)
     # model.compile(optimizer='sgd', loss='mse')
 
-    model.fit([input_array, neg_input_array], np.zeros(len(input_array)), nb_epoch=nb_epochs, batch_size=batch_size)
+    # model.fit([input_array, neg_input_array], input_labels, nb_epoch=nb_epochs, batch_size=batch_size)
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
     # print(output_array.shape)
+    funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
     print('Done')
 
 

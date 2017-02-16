@@ -5,11 +5,11 @@ SEED = 1234
 
 # Embedding options
 
-EPOCHS = 50
+EPOCHS = 3
 
 MARGIN = 1
 
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 
 EMBEDDING_LENGTH = 50
 
@@ -37,3 +37,5 @@ DATA_FILE = os.path.abspath("data/filtered/tweets.txt")
 DATA_FILE_LABELED = True
 
 VOCAB_FILE = os.path.abspath("data/raw/vocab.txt")
+
+OUTPUT_FILE = os.path.abspath("data/embeddings/embeddings.txt")
