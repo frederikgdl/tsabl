@@ -46,9 +46,9 @@ def main():
 
     # TODO: Unknown words must be handled
     # Add 1 for reserved index 0
-    vocab_size = len(tokenizer.word_counts) + 1
+    vocab_size = len(vocab_map) + 1
 
-    # Turn 'positive' to 1, etc.
+    # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
     labels = funcs.get_numeric_labels(labels)
 
     context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
@@ -58,10 +58,8 @@ def main():
     neg_input_array = np.array(negative_samples)
     input_labels = np.array(labels)
 
-    # print(input_labels)
-    # exit()
-
     # Init functions
+    # TODO: verify functions
 
     def init_embeddings(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
@@ -80,6 +78,7 @@ def main():
     # Embedding layer
     embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
                                 init=init_embeddings)
+    # Reshape to concat embeddings in context windows
     reshaped_embedding_layer = Reshape((embedding_length*window_size,))
 
     # PosMain
@@ -128,8 +127,6 @@ def main():
 
     merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
                                   name='merged_context_output')
-    # merged_sentiment_output = merge([sentiment_output, neg_sentiment_output], mode='concat', concat_axis=-1,
-    #                                 name='merged_sentiment_output')
 
     model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
     # model = Model(input=[main_input, neg_input], output=merged_context_output)
@@ -156,7 +153,6 @@ def main():
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
-    # print(output_array.shape)
     funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
     print('Done')
 
