@@ -147,7 +147,7 @@ def main():
     model.compile(optimizer='sgd', loss=context_loss_function)
     # model.compile(optimizer='sgd', loss='mse')
 
-    # model.fit([input_array, neg_input_array], input_labels, nb_epoch=nb_epochs, batch_size=batch_size)
+    model.fit([input_array, neg_input_array], input_labels, nb_epoch=nb_epochs, batch_size=batch_size)
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 

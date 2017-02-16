@@ -1,4 +1,5 @@
 import random
+import os
 
 # def get_vocab(tweet_texts, min_freq):
 #     """
@@ -118,6 +119,7 @@ def get_negative_samples(context_windows, vocab_size):
 
 
 def dump_embed_file(output_file, inverse_vocab_map, embeddings):
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w+') as f:
         for k in inverse_vocab_map.keys():
             f.write(str(inverse_vocab_map[k]) + ' ' + ' '.join([str(num) for num in embeddings[k]]) + '\n')
