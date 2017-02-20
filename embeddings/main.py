@@ -137,12 +137,13 @@ def main():
         # y_len = y_pred.shape[0]
         # TODO: sizes = 1? not y_len?
         y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
-        return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
+        # return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
+        return K.maximum(0., 1. - y_pos + y_neg)
 
     def sentiment_loss_function(y_true, y_pred):
         # TODO: verify function
-        # y_true is [1, -1, -1] for positive, [-1, 1, -1] for negative etc.
-        return K.sum(K.maximum(0., 1. - y_true*y_pred))
+        # y_true is [1, -1, -1] for positive, [-1, 1, -1] for neutral etc.
+        return K.maximum(0., 1. - K.sum(y_true*y_pred))
 
     model.compile(optimizer='sgd', loss={'merged_context_output': context_loss_function,
                                          'sentiment_output': sentiment_loss_function})
