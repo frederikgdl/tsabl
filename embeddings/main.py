@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Model
-from keras.layers import Embedding, Dense, Reshape, Input, merge
+from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 import keras.backend as K
 import theano.tensor as T
 
@@ -26,6 +26,7 @@ def main():
     nb_epochs = config.EPOCHS
     margin = config.MARGIN
     batch_size = config.BATCH_SIZE
+    dropout_p = config.DROPOUT_P
 
     # Read data
 
@@ -98,9 +99,10 @@ def main():
     sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
+    # Dropout?
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
-    lin_output = linear_layer(reshaped_embeddings)
-    tanh_output = tanh_layer(lin_output)
+    lin_output = Dropout(dropout_p)(linear_layer(reshaped_embeddings))
+    tanh_output = Dropout(dropout_p)(tanh_layer(lin_output))
     context_output = context_layer(tanh_output)
     sentiment_output = sentiment_layer(tanh_output)
 
@@ -120,8 +122,8 @@ def main():
 
     neg_embeddings = embedding_layer(neg_input)
     neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
-    neg_lin_output = neg_linear_layer(neg_reshaped_embeddings)
-    neg_tanh_output = neg_tanh_layer(neg_lin_output)
+    neg_lin_output = Dropout(dropout_p)(neg_linear_layer(neg_reshaped_embeddings))
+    neg_tanh_output = Dropout(dropout_p)(neg_tanh_layer(neg_lin_output))
     neg_context_output = neg_context_layer(neg_tanh_output)
     # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
 

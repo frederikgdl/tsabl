@@ -19,6 +19,8 @@ HIDDEN_SIZE = 20
 
 ADAGRAD_LR = 0.1
 
+DROPOUT_P = 0
+
 
 # Tokenizer options
 
