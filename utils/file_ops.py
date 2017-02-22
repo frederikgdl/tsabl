@@ -2,6 +2,7 @@ import os
 from functools import reduce
 from json import dumps
 from os.path import join, isfile, basename, splitext
+import numpy as np
 
 
 # Read and strip lines in file
@@ -73,3 +74,15 @@ def save_text_tweets(tweets, file_path, annotations=None):
         for tweet in tweets:
             f.write(get_text(tweet) +
                     (" " + annotations[tweet["id_str"]] if annotations is not None else '') + os.linesep)
+
+
+def load_word_embeddings(file_path):
+    with open(file_path) as f:
+        embeddings = {}
+
+        for i, line in enumerate(f):
+            split_line = line.strip().split(' ')
+            word = split_line[0]
+            embeddings[word] = np.array([float(num) for num in split_line[1:]])
+
+    return embeddings
