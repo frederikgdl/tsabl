@@ -29,7 +29,7 @@ def get_closest_words(word, embeddings):
         similarity = 1 - spatial.distance.cosine(embeddings[word], emb)
         scores.append((other_word, similarity))
 
-    scores = sorted(scores, key=lambda x: x[-1], reverse=True)
+    scores.sort(key=lambda x: x[-1], reverse=True)
     return scores
 
 
