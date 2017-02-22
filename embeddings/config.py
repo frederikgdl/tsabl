@@ -21,6 +21,8 @@ ADAGRAD_LR = 0.1
 
 DROPOUT_P = 0
 
+ALPHA = 0.5
+
 
 # Tokenizer options
 
