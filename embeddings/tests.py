@@ -13,13 +13,14 @@ test_words = [
     'queen',
     'king',
     'man',
-    'woman'
+    'woman',
+    'Kappa123'
 ]
 
 
 def get_closest_words(word, embeddings):
     if word not in embeddings:
-        return None
+        return []
 
     scores = []
     for other_word, emb in embeddings.items():
