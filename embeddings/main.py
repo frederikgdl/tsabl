@@ -8,6 +8,7 @@ from utils import file_ops
 from tokenizer import Tokenizer
 import config
 import funcs
+from lib.twokenize import twokenize
 
 
 def main():
@@ -36,7 +37,10 @@ def main():
     # else:
     #     texts = file_ops.read_lines(data_file)
 
-    # TODO: Do preprocessing here (lowercasing, tokenizing, etc.)
+    # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
+    print("Twokenizing...", end="")
+    texts = list(map(lambda tweet: ' '.join(twokenize.tokenize(tweet)), texts))
+    print("Done.")
 
     tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
