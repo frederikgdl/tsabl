@@ -4,3 +4,4 @@ theano
 grequests
 langid
 keras
+tweet-preprocessor

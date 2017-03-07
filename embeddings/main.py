@@ -4,7 +4,7 @@ from keras.layers import Embedding, Dense, Reshape, Input, merge
 import keras.backend as K
 import theano.tensor as T
 
-from utils import file_ops
+from utils import file_ops, text_processing
 from tokenizer import Tokenizer
 import config
 import funcs
@@ -38,8 +38,8 @@ def main():
     #     texts = file_ops.read_lines(data_file)
 
     # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
-    print("Twokenizing...", end="")
-    texts = list(map(lambda tweet: ' '.join(twokenize.tokenize(tweet)), texts))
+    print("Twokenizing and removing urls, @-mentions, hashtags...")
+    texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
     print("Done.")
 
     tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
