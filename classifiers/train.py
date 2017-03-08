@@ -9,8 +9,8 @@ import methods
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
 
-out_file_svm = config.OUT_FILE_SVM
-out_file_logres = config.OUT_FILE_LOGRES
+out_file_svm = config.SVM_MODEL_FILE
+out_file_logres = config.LOGRES_MODEL_FILE
 
 
 def main():
