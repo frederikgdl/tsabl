@@ -16,3 +16,23 @@ echo 'export PYTHONPATH="$PYTHONPATH:$PWD/tsabl"' >> venv/bin/activate
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+## Run
+TL;DR - Do everything:
+```bash
+source venv/bin/activate
+python embeddings/main.py
+python classifiers/train.py
+python classifiers/test.py
+```
+
+The `source venv/bin/activate` is needed in order to use the virtual environment and must be run before running the other scripts.
+
+### Embeddings
+* Edit `embeddings/config.py` to use the data files you want.
+* Run `python embeddings/main.py` to train and save the embeddings.
+
+### Classifiers
+* Edit `classifiers/config.py` to use the data files you want.
+* Run `python classifiers/train.py` to train and save the models.
+* Run `python classifiers/test.py` to test the saved classifier models.
