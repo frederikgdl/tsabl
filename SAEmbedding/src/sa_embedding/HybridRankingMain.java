@@ -43,7 +43,7 @@ public class HybridRankingMain {
 		HashMap<String, Integer> vocabMap  = new HashMap<String, Integer>();
 
 		// Funcs.getVocab(vocabFile, vocabMap, "utf8");
-		Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5)
+		Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5);
 		System.out.println("vocab.size(): " + vocabMap.size());
 
 		HybridRanking posMain = new HybridRanking(
