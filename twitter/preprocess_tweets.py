@@ -9,9 +9,9 @@ from utils import text_processing
 def main():
     texts = []
     with open(args.in_file, 'r') as f:
-        line = f.readline()
-        line = line.split('\t')[1]
-        texts.append(line)
+        for line in f:
+            line = line.split('\t')[1]
+            texts.append(line)
 
     texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
 
