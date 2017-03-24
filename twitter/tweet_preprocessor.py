@@ -22,7 +22,7 @@ def main():
         print('Processed tweet nr. {}'.format(i), end='\r')
     texts = preprocessed_texts
 
-    file_ops.save_text_tweets(texts, args.out_file)
+    file_ops.write_tweets(texts, args.out_file)
 
 
 def print_intro():

@@ -26,6 +26,14 @@ def read_tweets_tsv_file(file_path, index=1):
     return tweets
 
 
+# Saves the text of each tweet on separate lines in a new file
+def write_tweets(tweets, file_path):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w+') as f:
+        for tweet in tweets:
+            f.write(str(tweet) + os.linesep)
+
+
 def read_twitter_id_file(file_path, labeled=False):
     """
     Return a list of id strings from text file
