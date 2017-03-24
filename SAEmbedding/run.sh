@@ -9,7 +9,7 @@ TRAIN_FILE_NUM=1
 TRAINING_ROUND=3
 LEARNING_RATE=0.1
 MARGIN=1
-OUTPUT_FILE=saembedding_output.txt
+OUTPUT_FILE=../data/embeddings/sa_embedding_output
 RANDOM_BASE=420
 SENTIMENT_ALPHA=0.5
 
