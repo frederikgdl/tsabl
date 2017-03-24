@@ -2,6 +2,7 @@ import os
 from functools import reduce
 from json import dumps
 from os.path import join, isfile, basename, splitext
+import numpy as np
 
 
 # Read and strip lines in file
@@ -73,3 +74,27 @@ def save_text_tweets(tweets, file_path, annotations=None):
         for tweet in tweets:
             f.write(get_text(tweet) +
                     (" " + annotations[tweet["id_str"]] if annotations is not None else '') + os.linesep)
+
+
+def load_word_embeddings(file_name):
+    with open(file_name) as f:
+        # Get dimensionality from length of first vector
+        first_line = f.readline()
+        dimensionality = len(first_line.split(' ')) - 1
+        embeddings = {}
+
+        # Add the first line to embeddings
+        split_first_line = first_line.split(' ', 1)
+        embeddings[split_first_line[0]] = np.fromstring(split_first_line[1], dtype=float, sep=' ')
+
+        # Add the rest of the vectors
+        for i, line in enumerate(f):
+            split_line = line.strip().split(' ', 1)
+            word = split_line[0]
+
+            # GloVe had a space as char, first number used instead
+            # Plus erroneous files
+            if len(split_line[1].split(' ')) == dimensionality:
+                embeddings[word] = np.fromstring(split_line[1], dtype=float, sep=' ')
+
+    return embeddings

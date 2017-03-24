@@ -5,3 +5,4 @@ grequests
 langid
 keras
 tweet-preprocessor
+sklearn
