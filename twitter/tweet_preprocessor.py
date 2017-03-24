@@ -1,5 +1,6 @@
 import logging
 
+from time import time
 from os import path
 
 from utils import file_ops
@@ -17,7 +18,7 @@ def main():
     preprocessed_texts = []
     for i, text in enumerate(texts):
         preprocessed_texts.append(text_processing.clean_and_twokenize(text))
-        print('Processed tweet nr. {}'.format(i), end='\r')
+        print('Processed tweet nr. {}'.format(i + 1), end='\r')
     texts = preprocessed_texts
     logging.debug('Done. {}s'.format(str(time() - t)))
 
