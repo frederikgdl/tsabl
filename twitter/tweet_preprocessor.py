@@ -7,38 +7,40 @@ from utils import text_processing
 
 
 def main():
+    logging.info('Loading tweet data')
+    t = time()
     texts = file_ops.read_tweets_tsv_file(args.in_file)
-    # texts = []
-    # with open(args.in_file, 'r') as f:
-    #     for line in f:
-    #         line = line.split('\t')[1]
-    #         texts.append(line)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
-    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
-
+    logging.info('Cleaning and tokenizing tweets')
+    t = time()
     preprocessed_texts = []
     for i, text in enumerate(texts):
         preprocessed_texts.append(text_processing.clean_and_twokenize(text))
         print('Processed tweet nr. {}'.format(i), end='\r')
     texts = preprocessed_texts
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Writing preprocessed tweets to file')
+    t = time()
     file_ops.write_tweets(texts, args.out_file)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
 
 def print_intro():
     print()
     print('Preprocessing tweets')
     print()
-    print('Input file:\t\t\t' + args.in_file)
+    print('Input file:\t\t\t{}'.format(args.in_file))
     print()
-    print('Output file:\t\t\t' + args.out_file)
+    print('Output file:\t\t\t{}'.format(args.out_file))
     print()
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Preprocess tweets')
+    parser = argparse.ArgumentParser(description='Tweet preprocessor tweets')
 
     # Input file
     parser.add_argument('in_file', help='a tsv file containing tweets')
@@ -50,10 +52,6 @@ if __name__ == '__main__':
     # Directory
     parser.add_argument('--dir', nargs='?', default='.',
                         help='optional base directory for in_file and out_file')
-
-    # Data parameters
-    # parser.add_argument('-l', '--labeled', action='store_true',
-    #                     help='set if raw tweets are labeled (default: False)')
 
     # Logger verbosity parameters
     parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
