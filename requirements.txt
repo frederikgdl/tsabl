@@ -6,3 +6,6 @@ langid
 keras
 tweet-preprocessor
 sklearn
+afinn
+textblob
+vaderSentiment
