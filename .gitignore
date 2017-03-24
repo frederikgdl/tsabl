@@ -4,9 +4,10 @@ data/*
 data/raw/semeval*
 data/raw/*.txt
 data/raw/*.json
-resources/
 venv/
 __pycache__
 *.pyc
 .DS_Store
 models
+SAEmbedding/bin/
+!data/filtered/
