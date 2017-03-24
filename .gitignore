@@ -10,5 +10,4 @@ __pycache__
 .DS_Store
 models
 SAEmbedding/bin/
-SAEmbedding/*-round-*
 !data/filtered/
