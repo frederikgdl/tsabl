@@ -7,17 +7,22 @@ from utils import text_processing
 
 
 def main():
-    texts = []
-    with open(args.in_file, 'r') as f:
-        for line in f:
-            line = line.split('\t')[1]
-            texts.append(line)
+    texts = file_ops.read_tweets_tsv_file(args.in_file)
+    # texts = []
+    # with open(args.in_file, 'r') as f:
+    #     for line in f:
+    #         line = line.split('\t')[1]
+    #         texts.append(line)
 
-    texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
+    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
 
-    with open(args.out_file, 'w') as f:
-        for text in texts:
-            f.write(text + '\n')
+    preprocessed_texts = []
+    for i, text in enumerate(texts):
+        preprocessed_texts.append(text_processing.clean_and_twokenize(text))
+        print('Processed tweet nr. {}'.format(i), end='\r')
+    texts = preprocessed_texts
+
+    file_ops.save_text_tweets(texts, args.out_file)
 
 
 def print_intro():

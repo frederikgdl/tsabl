@@ -10,7 +10,7 @@ TRAINING_ROUND=3
 LEARNING_RATE=0.1
 MARGIN=1
 OUTPUT_FILE=../data/embeddings/sa_embedding_output
-RANDOM_BASE=420
+RANDOM_BASE=322
 SENTIMENT_ALPHA=0.5
 
 java -classpath bin sa_embedding.HybridRankingMain -windowSize ${WINDOW_SIZE} \
