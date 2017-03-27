@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     # Check if in_file exists
     if not path.isfile(args.in_file):
-        logging.critical('\nCould not find file called ', args.in_file)
+        logging.critical('Could not find file called: {}'.format(args.in_file))
         exit(1)
 
     if args.quiet:
