@@ -49,7 +49,6 @@ if __name__ == '__main__':
     # Output file
     parser.add_argument('out_file', help='text file to save preprocessed tweets to')
 
-
     # Directory
     parser.add_argument('--dir', nargs='?', default='.',
                         help='optional base directory for in_file and out_file')

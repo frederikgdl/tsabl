@@ -1,4 +1,3 @@
-import sys
 import os
 import logging
 
@@ -6,17 +5,20 @@ from os import path
 from time import time
 
 from utils import file_ops
-from api import TwitterApi
+from .api import TwitterApi
 
 twitter_api = TwitterApi()
+
 
 # Fetch tweet id from id, sentiment pair from previous step
 def get_tweet_ids_from_raw(lines):
     return [line.split()[0] for line in lines]
 
+
 # Turn a list of tweet ids into a list of tweet objects
 def get_tweets(ids):
     return twitter_api.bulk_get_statuses(ids)
+
 
 def main():
 
@@ -39,7 +41,7 @@ def main():
     if args.labeled:
         # Map training annotations to tweets
         # annotations = { "12389425": "positive", ... }
-        existing_tweet_ids = list(map(lambda t: t['id_str'], tweets))
+        existing_tweet_ids = list(map(lambda tweet: tweet['id_str'], tweets))
         annotations = {}
         for annotation_tuple in map(lambda line: line.split(), lines):
             if annotation_tuple[0] in existing_tweet_ids:
@@ -52,6 +54,7 @@ def main():
     if args.out_file_text is not None:
         file_ops.save_text_tweets(tweets, args.out_file_text, annotations)
     logging.debug('Done. {}s'.format(str(time() - t)))
+
 
 def print_intro():
     print()
