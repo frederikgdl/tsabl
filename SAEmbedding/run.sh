@@ -3,14 +3,14 @@
 WINDOW_SIZE=7
 HIDDEN_LENGTH=20
 EMBEDDING_LENGTH=50
-INPUT_DIR=../data/filtered/
+INPUT_DIR=../data/preprocessed/
 VOCAB_FILE=FOO
 TRAIN_FILE_NUM=1
-TRAINING_ROUND=3
+TRAINING_ROUND=20
 LEARNING_RATE=0.1
 MARGIN=1
 OUTPUT_FILE=../data/embeddings/sa_embedding_output
-RANDOM_BASE=420
+RANDOM_BASE=322
 SENTIMENT_ALPHA=0.5
 
 java -classpath bin sa_embedding.HybridRankingMain -windowSize ${WINDOW_SIZE} \
