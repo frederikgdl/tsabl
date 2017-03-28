@@ -21,6 +21,9 @@ def main():
     data_file_labeled = config.DATA_FILE_LABELED
     output_file = config.OUTPUT_FILE
 
+    pos_file = config.POS_DATA_FILE_EXTENSION
+    neg_file = config.NEG_DATA_FILE_EXTENSION
+
     min_freq = config.MIN_WORD_FREQUENCY
     max_nb_words = config.MAX_NUMBER_WORDS
     lowercase = config.LOWERCASE
@@ -34,17 +37,16 @@ def main():
 
     # Read data
 
-    texts, labels = file_ops.read_labeled_file(data_file)
+    # texts, labels = file_ops.read_labeled_file(data_file)
 
-    # if data_file_labeled:
-    #     texts, labels = file_ops.read_labeled_file(data_file)
-    # else:
-    #     texts = file_ops.read_lines(data_file)
+    texts, labels = funcs.read_training_data(pos_file, neg_file)
+
+    texts, labels = funcs.shuffle_data(texts, labels)
 
     # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
-    print("Twokenizing and removing urls, @-mentions, hashtags...")
-    texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
-    print("Done.")
+    # print("Twokenizing and removing urls, @-mentions, hashtags...")
+    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
+    # print("Done.")
 
     tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
@@ -101,8 +103,8 @@ def main():
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
 
     # Sentiment linear 2
-    # sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
     # Dropout?
@@ -158,11 +160,12 @@ def main():
     optimizer = Adagrad(lr=adagrad_lr)
 
     model.compile(optimizer=optimizer, loss={'merged_context_output': context_loss_function,
-                                         'sentiment_output': sentiment_loss_function})
+                                             'sentiment_output': sentiment_loss_function})
     # model.compile(optimizer='sgd', loss=context_loss_function)
     # model.compile(optimizer='sgd', loss='mse')
 
-    model.fit([input_array, neg_input_array], [input_labels, input_labels], nb_epoch=nb_epochs, batch_size=batch_size)
+    model.fit([input_array, neg_input_array], [input_labels, input_labels],
+              nb_epoch=nb_epochs, batch_size=batch_size, shuffle=True)
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
