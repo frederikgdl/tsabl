@@ -39,7 +39,7 @@ def main():
 
     # texts, labels = file_ops.read_labeled_file(data_file)
 
-    texts, labels = funcs.read_training_data(pos_file, neg_file)
+    texts, labels = funcs.get_training_data(pos_file, neg_file)
 
     texts, labels = funcs.shuffle_data(texts, labels)
 
