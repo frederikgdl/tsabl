@@ -9,7 +9,6 @@ from utils import file_ops, text_processing
 from tokenizer import Tokenizer
 import config
 import funcs
-from lib.twokenize import twokenize
 
 
 def main():
