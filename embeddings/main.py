@@ -6,9 +6,84 @@ import keras.backend as K
 import theano.tensor as T
 
 from utils import file_ops, text_processing
-from tokenizer import Tokenizer
 import config
 import funcs
+from tokenizer import Tokenizer
+# import config
+# import funcs
+
+
+def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
+    def init_embeddings(shape, name=None):
+        return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
+
+    # Init from a uniform distribution U(-0.01/InputLength, 0.01/InputLength), see Tang16 3.6.2
+    def init_hidden_layer(shape, name=None):
+        return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
+
+    # Model
+
+    # Input
+
+    main_input = Input((window_size,))
+    neg_input = Input((window_size,))
+
+    # Embedding layer
+    embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
+                                init=init_embeddings, name='embedding_layer')
+    # Reshape to concat embeddings in context windows
+    reshaped_embedding_layer = Reshape((embedding_length*window_size,))
+
+    # PosMain
+
+    # Linear layer
+    linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
+
+    # hTanh layer
+    # TODO: tanh vs hTanh
+    tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
+
+    # Context linear 2
+    context_layer = Dense(1, activation='linear', init=init_hidden_layer)
+
+    # Sentiment linear 2
+    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+
+    embeddings = embedding_layer(main_input)
+    reshaped_embeddings = reshaped_embedding_layer(embeddings)
+    lin_output = Dropout(dropout_p)(linear_layer(reshaped_embeddings))
+    tanh_output = Dropout(dropout_p)(tanh_layer(lin_output))
+    context_output = context_layer(tanh_output)
+    sentiment_output = sentiment_layer(tanh_output)
+
+    # NegMain
+
+    # Linear layer
+    neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
+
+    # hTanh layer
+    neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
+
+    # Context linear 2
+    neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
+
+    # Sentiment linear 2
+    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
+
+    neg_embeddings = embedding_layer(neg_input)
+    neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
+    neg_lin_output = Dropout(dropout_p)(neg_linear_layer(neg_reshaped_embeddings))
+    neg_tanh_output = Dropout(dropout_p)(neg_tanh_layer(neg_lin_output))
+    neg_context_output = neg_context_layer(neg_tanh_output)
+    # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
+
+    merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
+                                  name='merged_context_output')
+
+    model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
+
+    return model
 
 
 def main():
@@ -69,75 +144,8 @@ def main():
     # Init functions
     # TODO: verify functions
 
-    def init_embeddings(shape, name=None):
-        return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
+    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
 
-    # Init from a uniform distribution U(-0.01/InputLength, 0.01/InputLength), see Tang16 3.6.2
-    def init_hidden_layer(shape, name=None):
-        return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
-
-    # Model
-
-    # Input
-
-    main_input = Input((window_size,))
-    neg_input = Input((window_size,))
-
-    # Embedding layer
-    embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
-                                init=init_embeddings)
-    # Reshape to concat embeddings in context windows
-    reshaped_embedding_layer = Reshape((embedding_length*window_size,))
-
-    # PosMain
-
-    # Linear layer
-    linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
-
-    # hTanh layer
-    # TODO: tanh vs hTanh
-    tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
-
-    # Context linear 2
-    context_layer = Dense(1, activation='linear', init=init_hidden_layer)
-
-    # Sentiment linear 2
-    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
-
-    embeddings = embedding_layer(main_input)
-    # Dropout?
-    reshaped_embeddings = reshaped_embedding_layer(embeddings)
-    lin_output = Dropout(dropout_p)(linear_layer(reshaped_embeddings))
-    tanh_output = Dropout(dropout_p)(tanh_layer(lin_output))
-    context_output = context_layer(tanh_output)
-    sentiment_output = sentiment_layer(tanh_output)
-
-    # NegMain
-
-    # Linear layer
-    neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
-
-    # hTanh layer
-    neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
-
-    # Context linear 2
-    neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
-
-    # Sentiment linear 2
-    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
-
-    neg_embeddings = embedding_layer(neg_input)
-    neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
-    neg_lin_output = Dropout(dropout_p)(neg_linear_layer(neg_reshaped_embeddings))
-    neg_tanh_output = Dropout(dropout_p)(neg_tanh_layer(neg_lin_output))
-    neg_context_output = neg_context_layer(neg_tanh_output)
-    # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
-
-    merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
-                                  name='merged_context_output')
-
-    model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
     # model = Model(input=[main_input, neg_input], output=merged_context_output)
     # model = Model(input=main_input, output=context_output)
 
@@ -168,7 +176,8 @@ def main():
     # output_array = model.predict([input_array, neg_input_array])
     # output_array = model.predict(input_array)
 
-    funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
+    # funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
+    funcs.dump_embed_file(output_file, inverse_vocab_map, model.get_layer('embedding_layer').get_weights()[0])
     print('Done')
 
 
