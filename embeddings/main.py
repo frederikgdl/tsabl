@@ -21,8 +21,8 @@ def main():
     data_file_labeled = config.DATA_FILE_LABELED
     output_file = config.OUTPUT_FILE
 
-    pos_file = config.POS_DATA_FILE_EXTENSION
-    neg_file = config.NEG_DATA_FILE_EXTENSION
+    pos_file = config.POS_DATA_FILE
+    neg_file = config.NEG_DATA_FILE
 
     min_freq = config.MIN_WORD_FREQUENCY
     max_nb_words = config.MAX_NUMBER_WORDS
