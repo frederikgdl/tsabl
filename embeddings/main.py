@@ -1,3 +1,6 @@
+import logging
+from time import time
+
 import numpy as np
 from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
@@ -108,18 +111,23 @@ def main():
     adagrad_lr = config.ADAGRAD_LR
 
     # Read data
-
-    # texts, labels = file_ops.read_labeled_file(data_file)
-
+    logging.info('Loading tweet data')
+    t = time()
     texts, labels = funcs.get_training_data(pos_file, neg_file)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Shuffling tweet data')
+    t = time()
     texts, labels = funcs.shuffle_data(texts, labels)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
     # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
     # print("Twokenizing and removing urls, @-mentions, hashtags...")
     # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
     # print("Done.")
 
+    logging.info('Creating vocabulary and one-hot vectors')
+    t = time()
     tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
     seqs = tokenizer.texts_to_sequences(texts)
@@ -128,19 +136,29 @@ def main():
 
     # Add 1 for reserved index 0
     vocab_size = len(vocab_map) + 1
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Converts labels')
+    t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
     labels = funcs.get_numeric_labels(labels)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Creating context windows and negative samples')
+    t = time()
     context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
     negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
     input_array = np.array(context_windows)
     neg_input_array = np.array(negative_samples)
     input_labels = np.array(labels)
 
     # Create model
+    logging.info('Creating model')
+    t = time()
     model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
     # Loss functions
     def context_loss_function(y_true, y_pred):
@@ -159,15 +177,42 @@ def main():
     # Optimizer
     optimizer = Adagrad(lr=adagrad_lr)
 
+    logging.info('Compiling model')
+    t = time()
     model.compile(optimizer=optimizer, loss={'merged_context_output': context_loss_function,
                                              'sentiment_output': sentiment_loss_function})
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Fitting model')
+    t = time()
     model.fit([input_array, neg_input_array], [input_labels, input_labels],
               nb_epoch=nb_epochs, batch_size=batch_size, shuffle=True)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
+    logging.info('Writing word embeddings to file')
+    t = time()
     funcs.dump_embed_file(output_file, inverse_vocab_map, model.get_layer('embedding_layer').get_weights()[0])
+    logging.debug('Done. {}s'.format(str(time() - t)))
+
     print('Done')
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='tsabl - creating sentiment enhanced word embeddings')
+
+    # Logger verbosity parameters
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
+    parser.add_argument('-q', '--quiet', action='store_true', help='no print to console')
+
+    args = parser.parse_args()
+
+    levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
+    level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
+    logging.basicConfig(level=level, format="%(asctime)s\t%(levelname)s\t%(message)s")
+
+    if args.quiet:
+        logging.disable(levels[0])
+
     main()
