@@ -20,7 +20,7 @@ class Tokenizer(keras_text.Tokenizer):
         # Yields
             Yields individual sequences.
         """
-        num_words = self.num_words
+        num_words = self.nb_words
         min_freq = self.min_freq
         for text in texts:
             seq = text if self.char_level else keras_text.text_to_word_sequence(text,
