@@ -9,8 +9,6 @@ from utils import file_ops, text_processing
 import config
 import funcs
 from tokenizer import Tokenizer
-# import config
-# import funcs
 
 
 def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
@@ -141,15 +139,10 @@ def main():
     neg_input_array = np.array(negative_samples)
     input_labels = np.array(labels)
 
-    # Init functions
-    # TODO: verify functions
-
+    # Create model
     model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
 
-    # model = Model(input=[main_input, neg_input], output=merged_context_output)
-    # model = Model(input=main_input, output=context_output)
-
-    # Objectives
+    # Loss functions
     def context_loss_function(y_true, y_pred):
         # TODO: verify function
         # y_len = y_pred.shape[0]
@@ -168,15 +161,10 @@ def main():
 
     model.compile(optimizer=optimizer, loss={'merged_context_output': context_loss_function,
                                              'sentiment_output': sentiment_loss_function})
-    # model.compile(optimizer='sgd', loss=context_loss_function)
-    # model.compile(optimizer='sgd', loss='mse')
 
     model.fit([input_array, neg_input_array], [input_labels, input_labels],
               nb_epoch=nb_epochs, batch_size=batch_size, shuffle=True)
-    # output_array = model.predict([input_array, neg_input_array])
-    # output_array = model.predict(input_array)
 
-    # funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
     funcs.dump_embed_file(output_file, inverse_vocab_map, model.get_layer('embedding_layer').get_weights()[0])
     print('Done')
 
