@@ -20,7 +20,7 @@ class Tokenizer(keras_text.Tokenizer):
         # Yields
             Yields individual sequences.
         """
-        nb_words = self.nb_words
+        num_words = self.num_words
         min_freq = self.min_freq
         for text in texts:
             seq = text if self.char_level else keras_text.text_to_word_sequence(text,
@@ -31,7 +31,7 @@ class Tokenizer(keras_text.Tokenizer):
             for w in seq:
                 i = self.word_index.get(w)
                 if i is not None:
-                    if nb_words and i >= nb_words:
+                    if num_words and i >= num_words:
                         continue
 
                     # Filter for minimum frequency
