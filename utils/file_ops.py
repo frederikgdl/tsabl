@@ -1,7 +1,7 @@
 import os
 from functools import reduce
 from json import dumps
-from os.path import join, isfile, basename, splitext
+from os.path import join, isfile
 import numpy as np
 
 
@@ -14,6 +14,24 @@ def read_file(file_path):
 # Read and strip lines in file
 def read_lines(file_path):
     return read_file(file_path).splitlines()
+
+
+# Read tweets from tsv file
+def read_tweets_tsv_file(file_path, index=1):
+    tweets = []
+    with open(file_path) as f:
+        for line in f:
+            tweets.append(line.split('\t')[index])
+
+    return tweets
+
+
+# Saves the text of each tweet on separate lines in a new file
+def write_tweets(tweets, file_path):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w+') as f:
+        for tweet in tweets:
+            f.write(str(tweet) + os.linesep)
 
 
 def read_twitter_id_file(file_path, labeled=False):
@@ -45,7 +63,7 @@ def read_labeled_file(file_path):
 
 def get_files_in_dir_with_extension(dir_path, extension=""):
     return [join(dir_path, f) for f in os.listdir(dir_path) if
-             isfile(join(dir_path, f)) and join(dir_path, f).endswith(extension)]
+            isfile(join(dir_path, f)) and join(dir_path, f).endswith(extension)]
 
 
 # Concatenate files and return lines as strings in an array

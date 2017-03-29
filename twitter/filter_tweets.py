@@ -14,26 +14,25 @@ from utils import file_ops as utils
 def filter_tweets(lines):
     # Returns true if a tweet is to be kept
     def filter_tweet(tweet: dict) -> bool:
-        return "created_at" in tweet \
-               and (tweet["lang"] == "en" or (tweet["lang"] == "und" and langid.classify(tweet["text"])[0] == "en")) \
-               and "retweeted_status" not in tweet
+        return 'created_at' in tweet \
+               and (tweet['lang'] == 'en' or (tweet['lang'] == 'und' and langid.classify(tweet['text'])[0] == 'en')) \
+               and 'retweeted_status' not in tweet
 
     return list(filter(filter_tweet, map(json.loads, lines)))
 
 
 def main():
-    logging.info("Loading raw tweet data from file " + args.in_file)
+    logging.info('Loading raw tweet data from file {}'.format(args.in_file))
     t = time()
     if args.labeled:
         raw_tweets, labels = utils.read_labeled_file(args.in_file)
-        ids = [json.loads(tweet)["id_str"] for tweet in raw_tweets]
+        ids = [json.loads(tweet)['id_str'] for tweet in raw_tweets]
         annotations = dict(zip(ids, labels))
     else:
         raw_tweets = utils.read_lines(args.in_file)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.debug("Done. " + str(time() - t) + "s")
-
-    logging.info("Filtering tweets")
+    logging.info('Filtering tweets')
     t = time()
     try:
         filtered_tweets = filter_tweets(raw_tweets)
@@ -43,32 +42,32 @@ def main():
 
     new_annotations = None
     if args.labeled:
-        filtered_ids = [tweet["id_str"] for tweet in filtered_tweets]
+        filtered_ids = [tweet['id_str'] for tweet in filtered_tweets]
         new_annotations = dict((tweet_id, label) for tweet_id, label
                                in annotations.items() if tweet_id in filtered_ids)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.info("Saving processed tweets")
+    logging.info('Saving processed tweets')
     t = time()
     utils.save_text_tweets(filtered_tweets, args.out_file_text, new_annotations)
 
     if args.out_file_json is not None:
         utils.save_text_tweets(filtered_tweets, args.out_file_json, annotations)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.info("Turned " + str(len(raw_tweets)) + " into " + str(len(filtered_tweets)) + " tweets after filtering.")
+    logging.info('Turned {} into {} tweets after filtering.'.format(str(len(raw_tweets)), str(len(filtered_tweets))))
 
 
 def print_intro():
     print()
     print('Filtering unwanted tweets')
     print()
-    print('Tweets data file:\t\t' + args.in_file)
+    print('Tweets data file:\t\t{}'.format(args.in_file))
     print()
-    print('Output text file:\t\t' + args.out_file_text)
+    print('Output text file:\t\t{}'.format(args.out_file_text))
 
     if args.out_file_json is not None:
-        print('Output JSON file:\t\t' + args.out_file_json)
+        print('Output JSON file:\t\t{}'.format(args.out_file_json))
 
     print()
 
@@ -79,11 +78,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remove unwanted tweets')
 
     # Input file
-    parser.add_argument('in_file', nargs='?', default="data/raw/tweets.json",
+    parser.add_argument('in_file', nargs='?', default='data/raw/tweets.json',
                         help='a JSON file containing tweets (default: data/raw/tweets.json)')
 
     # Output file
-    parser.add_argument('out_file_text', nargs='?', default="data/filtered/tweets.txt",
+    parser.add_argument('out_file_text', nargs='?', default='data/filtered/tweets.txt',
                         help='text file to save filtered tweets to (default: data/filtered/tweets.txt)')
 
     parser.add_argument('out_file_json', nargs='?', default=None,
@@ -111,11 +110,11 @@ if __name__ == '__main__':
     # Set logger verbosity level. Default is logging.INFO.
     levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
     level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
-    logging.basicConfig(level=level, format="%(asctime)s\t%(levelname)s\t%(message)s")
+    logging.basicConfig(level=level, format='%(asctime)s\t%(levelname)s\t%(message)s')
 
     # Check if in_file exists
     if not path.isfile(args.in_file):
-        logging.critical('\nCould not find file called ', args.in_file)
+        logging.critical('\nCould not find file called {}'.format(args.in_file))
         exit(1)
 
     if args.quiet:

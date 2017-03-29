@@ -6,68 +6,12 @@ import keras.backend as K
 import theano.tensor as T
 
 from utils import file_ops, text_processing
-from tokenizer import Tokenizer
 import config
 import funcs
-from lib.twokenize import twokenize
+from tokenizer import Tokenizer
 
 
-def main():
-    window_size = config.WINDOW_SIZE
-    hidden_size = config.HIDDEN_SIZE
-    embedding_length = config.EMBEDDING_LENGTH
-
-    data_file = config.DATA_FILE
-    data_file_labeled = config.DATA_FILE_LABELED
-    output_file = config.OUTPUT_FILE
-
-    min_freq = config.MIN_WORD_FREQUENCY
-    max_nb_words = config.MAX_NUMBER_WORDS
-    lowercase = config.LOWERCASE
-
-    nb_epochs = config.EPOCHS
-    margin = config.MARGIN
-    batch_size = config.BATCH_SIZE
-    dropout_p = config.DROPOUT_P
-    alpha = config.ALPHA
-    adagrad_lr = config.ADAGRAD_LR
-
-    # Read data
-
-    texts, labels = file_ops.read_labeled_file(data_file)
-
-    # if data_file_labeled:
-    #     texts, labels = file_ops.read_labeled_file(data_file)
-    # else:
-    #     texts = file_ops.read_lines(data_file)
-
-    # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
-    print("Twokenizing and removing urls, @-mentions, hashtags...")
-    texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
-    print("Done.")
-
-    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
-    tokenizer.fit_on_texts(texts)
-    seqs = tokenizer.texts_to_sequences(texts)
-    vocab_map = tokenizer.word_index
-    inverse_vocab_map = {v: k for k, v in vocab_map.items()}
-
-    # Add 1 for reserved index 0
-    vocab_size = len(vocab_map) + 1
-
-    # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
-    labels = funcs.get_numeric_labels(labels)
-
-    context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
-    negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
-
-    input_array = np.array(context_windows)
-    neg_input_array = np.array(negative_samples)
-    input_labels = np.array(labels)
-
-    # Init functions
-    # TODO: verify functions
-
+def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
     def init_embeddings(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
 
@@ -84,7 +28,7 @@ def main():
 
     # Embedding layer
     embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
-                                init=init_embeddings)
+                                init=init_embeddings, name='embedding_layer')
     # Reshape to concat embeddings in context windows
     reshaped_embedding_layer = Reshape((embedding_length*window_size,))
 
@@ -101,11 +45,10 @@ def main():
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
 
     # Sentiment linear 2
-    # sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
-    # Dropout?
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
     lin_output = Dropout(dropout_p)(linear_layer(reshaped_embeddings))
     tanh_output = Dropout(dropout_p)(tanh_layer(lin_output))
@@ -137,10 +80,69 @@ def main():
                                   name='merged_context_output')
 
     model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
-    # model = Model(input=[main_input, neg_input], output=merged_context_output)
-    # model = Model(input=main_input, output=context_output)
 
-    # Objectives
+    return model
+
+
+def main():
+    window_size = config.WINDOW_SIZE
+    hidden_size = config.HIDDEN_SIZE
+    embedding_length = config.EMBEDDING_LENGTH
+
+    data_file = config.DATA_FILE
+    data_file_labeled = config.DATA_FILE_LABELED
+    output_file = config.OUTPUT_FILE
+
+    pos_file = config.POS_DATA_FILE
+    neg_file = config.NEG_DATA_FILE
+
+    min_freq = config.MIN_WORD_FREQUENCY
+    max_nb_words = config.MAX_NUMBER_WORDS
+    lowercase = config.LOWERCASE
+
+    nb_epochs = config.EPOCHS
+    margin = config.MARGIN
+    batch_size = config.BATCH_SIZE
+    dropout_p = config.DROPOUT_P
+    alpha = config.ALPHA
+    adagrad_lr = config.ADAGRAD_LR
+
+    # Read data
+
+    # texts, labels = file_ops.read_labeled_file(data_file)
+
+    texts, labels = funcs.get_training_data(pos_file, neg_file)
+
+    texts, labels = funcs.shuffle_data(texts, labels)
+
+    # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
+    # print("Twokenizing and removing urls, @-mentions, hashtags...")
+    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
+    # print("Done.")
+
+    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
+    tokenizer.fit_on_texts(texts)
+    seqs = tokenizer.texts_to_sequences(texts)
+    vocab_map = tokenizer.word_index
+    inverse_vocab_map = {v: k for k, v in vocab_map.items()}
+
+    # Add 1 for reserved index 0
+    vocab_size = len(vocab_map) + 1
+
+    # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
+    labels = funcs.get_numeric_labels(labels)
+
+    context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
+    negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
+
+    input_array = np.array(context_windows)
+    neg_input_array = np.array(negative_samples)
+    input_labels = np.array(labels)
+
+    # Create model
+    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
+
+    # Loss functions
     def context_loss_function(y_true, y_pred):
         # TODO: verify function
         # y_len = y_pred.shape[0]
@@ -158,15 +160,12 @@ def main():
     optimizer = Adagrad(lr=adagrad_lr)
 
     model.compile(optimizer=optimizer, loss={'merged_context_output': context_loss_function,
-                                         'sentiment_output': sentiment_loss_function})
-    # model.compile(optimizer='sgd', loss=context_loss_function)
-    # model.compile(optimizer='sgd', loss='mse')
+                                             'sentiment_output': sentiment_loss_function})
 
-    model.fit([input_array, neg_input_array], [input_labels, input_labels], nb_epoch=nb_epochs, batch_size=batch_size)
-    # output_array = model.predict([input_array, neg_input_array])
-    # output_array = model.predict(input_array)
+    model.fit([input_array, neg_input_array], [input_labels, input_labels],
+              nb_epoch=nb_epochs, batch_size=batch_size, shuffle=True)
 
-    funcs.dump_embed_file(output_file, inverse_vocab_map, embedding_layer.get_weights()[0])
+    funcs.dump_embed_file(output_file, inverse_vocab_map, model.get_layer('embedding_layer').get_weights()[0])
     print('Done')
 
 
