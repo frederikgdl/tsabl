@@ -3,7 +3,8 @@ from time import time
 
 import numpy as np
 from keras.models import Model
-from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
+from keras.layers import Embedding, Dense, Reshape, Input, Dropout
+from keras.layers.merge import concatenate
 from keras.optimizers import Adagrad
 import keras.backend as K
 import theano.tensor as T
@@ -22,34 +23,32 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     def init_hidden_layer(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
 
-    # Model
-
     # Input
-
     main_input = Input((window_size,))
     neg_input = Input((window_size,))
 
     # Embedding layer
     embedding_layer = Embedding(input_dim=vocab_size, output_dim=embedding_length, input_length=window_size,
-                                init=init_embeddings, name='embedding_layer')
+                                embeddings_initializer=init_embeddings, name='embedding_layer')
+
     # Reshape to concat embeddings in context windows
     reshaped_embedding_layer = Reshape((embedding_length*window_size,))
 
     # PosMain
 
     # Linear layer
-    linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
+    linear_layer = Dense(hidden_size, activation='linear', kernel_initializer=init_hidden_layer)
 
     # hTanh layer
     # TODO: tanh vs hTanh
-    tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
+    tanh_layer = Dense(hidden_size, activation='tanh', kernel_initializer=init_hidden_layer)
 
     # Context linear 2
-    context_layer = Dense(1, activation='linear', init=init_hidden_layer)
+    context_layer = Dense(1, activation='linear', kernel_initializer=init_hidden_layer)
 
     # Sentiment linear 2
-    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(2, activation='linear', kernel_initializer=init_hidden_layer, name='sentiment_output')
+    # sentiment_layer = Dense(3, activation='linear', kernel_initializer=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
@@ -79,10 +78,12 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     neg_context_output = neg_context_layer(neg_tanh_output)
     # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
 
-    merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
-                                  name='merged_context_output')
+    merged_context_output = concatenate([context_output, neg_context_output], name='merged_context_output')
 
-    model = Model(input=[main_input, neg_input], output=[merged_context_output, sentiment_output])
+    # merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
+    #                               name='merged_context_output')
+
+    model = Model(inputs=[main_input, neg_input], outputs=[merged_context_output, sentiment_output])
 
     return model
 
@@ -103,7 +104,7 @@ def main():
     max_nb_words = config.MAX_NUMBER_WORDS
     lowercase = config.LOWERCASE
 
-    nb_epochs = config.EPOCHS
+    epochs = config.EPOCHS
     margin = config.MARGIN
     batch_size = config.BATCH_SIZE
     dropout_p = config.DROPOUT_P
@@ -128,7 +129,7 @@ def main():
 
     logging.info('Creating vocabulary and one-hot vectors')
     t = time()
-    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
+    tokenizer = Tokenizer(num_words=max_nb_words, lower=lowercase, min_freq=min_freq)
     tokenizer.fit_on_texts(texts)
     seqs = tokenizer.texts_to_sequences(texts)
     vocab_map = tokenizer.word_index
@@ -186,7 +187,7 @@ def main():
     logging.info('Fitting model')
     t = time()
     model.fit([input_array, neg_input_array], [input_labels, input_labels],
-              nb_epoch=nb_epochs, batch_size=batch_size, shuffle=True)
+              epochs=epochs, batch_size=batch_size, shuffle=True)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Writing word embeddings to file')
