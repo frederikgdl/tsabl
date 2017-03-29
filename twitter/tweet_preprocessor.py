@@ -10,7 +10,10 @@ from utils import text_processing
 def main():
     logging.info('Loading tweet data')
     t = time()
-    texts = file_ops.read_tweets_tsv_file(args.in_file)
+    if args.tsv:
+        texts = file_ops.read_tweets_tsv_file(args.in_file)
+    else:
+        texts = file_ops.read_lines(args.in_file)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Cleaning and tokenizing tweets')
@@ -21,6 +24,12 @@ def main():
         print('Processed tweet nr. {}'.format(i + 1), end='\r')
     texts = preprocessed_texts
     logging.debug('Done. {}s'.format(str(time() - t)))
+
+    if args.lowercase:
+        logging.info('Lowercasing tweets')
+        t = time()
+        texts = [text.lower() for text in texts]
+        logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Writing preprocessed tweets to file')
     t = time()
@@ -48,6 +57,11 @@ if __name__ == '__main__':
 
     # Output file
     parser.add_argument('out_file', help='text file to save preprocessed tweets to')
+
+    # Input parameters
+    parser.add_argument('-tsv', action='store_true', help='input file has tsv format')
+
+    parser.add_argument('-l', '--lowercase', action='store_true', help='lowercase the tweets')
 
     # Directory
     parser.add_argument('--dir', nargs='?', default='.',
