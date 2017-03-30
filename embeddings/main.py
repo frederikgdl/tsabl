@@ -197,6 +197,36 @@ def main():
     print('Done')
 
 
+def print_intro():
+    print()
+    print('Training sentiment enhanced word embeddings')
+    print()
+    print('config.py settings:')
+    print()
+    print('Window size: {}'.format(config.WINDOW_SIZE))
+    print('Hidden size: {}'.format(config.HIDDEN_SIZE))
+    print('Embedding length: {}'.format(config.EMBEDDING_LENGTH))
+    print()
+    print('Data file: {}'.format(config.DATA_FILE))
+    print('Data file labeled: {}'.format(config.DATA_FILE_LABELED))
+    print('Output file: {}'.format(config.OUTPUT_FILE))
+    print()
+    print('Pos file: {}'.format(config.POS_DATA_FILE))
+    print('Neg file: {}'.format(config.NEG_DATA_FILE))
+    print()
+    print('Min frequency: {}'.format(config.MIN_WORD_FREQUENCY))
+    print('Max number of words: {}'.format(config.MAX_NUMBER_WORDS))
+    print('Lowercase: {}'.format(config.LOWERCASE))
+    print()
+    print('Number of epochs: {}'.format(config.EPOCHS))
+    print('Margin: {}'.format(config.MARGIN))
+    print('Batch size: {}'.format(config.BATCH_SIZE))
+    print('Dropout p: {}'.format(config.DROPOUT_P))
+    print('Alpha: {}'.format(config.ALPHA))
+    print('Adagrad learning rate: {}'.format(config.ADAGRAD_LR))
+    print()
+
+
 if __name__ == "__main__":
     import argparse
 
