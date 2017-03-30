@@ -3,7 +3,7 @@ scipy
 theano
 grequests
 langid
-keras
+Keras==1.2.2
 tweet-preprocessor
 sklearn
 afinn
