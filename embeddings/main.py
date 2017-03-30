@@ -138,7 +138,7 @@ def main():
     vocab_size = len(vocab_map) + 1
     logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.info('Converts labels')
+    logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
     labels = funcs.get_numeric_labels(labels)
