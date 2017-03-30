@@ -244,5 +244,7 @@ if __name__ == "__main__":
 
     if args.quiet:
         logging.disable(levels[0])
+    else:
+        print_intro()
 
     main()
