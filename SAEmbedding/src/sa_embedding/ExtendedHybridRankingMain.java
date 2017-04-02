@@ -30,15 +30,18 @@ public class ExtendedHybridRankingMain {
 
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
+        List<String> neuFiles = new ArrayList<String>();
         for(int i = 0; i < trainFileNum; i++)
         {
             posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
             negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
+            neuFiles.add(inputDir + "emoticon.neu." + i + ".txt");
         }
 
         List<String> allTrainFiles = new ArrayList<String>();
         allTrainFiles.addAll(posFiles);
         allTrainFiles.addAll(negFiles);
+        allTrainFiles.addAll(neuFiles);
 
         HashMap<String, Integer> vocabMap  = new HashMap<String, Integer>();
 
@@ -62,6 +65,7 @@ public class ExtendedHybridRankingMain {
 
             Collections.shuffle(posFiles);
             Collections.shuffle(negFiles);
+            Collections.shuffle(neuFiles);
 
             for(int fileIdx = 0; fileIdx < posFiles.size(); fileIdx++)
             {
@@ -71,9 +75,12 @@ public class ExtendedHybridRankingMain {
                         0, trainingDatas);
                 Funcs.readTrainFile(negFiles.get(fileIdx), "utf8",
                         1, trainingDatas);
+                Funcs.readTrainFile(neuFiles.get(fileIdx), "utf8",
+                        2, trainingDatas);
 
                 System.out.println("running pos-file: " + posFiles.get(fileIdx));
                 System.out.println("running neg-file: " + negFiles.get(fileIdx));
+                System.out.println("running neu-file: " + neuFiles.get(fileIdx));
 
                 Collections.shuffle(trainingDatas);
 
@@ -110,12 +117,16 @@ public class ExtendedHybridRankingMain {
                         }
 
                         if(posMain.sentimentLinear2.output[data.goldPol]
-                                < posMain.sentimentLinear2.output[1 - data.goldPol] + margin)
+                                < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
+                                + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3] + margin)
                         {
-                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[1 - data.goldPol]
+                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
+                                    + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
+
                             posMain.sentimentLinear2.outputG[data.goldPol] = sentimentAlpha * 1;
-                            posMain.sentimentLinear2.outputG[1 - data.goldPol] = sentimentAlpha * -1;
+                            posMain.sentimentLinear2.outputG[(data.goldPol + 1) % 3] = sentimentAlpha * -1;
+                            posMain.sentimentLinear2.outputG[(data.goldPol + 2) % 3] = sentimentAlpha * -1;
                         }
 
                         // loss function
