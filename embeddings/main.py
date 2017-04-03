@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from os import getenv
 import logging
 from time import time
 
@@ -6,13 +9,24 @@ from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 from keras.optimizers import Adagrad
 import keras.backend as K
-import theano.tensor as T
+#import theano.tensor as T
+if getenv('KERAS_BACKEND') == 'theano':
+    import theano.tensor as T
+else:
+    import tensorflow
 
 from utils import file_ops, text_processing
 import config
 import funcs
 from tokenizer import Tokenizer
 
+import sys
+
+def split(tensor, size_splits, n_splits, axis):
+    if getenv('KERAS_BACKEND') == 'theano':
+        return T.split(tensor, size_splits, n_splits, axis=axis)
+    else:
+        return tensorflow.split(tensor, size_splits, axis=axis)
 
 def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
     def init_embeddings(shape, name=None):
@@ -165,7 +179,9 @@ def main():
         # TODO: verify function
         # y_len = y_pred.shape[0]
         # TODO: sizes = 1? not y_len?
-        y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
+        #y_pos, y_neg = y_pred
+        y_pos, y_neg = split(y_pred, [1, 1], 2, axis=1)
+        #y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
         # return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
         return (1 - alpha) * K.maximum(0., 1. - y_pos + y_neg)
 
