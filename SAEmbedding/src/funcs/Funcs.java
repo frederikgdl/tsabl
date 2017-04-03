@@ -206,7 +206,7 @@ public class Funcs {
 			}
 		}
 		
-		System.out.println(wordFreqMap.size());
+		System.out.println("wordFreqMap.size(): " + wordFreqMap.size());
 		TreeMap<Integer, List<String>> treeMap = new TreeMap<Integer, List<String>>();
 		
 		for(String word: wordFreqMap.keySet())
