@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from os import getenv
 import logging
 from time import time
@@ -9,18 +7,15 @@ from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 from keras.optimizers import Adagrad
 import keras.backend as K
-#import theano.tensor as T
 if getenv('KERAS_BACKEND') == 'theano':
     import theano.tensor as T
 else:
     import tensorflow
 
-from utils import file_ops, text_processing
 import config
 import funcs
 from tokenizer import Tokenizer
 
-import sys
 
 def split(tensor, size_splits, n_splits, axis):
     if getenv('KERAS_BACKEND') == 'theano':
@@ -134,11 +129,6 @@ def main():
     t = time()
     texts, labels = funcs.shuffle_data(texts, labels)
     logging.debug('Done. {}s'.format(str(time() - t)))
-
-    # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
-    # print("Twokenizing and removing urls, @-mentions, hashtags...")
-    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
-    # print("Done.")
 
     logging.info('Creating vocabulary and one-hot vectors')
     t = time()
