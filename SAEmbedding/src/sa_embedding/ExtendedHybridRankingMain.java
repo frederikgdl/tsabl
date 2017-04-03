@@ -1,5 +1,7 @@
 package sa_embedding;
 
+import java.text.DateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -150,7 +152,7 @@ public class ExtendedHybridRankingMain {
                     if(dataIdx % 50000 == 0)
                     {
                         System.out.println("running " + dataIdx + "/" + trainingDatas.size() +
-                                "\t loss: " + (lossV / lossC) + "\t" + new Date().toLocaleString());
+                                "\t loss: " + (lossV / lossC) + "\t" + DateFormat.getDateTimeInstance().format(new Date()));
                     }
                 }
 
