@@ -73,7 +73,8 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
 
     def htanh(x):
-        return K.min(K.max(x, -1), 1)
+        # return K.min(K.max(x, -1, keepdims=True), 1)
+        return K.clip(x, -1, 1)
 
     # hTanh layer
     # neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
