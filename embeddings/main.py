@@ -7,23 +7,28 @@ from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 from keras.optimizers import Adagrad
 import keras.backend as K
-if getenv('KERAS_BACKEND') == 'theano':
-    import theano.tensor as T
-else:
-    import tensorflow
 
 import config
 import funcs
 from tokenizer import Tokenizer
 
+KERAS_BACKEND = getenv('KERAS_BACKEND')
+if KERAS_BACKEND == 'theano':
+    import theano.tensor as T
+else:
+    import tensorflow
 
+
+# Split context output using theano or tensorflow depending on backend
 def split(tensor, size_splits, n_splits, axis):
-    if getenv('KERAS_BACKEND') == 'theano':
+    if KERAS_BACKEND == 'theano':
         return T.split(tensor, size_splits, n_splits, axis=axis)
     else:
         return tensorflow.split(tensor, size_splits, axis=axis)
 
-def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
+
+# Create Keras model
+def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p, sentiment_classes):
     def init_embeddings(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
 
@@ -31,10 +36,12 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     def init_hidden_layer(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
 
-    # Model
+    # Activation function for htanh layers
+    def htanh(x):
+        # return K.min(K.max(x, -1, keepdims=True), 1)
+        return K.clip(x, -1, 1)
 
     # Input
-
     main_input = Input((window_size,))
     neg_input = Input((window_size,))
 
@@ -51,14 +58,13 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
 
     # hTanh layer
     # TODO: tanh vs hTanh
-    tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
+    tanh_layer = Dense(hidden_size, activation=htanh, init=init_hidden_layer)
 
     # Context linear 2
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
 
     # Sentiment linear 2
-    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(sentiment_classes, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
@@ -72,12 +78,7 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     # Linear layer
     neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
 
-    def htanh(x):
-        # return K.min(K.max(x, -1, keepdims=True), 1)
-        return K.clip(x, -1, 1)
-
     # hTanh layer
-    # neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
     neg_tanh_layer = Dense(hidden_size, activation=htanh, weights=tanh_layer.get_weights())
 
     # Context linear 2
@@ -123,6 +124,7 @@ def main():
     dropout_p = config.DROPOUT_P
     alpha = config.ALPHA
     adagrad_lr = config.ADAGRAD_LR
+    sentiment_classes = config.SENTIMENT_CLASSES
 
     # Read data
     logging.info('Loading tweet data')
@@ -150,7 +152,7 @@ def main():
     logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
-    labels = funcs.get_numeric_labels(labels)
+    labels = funcs.get_numeric_labels(labels, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Creating context windows and negative samples')
@@ -166,7 +168,7 @@ def main():
     # Create model
     logging.info('Creating model')
     t = time()
-    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
+    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     # Loss functions

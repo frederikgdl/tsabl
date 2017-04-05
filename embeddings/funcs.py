@@ -21,11 +21,13 @@ def shuffle_data(texts, labels):
     return unzipped[0], unzipped[1]
 
 
-def get_numeric_labels(labels):
-    return [[1, -1] if label == 'positive' else [-1, 1] for label in labels]
-    # return [[1, -1, -1] if label == 'positive'
-    #         else [-1, -1, 1] if label == 'negative'
-    #         else [-1, 1, -1] for label in labels]
+def get_numeric_labels(labels, length=2):
+    if length == 2:
+        return [[1, -1] if label == 'positive' else [-1, 1] for label in labels]
+    elif length == 3:
+        return [[1, -1, -1] if label == 'positive'
+                else [-1, -1, 1] if label == 'negative'
+                else [-1, 1, -1] for label in labels]
 
 
 def get_context_windows_labels(text_sequences, labels, window_size):
