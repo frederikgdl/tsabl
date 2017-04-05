@@ -28,6 +28,8 @@ def get_numeric_labels(labels, length=2):
         return [[1, -1, -1] if label == 'positive'
                 else [-1, -1, 1] if label == 'negative'
                 else [-1, 1, -1] for label in labels]
+    else:
+        return None
 
 
 def get_context_windows_labels(text_sequences, labels, window_size):

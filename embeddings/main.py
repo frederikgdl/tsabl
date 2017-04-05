@@ -152,6 +152,10 @@ def main():
     logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
+    if sentiment_classes not in [2, 3]:
+        logging.critical('The number of supported sentiment classes is 2 or 3. Number given: {}'
+                         .format(sentiment_classes))
+        exit(1)
     labels = funcs.get_numeric_labels(labels, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
@@ -237,6 +241,7 @@ def print_intro():
     print('Dropout p:\t\t{}'.format(config.DROPOUT_P))
     print('Alpha:\t\t\t{}'.format(config.ALPHA))
     print('Adagrad learning rate:\t{}'.format(config.ADAGRAD_LR))
+    print('Sentiment classes:\t{}'.format(config.SENTIMENT_CLASSES))
     print()
 
 
