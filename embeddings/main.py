@@ -8,9 +8,9 @@ from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 from keras.optimizers import Adagrad
 import keras.backend as K
 
-import config
-import funcs
-from tokenizer import Tokenizer
+import embeddings.config as config
+import embeddings.funcs as funcs
+from .tokenizer import Tokenizer
 
 KERAS_BACKEND = getenv('KERAS_BACKEND')
 if KERAS_BACKEND == 'theano':
