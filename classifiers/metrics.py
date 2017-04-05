@@ -1,7 +1,7 @@
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 
-import methods
+import classifiers.funcs as funcs
 
 
 # Returns precision given predictions and labels
@@ -16,8 +16,8 @@ def calc_precision_with_neutrals(predictions_num, labels_num, version="pos"):
         rel_docs = 1
 
     # Change neutrals to opposite of docs wanted
-    processed_true_vals = rel_docs * methods.remove_neutrals(labels_num, rel_docs)
-    processed_pred_vals = rel_docs * methods.remove_neutrals(predictions_num, rel_docs)
+    processed_true_vals = rel_docs * funcs.remove_neutrals(labels_num, rel_docs)
+    processed_pred_vals = rel_docs * funcs.remove_neutrals(predictions_num, rel_docs)
 
     return precision_score(y_true=processed_true_vals, y_pred=processed_pred_vals)
 
@@ -34,8 +34,8 @@ def calc_recall_with_neutrals(predictions_num, labels_num, version="pos"):
         rel_docs = 1
 
     # Change neutrals to opposite of docs wanted
-    processed_true_vals = rel_docs * methods.remove_neutrals(labels_num, rel_docs)
-    processed_pred_vals = rel_docs * methods.remove_neutrals(predictions_num, rel_docs)
+    processed_true_vals = rel_docs * funcs.remove_neutrals(labels_num, rel_docs)
+    processed_pred_vals = rel_docs * funcs.remove_neutrals(predictions_num, rel_docs)
 
     return recall_score(y_true=processed_true_vals, y_pred=processed_pred_vals)
 

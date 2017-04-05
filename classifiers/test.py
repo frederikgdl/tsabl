@@ -1,17 +1,16 @@
 from time import time
 import numpy as np
 
-from embeddings import word_embedding_dict as wedict
 import classifiers.config as config
-import classifiers.methods as methods
+import classifiers.funcs as funcs
 import classifiers.metrics as metrics
-
+import classifiers.word_embedding_dict as wedict
+from classifiers.baselines.afinn_tweets import AfinnTweets
+from classifiers.baselines.combo_tweets import ComboTweets
 from classifiers.baselines.random_uniform import RandomUniform
 from classifiers.baselines.random_weighted import RandomWeighted
-from classifiers.baselines.afinn_tweets import AfinnTweets
-from classifiers.baselines.vader_tweets import VaderTweets
 from classifiers.baselines.textblob_tweets import TextblobTweets
-from classifiers.baselines.combo_tweets import ComboTweets
+from classifiers.baselines.vader_tweets import VaderTweets
 
 test_file = config.TEST_FILE
 svm_model_file = config.SVM_MODEL_FILE
@@ -39,18 +38,18 @@ def main():
 
     print("Loading SVM model")
     t = time()
-    clf_svm = methods.load_model(svm_model_file)
+    clf_svm = funcs.load_model(svm_model_file)
     print("Done. " + str(time() - t) + "s")
 
     print("Loading LogRes model")
     t = time()
-    clf_logres = methods.load_model(logres_model_file)
+    clf_logres = funcs.load_model(logres_model_file)
     print("Done. " + str(time() - t) + "s")
 
     print("Loading test data")
     t = time()
-    full_tweets = methods.load_tweets_full(data_file_name)
-    tweets_test, labels_test_txt = methods.load_labeled_data(data_file_name)
+    full_tweets = funcs.load_tweets_full(data_file_name)
+    tweets_test, labels_test_txt = funcs.load_labeled_data(data_file_name)
     print("Done. " + str(time() - t) + "s")
 
     print("Calculating tweet embeddings")
@@ -61,14 +60,14 @@ def main():
 
     print("Scaling word embedding vectors")
     t = time()
-    embeddings_test_scaled = [methods.scale_vector(emb) for emb in embeddings_test]
+    embeddings_test_scaled = [funcs.scale_vector(emb) for emb in embeddings_test]
     embeddings_test_scaled = np.array(embeddings_test_scaled)
     print("Done. " + str(time() - t) + "s")
-    # embeddings_test_scaled = methods.regularize_hor(embeddings_test)
+    # embeddings_test_scaled = funcs.regularize_hor(embeddings_test)
 
     print("Converting labels to numerical")
     t = time()
-    labels_test_num = methods.get_labels_numerical(labels_test_txt)
+    labels_test_num = funcs.get_labels_numerical(labels_test_txt)
     print("Done. " + str(time() - t) + "s")
 
     print("Classifying test samples using the SVM model")
