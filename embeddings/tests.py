@@ -1,6 +1,7 @@
 from utils import file_ops
-import config
 from scipy import spatial
+
+import embeddings.config as config
 
 
 test_words = [
