@@ -1,3 +1,4 @@
+from os import getenv
 import logging
 from time import time
 
@@ -6,15 +7,28 @@ from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
 from keras.optimizers import Adagrad
 import keras.backend as K
-import theano.tensor as T
 
-from utils import file_ops, text_processing
 import config
 import funcs
 from tokenizer import Tokenizer
 
+KERAS_BACKEND = getenv('KERAS_BACKEND')
+if KERAS_BACKEND == 'theano':
+    import theano.tensor as T
+else:
+    import tensorflow
 
-def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p):
+
+# Split context output using theano or tensorflow depending on backend
+def split(tensor, size_splits, n_splits, axis):
+    if KERAS_BACKEND == 'theano':
+        return T.split(tensor, size_splits, n_splits, axis=axis)
+    else:
+        return tensorflow.split(tensor, size_splits, axis=axis)
+
+
+# Create Keras model
+def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p, sentiment_classes):
     def init_embeddings(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01, high=0.01, name=name)
 
@@ -22,10 +36,12 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     def init_hidden_layer(shape, name=None):
         return K.random_uniform_variable(shape=shape, low=-0.01/shape[0], high=0.01/shape[0], name=name)
 
-    # Model
+    # Activation function for htanh layers
+    def htanh(x):
+        # return K.min(K.max(x, -1, keepdims=True), 1)
+        return K.clip(x, -1, 1)
 
     # Input
-
     main_input = Input((window_size,))
     neg_input = Input((window_size,))
 
@@ -42,14 +58,13 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
 
     # hTanh layer
     # TODO: tanh vs hTanh
-    tanh_layer = Dense(hidden_size, activation='tanh', init=init_hidden_layer)
+    tanh_layer = Dense(hidden_size, activation=htanh, init=init_hidden_layer)
 
     # Context linear 2
     context_layer = Dense(1, activation='linear', init=init_hidden_layer)
 
     # Sentiment linear 2
-    sentiment_layer = Dense(2, activation='linear', init=init_hidden_layer, name='sentiment_output')
-    # sentiment_layer = Dense(3, activation='linear', init=init_hidden_layer, name='sentiment_output')
+    sentiment_layer = Dense(sentiment_classes, activation='linear', init=init_hidden_layer, name='sentiment_output')
 
     embeddings = embedding_layer(main_input)
     reshaped_embeddings = reshaped_embedding_layer(embeddings)
@@ -64,7 +79,7 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     neg_linear_layer = Dense(hidden_size, activation='linear', weights=linear_layer.get_weights())
 
     # hTanh layer
-    neg_tanh_layer = Dense(hidden_size, activation='tanh', weights=tanh_layer.get_weights())
+    neg_tanh_layer = Dense(hidden_size, activation=htanh, weights=tanh_layer.get_weights())
 
     # Context linear 2
     neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
@@ -109,6 +124,7 @@ def main():
     dropout_p = config.DROPOUT_P
     alpha = config.ALPHA
     adagrad_lr = config.ADAGRAD_LR
+    sentiment_classes = config.SENTIMENT_CLASSES
 
     # Read data
     logging.info('Loading tweet data')
@@ -120,11 +136,6 @@ def main():
     t = time()
     texts, labels = funcs.shuffle_data(texts, labels)
     logging.debug('Done. {}s'.format(str(time() - t)))
-
-    # Use Twokenize (https://github.com/myleott/ark-twokenize-py) to tokenize tweets
-    # print("Twokenizing and removing urls, @-mentions, hashtags...")
-    # texts = list(map(lambda tweet: ' '.join(text_processing.clean_and_twokenize(tweet)), texts))
-    # print("Done.")
 
     logging.info('Creating vocabulary and one-hot vectors')
     t = time()
@@ -138,10 +149,14 @@ def main():
     vocab_size = len(vocab_map) + 1
     logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.info('Converts labels')
+    logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
-    labels = funcs.get_numeric_labels(labels)
+    if sentiment_classes not in [2, 3]:
+        logging.critical('The number of supported sentiment classes is 2 or 3. Number given: {}'
+                         .format(sentiment_classes))
+        exit(1)
+    labels = funcs.get_numeric_labels(labels, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Creating context windows and negative samples')
@@ -157,7 +172,7 @@ def main():
     # Create model
     logging.info('Creating model')
     t = time()
-    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p)
+    model = create_model(window_size, vocab_size, embedding_length, hidden_size, dropout_p, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     # Loss functions
@@ -165,7 +180,9 @@ def main():
         # TODO: verify function
         # y_len = y_pred.shape[0]
         # TODO: sizes = 1? not y_len?
-        y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
+        #y_pos, y_neg = y_pred
+        y_pos, y_neg = split(y_pred, [1, 1], 2, axis=1)
+        #y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
         # return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
         return (1 - alpha) * K.maximum(0., 1. - y_pos + y_neg)
 
@@ -197,6 +214,37 @@ def main():
     print('Done')
 
 
+def print_intro():
+    print()
+    print('Training sentiment enhanced word embeddings')
+    print()
+    print('config.py settings:')
+    print()
+    print('Window size:\t\t{}'.format(config.WINDOW_SIZE))
+    print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
+    print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
+    print()
+    print('Data file:\t\t{}'.format(config.DATA_FILE))
+    print('Data file labeled:\t{}'.format(config.DATA_FILE_LABELED))
+    print('Output file:\t\t{}'.format(config.OUTPUT_FILE))
+    print()
+    print('Pos file:\t\t{}'.format(config.POS_DATA_FILE))
+    print('Neg file:\t\t{}'.format(config.NEG_DATA_FILE))
+    print()
+    print('Min frequency:\t\t{}'.format(config.MIN_WORD_FREQUENCY))
+    print('Max number of words:\t{}'.format(config.MAX_NUMBER_WORDS))
+    print('Lowercase:\t\t{}'.format(config.LOWERCASE))
+    print()
+    print('Number of epochs:\t{}'.format(config.EPOCHS))
+    print('Margin:\t\t\t{}'.format(config.MARGIN))
+    print('Batch size:\t\t{}'.format(config.BATCH_SIZE))
+    print('Dropout p:\t\t{}'.format(config.DROPOUT_P))
+    print('Alpha:\t\t\t{}'.format(config.ALPHA))
+    print('Adagrad learning rate:\t{}'.format(config.ADAGRAD_LR))
+    print('Sentiment classes:\t{}'.format(config.SENTIMENT_CLASSES))
+    print()
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -214,5 +262,7 @@ if __name__ == "__main__":
 
     if args.quiet:
         logging.disable(levels[0])
+    else:
+        print_intro()
 
     main()
