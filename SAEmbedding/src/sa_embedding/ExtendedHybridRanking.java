@@ -7,7 +7,7 @@ import duyuNN.*;
 /*
  * This class implements the window ranking approach which uses sentiment of sentences
  * for learning sentiment embedding
- * This is suitable for binary class situation.
+ * Extended for three-way classification
  */
 public class ExtendedHybridRanking{
     public LookupLayer lookup;

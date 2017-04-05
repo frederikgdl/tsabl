@@ -174,6 +174,7 @@ public class ExtendedHybridRankingMain {
 
         try {
             train(argsMap);
+            System.out.println("Done");
         } catch (Exception e) {
             e.printStackTrace();
         }
