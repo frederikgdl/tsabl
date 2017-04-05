@@ -8,7 +8,8 @@ def clean_twitter_tokens(text):
     :param text: Text to clean
     :return: Cleaned text
     """
-    preprocessor.set_options(preprocessor.OPT.URL, preprocessor.OPT.HASHTAG, preprocessor.OPT.MENTION)
+    preprocessor.set_options(preprocessor.OPT.URL, preprocessor.OPT.RESERVED, preprocessor.OPT.MENTION,
+                             preprocessor.OPT.NUMBER)
     return preprocessor.clean(text)
 
 
