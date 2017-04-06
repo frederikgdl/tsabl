@@ -72,7 +72,6 @@ def print_intro():
     print()
     print('Word embedding file:\t{}'.format(config.EMBEDDING_FILE))
     print('Training data file:\t{}'.format(config.TRAIN_FILE))
-    print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
     print()
     print('SVM model file:\t\t{}'.format(config.SVM_MODEL_FILE))
     print('LogRes model file:\t{}'.format(config.LOGRES_MODEL_FILE))
