@@ -93,7 +93,7 @@ def main():
     print("F1-score SVM classifier:\t" + str(F1_score_svm))
     print("F1-score LogRes classifier:\t" + str(F1_score_logres))
 
-    logging.info("\nTesting baselines")
+    logging.info("Testing baselines")
     t = time()
     test_baselines(full_tweets, tweets_test, labels_test_num)
     logging.debug("Done. " + str(time() - t) + "s")
