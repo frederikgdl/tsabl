@@ -1,4 +1,5 @@
 from os import path
+
 SEED = 1234
 
 
