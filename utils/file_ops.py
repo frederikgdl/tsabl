@@ -1,3 +1,4 @@
+import re
 import os
 from functools import reduce
 from json import dumps
@@ -74,7 +75,8 @@ def read_and_concatenate_files(dir_path, extension=""):
 
 # Returns the text from a tweet object
 def get_text(tweet):
-    return tweet["text"].replace("\n", " ")
+    return re.sub('\s+', ' ', tweet["text"])
+    # return tweet["text"].replace("\n", " ")
 
 
 # Saves every JSON tweet object on a separate line in a new file
