@@ -1,4 +1,4 @@
-import os.path
+from os import path
 
 SEED = 1234
 
@@ -23,6 +23,8 @@ DROPOUT_P = 0
 
 ALPHA = 0.5
 
+SENTIMENT_CLASSES = 2
+
 
 # Tokenizer options
 
@@ -37,13 +39,13 @@ LOWERCASE = True
 
 # File options
 
-DATA_FILE = os.path.abspath('data/filtered/tweets.txt')
+DATA_FILE = path.abspath('data/filtered/tweets.txt')
 DATA_FILE_LABELED = True
 
-VOCAB_FILE = os.path.abspath('data/raw/vocab.txt')
+VOCAB_FILE = path.abspath('data/raw/vocab.txt')
 
-OUTPUT_FILE = os.path.abspath('data/embeddings/embeddings.txt')
+OUTPUT_FILE = path.abspath('data/embeddings/embeddings.txt')
 
-POS_DATA_FILE = os.path.abspath('data/preprocessed/emoticon.pos.0.txt')
+POS_DATA_FILE = path.abspath('data/preprocessed/emoticon.pos.0.txt')
 
-NEG_DATA_FILE = os.path.abspath('data/preprocessed/emoticon.neg.0.txt')
+NEG_DATA_FILE = path.abspath('data/preprocessed/emoticon.neg.0.txt')

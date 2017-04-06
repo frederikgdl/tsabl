@@ -6,7 +6,7 @@ import langid
 from os import path
 from time import time
 
-from utils import file_ops as utils
+from utils import file_ops
 
 
 # Filters data/raw/*.json, data/raw/*.txt and saves corresponding files in data/filtered
@@ -25,11 +25,11 @@ def main():
     logging.info('Loading raw tweet data from file {}'.format(args.in_file))
     t = time()
     if args.labeled:
-        raw_tweets, labels = utils.read_labeled_file(args.in_file)
+        raw_tweets, labels = file_ops.read_labeled_file(args.in_file)
         ids = [json.loads(tweet)['id_str'] for tweet in raw_tweets]
         annotations = dict(zip(ids, labels))
     else:
-        raw_tweets = utils.read_lines(args.in_file)
+        raw_tweets = file_ops.read_lines(args.in_file)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Filtering tweets')
@@ -49,10 +49,10 @@ def main():
 
     logging.info('Saving processed tweets')
     t = time()
-    utils.save_text_tweets(filtered_tweets, args.out_file_text, new_annotations)
+    file_ops.save_text_tweets(filtered_tweets, args.out_file_text, new_annotations)
 
     if args.out_file_json is not None:
-        utils.save_text_tweets(filtered_tweets, args.out_file_json, annotations)
+        file_ops.save_text_tweets(filtered_tweets, args.out_file_json, annotations)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Turned {} into {} tweets after filtering.'.format(str(len(raw_tweets)), str(len(filtered_tweets))))

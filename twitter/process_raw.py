@@ -5,7 +5,7 @@ from os import path
 from time import time
 
 from utils import file_ops
-from .api import TwitterApi
+from twitter.api import TwitterApi
 
 twitter_api = TwitterApi()
 
