@@ -10,7 +10,7 @@ import keras.backend as K
 
 import embeddings.config as config
 import embeddings.funcs as funcs
-from .tokenizer import Tokenizer
+from embeddings.tokenizer import Tokenizer
 
 KERAS_BACKEND = getenv('KERAS_BACKEND')
 if KERAS_BACKEND == 'theano':
