@@ -5,7 +5,7 @@ import numpy as np
 import classifiers.config as config
 import classifiers.funcs as funcs
 import classifiers.metrics as metrics
-import classifiers.word_embedding_dict as wedict
+from classifiers.word_embedding_dict import WordEmbeddingDict
 from classifiers.baselines.afinn_tweets import AfinnTweets
 from classifiers.baselines.combo_tweets import ComboTweets
 from classifiers.baselines.random_uniform import RandomUniform
@@ -33,17 +33,17 @@ def main():
 
     logging.info("Loading word embeddings")
     t = time()
-    md = wedict.WordEmbeddingDict(word_embed_file)
+    embeddings_dict = WordEmbeddingDict(word_embed_file)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Loading SVM model")
     t = time()
-    clf_svm = funcs.load_model(svm_model_file)
+    svm_model = funcs.load_model(svm_model_file)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Loading LogRes model")
     t = time()
-    clf_logres = funcs.load_model(logres_model_file)
+    logres_model = funcs.load_model(logres_model_file)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Loading test data")
@@ -54,7 +54,7 @@ def main():
 
     logging.info("Calculating tweet embeddings")
     t = time()
-    embeddings_test = list(map(md.get_tweet_embedding, tweets_test))
+    embeddings_test = list(map(embeddings_dict.get_tweet_embedding, tweets_test))
     embeddings_test = np.array(embeddings_test)
     logging.debug("Done. " + str(time() - t) + "s")
 
@@ -72,26 +72,26 @@ def main():
 
     logging.info("Classifying test samples using the SVM model")
     t = time()
-    predictions_svm = clf_svm.predict(embeddings_test_scaled)
+    predictions_svm = svm_model.predict(embeddings_test_scaled)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Calculating scores for SVM classifier")
     t = time()
-    F1_score_svm = metrics.calc_F1_score_with_neutrals(predictions_svm, labels_test_num)
+    f1_pn_score_svm = metrics.f1_pn_score(predictions_svm, labels_test_num)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Classifying test samples using the LogRes model")
     t = time()
-    predictions_logres = clf_logres.predict(embeddings_test_scaled)
+    predictions_logres = logres_model.predict(embeddings_test_scaled)
     logging.debug("Done. " + str(time() - t) + "s")
 
     logging.info("Calculating scores for LogRes classifier")
     t = time()
-    F1_score_logres = metrics.calc_F1_score_with_neutrals(predictions_logres, labels_test_num)
+    f1_pn_score_logres = metrics.f1_pn_score(predictions_logres, labels_test_num)
     logging.debug("Done. " + str(time() - t) + "s")
 
-    print("F1-score SVM classifier:\t" + str(F1_score_svm))
-    print("F1-score LogRes classifier:\t" + str(F1_score_logres))
+    print("F1-score SVM classifier:\t" + str(f1_pn_score_svm))
+    print("F1-score LogRes classifier:\t" + str(f1_pn_score_logres))
 
     logging.info("Testing baselines")
     t = time()

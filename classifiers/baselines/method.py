@@ -1,6 +1,7 @@
-from time import time, strftime, gmtime
+from time import time
 
 import classifiers.metrics as metrics
+
 
 class Method:
     def __init__(self, tweets, tokenized_tweets, labels, name="Method"):
@@ -53,7 +54,7 @@ class Method:
         Calculates the F1-score
         :return: F1-score
         """
-        self.score = metrics.calc_F1_score_with_neutrals(self.predictions, self.labels)
+        self.score = metrics.f1_pn_score(self.predictions, self.labels)
 
         return self
 
