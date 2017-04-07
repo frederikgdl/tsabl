@@ -4,7 +4,7 @@ source venv/bin/activate
 
 PROGRAM='twitter/tweet_preprocessor.py'
 
-FLAGS='-tsv -l'
+FLAGS='-tsv -l -r'
 
 DATASETS_PATH='/data/twitty/data/distant_supervised/datasets/'
 
