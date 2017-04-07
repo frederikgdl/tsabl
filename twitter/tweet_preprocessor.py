@@ -20,6 +20,11 @@ def main():
     t = time()
     preprocessed_texts = []
     for i, text in enumerate(texts):
+
+        # Reduces text to have maximum 10 repeating character
+        # Prevents URL matching from taking very long time due of catastrophic backtracking
+        text = text_processing.reduce_excessive_lengthening(text)
+
         preprocessed_texts.append(' '.join(text_processing.clean_and_twokenize(text)))
         print('Processed tweet nr. {}'.format(i + 1), end='\r')
     texts = preprocessed_texts
