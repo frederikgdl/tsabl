@@ -1,7 +1,5 @@
 package sa_embedding;
 
-import java.text.DateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +11,7 @@ import java.util.Random;
 import funcs.Data;
 import funcs.Funcs;
 
-public class ExtendedHybridRankingMain {
+public class BinaryHybridRankingMain {
     public static void train(HashMap<String, String> argsMap) throws Exception
     {
         int xWindowSize = Integer.parseInt(argsMap.get("-windowSize"));
@@ -32,18 +30,15 @@ public class ExtendedHybridRankingMain {
 
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
-        List<String> neuFiles = new ArrayList<String>();
         for(int i = 0; i < trainFileNum; i++)
         {
             posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
             negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
-            neuFiles.add(inputDir + "emoticon.neu." + i + ".txt");
         }
 
         List<String> allTrainFiles = new ArrayList<String>();
         allTrainFiles.addAll(posFiles);
         allTrainFiles.addAll(negFiles);
-        allTrainFiles.addAll(neuFiles);
 
         HashMap<String, Integer> vocabMap  = new HashMap<String, Integer>();
 
@@ -51,13 +46,13 @@ public class ExtendedHybridRankingMain {
         Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5);
         System.out.println("vocab.size(): " + vocabMap.size());
 
-        ExtendedHybridRanking posMain = new ExtendedHybridRanking(
+        BinaryHybridRanking posMain = new BinaryHybridRanking(
                 xWindowSize, vocabMap.size(), xHiddenSize, xEmbeddingLength);
 
         Random rnd = new Random();
         posMain.randomize(rnd, -randomBase, randomBase);
 
-        ExtendedHybridRanking negMain = posMain.cloneWithTiedParams();
+        BinaryHybridRanking negMain = posMain.cloneWithTiedParams();
 
         double lossV = 0.0;
         int lossC = 0;
@@ -67,7 +62,6 @@ public class ExtendedHybridRankingMain {
 
             Collections.shuffle(posFiles);
             Collections.shuffle(negFiles);
-            Collections.shuffle(neuFiles);
 
             for(int fileIdx = 0; fileIdx < posFiles.size(); fileIdx++)
             {
@@ -77,12 +71,9 @@ public class ExtendedHybridRankingMain {
                         0, trainingDatas);
                 Funcs.readTrainFile(negFiles.get(fileIdx), "utf8",
                         1, trainingDatas);
-                Funcs.readTrainFile(neuFiles.get(fileIdx), "utf8",
-                        2, trainingDatas);
 
                 System.out.println("running pos-file: " + posFiles.get(fileIdx));
                 System.out.println("running neg-file: " + negFiles.get(fileIdx));
-                System.out.println("running neu-file: " + neuFiles.get(fileIdx));
 
                 Collections.shuffle(trainingDatas);
 
@@ -119,16 +110,12 @@ public class ExtendedHybridRankingMain {
                         }
 
                         if(posMain.sentimentLinear2.output[data.goldPol]
-                                < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
-                                + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3] + margin)
+                                < posMain.sentimentLinear2.output[1 - data.goldPol] + margin)
                         {
-                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
-                                    + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
+                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[1 - data.goldPol]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
-
                             posMain.sentimentLinear2.outputG[data.goldPol] = sentimentAlpha * 1;
-                            posMain.sentimentLinear2.outputG[(data.goldPol + 1) % 3] = sentimentAlpha * -1;
-                            posMain.sentimentLinear2.outputG[(data.goldPol + 2) % 3] = sentimentAlpha * -1;
+                            posMain.sentimentLinear2.outputG[1 - data.goldPol] = sentimentAlpha * -1;
                         }
 
                         // loss function
@@ -152,7 +139,7 @@ public class ExtendedHybridRankingMain {
                     if(dataIdx % 50000 == 0)
                     {
                         System.out.println("running " + dataIdx + "/" + trainingDatas.size() +
-                                "\t loss: " + (lossV / lossC) + "\t" + DateFormat.getDateTimeInstance().format(new Date()));
+                                "\t loss: " + (lossV / lossC) + "\t" + new Date().toLocaleString());
                     }
                 }
 
@@ -174,7 +161,6 @@ public class ExtendedHybridRankingMain {
 
         try {
             train(argsMap);
-            System.out.println("Done");
         } catch (Exception e) {
             e.printStackTrace();
         }

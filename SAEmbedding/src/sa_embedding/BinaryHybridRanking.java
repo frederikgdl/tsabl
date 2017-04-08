@@ -7,9 +7,9 @@ import duyuNN.*;
 /*
  * This class implements the window ranking approach which uses sentiment of sentences
  * for learning sentiment embedding
- * Extended for three-way classification
+ * This is suitable for binary class situation.
  */
-public class ExtendedHybridRanking{
+public class BinaryHybridRanking{
     public LookupLayer lookup;
     public LinearLayer linear1;
     public TanhLayer tanh;
@@ -17,7 +17,7 @@ public class ExtendedHybridRanking{
 
     public LinearLayer contextLinear2;
 
-    public ExtendedHybridRanking()
+    public BinaryHybridRanking()
     {
     }
 
@@ -28,7 +28,7 @@ public class ExtendedHybridRanking{
     public int hiddenSize;
     public int embeddingLength;
 
-    public ExtendedHybridRanking(
+    public BinaryHybridRanking(
             int xWindowSize,
             int xVocabSize,
             int xHiddenSize,
@@ -42,7 +42,7 @@ public class ExtendedHybridRanking{
         lookup = new LookupLayer(embeddingLength, vocabSize, windowSize);
         linear1 = new LinearLayer(windowSize * embeddingLength, hiddenSize);
         tanh = new TanhLayer(hiddenSize);
-        sentimentLinear2 = new LinearLayer(hiddenSize, 3); // positive, negative and neutral
+        sentimentLinear2 = new LinearLayer(hiddenSize, 2);
 
         lookup.link(linear1);
         linear1.link(tanh);
@@ -106,9 +106,9 @@ public class ExtendedHybridRanking{
         contextLinear2.clearGrad();
     }
 
-    public ExtendedHybridRanking cloneWithTiedParams() throws Exception
+    public BinaryHybridRanking cloneWithTiedParams() throws Exception
     {
-        ExtendedHybridRanking clone = new ExtendedHybridRanking();
+        BinaryHybridRanking clone = new BinaryHybridRanking();
         clone.windowSize = windowSize;
         clone.vocabSize = vocabSize;
         clone.hiddenSize = hiddenSize;

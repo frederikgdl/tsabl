@@ -10,7 +10,7 @@ TRAINING_ROUND=20
 LEARNING_RATE=0.1
 MARGIN=1
 OUTPUT_FILE=../data/embeddings/sa_embedding_output
-RANDOM_BASE=322
+RANDOM_BASE=0.01
 SENTIMENT_ALPHA=0.5
 
 DATA_DIR='/data/twitty/tsabl/preprocessed/datasets/1M/'
