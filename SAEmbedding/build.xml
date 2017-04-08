@@ -1,6 +1,8 @@
 <project default="compile">
   <target name="compile">
     <mkdir dir="bin"/>
-    <javac srcdir="src" destdir="bin" encoding="utf-8" debug="true"/>
+    <javac srcdir="src" destdir="bin" encoding="utf-8" debug="true">
+      <compilerarg />
+    </javac>
   </target>
 </project>
