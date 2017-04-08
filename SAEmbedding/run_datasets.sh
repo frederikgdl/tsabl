@@ -13,6 +13,12 @@ OUTPUT_FILE=../data/embeddings/sa_embedding_output
 RANDOM_BASE=322
 SENTIMENT_ALPHA=0.5
 
+DATA_DIR='/data/twitty/tsabl/preprocessed/datasets/1M/'
+
+DATA_PREFIX='tweets.'
+
+for DATASET in 'AFINN' 'EMOTICON_EXT' 'EMOTICON.150K' 'TEXTBLOB' 'VADER'
+
 java -classpath bin sa_embedding.HybridRankingMain -windowSize ${WINDOW_SIZE} \
  -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
  -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
