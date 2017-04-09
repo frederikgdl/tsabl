@@ -27,14 +27,17 @@ public class BinaryHybridRankingMain {
         String outputFile = argsMap.get("-outputFile");
         double randomBase = Double.parseDouble(argsMap.get("-randomBase"));
         double sentimentAlpha = Double.parseDouble(argsMap.get("-sentimentAlpha"));
+        String inputFilePrefix = argsMap.get("-inputFilePrefix");
 
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
-        for(int i = 0; i < trainFileNum; i++)
-        {
-            posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
-            negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
-        }
+//        for(int i = 0; i < trainFileNum; i++)
+//        {
+//            posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
+//            negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
+//        }
+        posFiles.add(inputDir + inputFilePrefix + ".pos.txt");
+        negFiles.add(inputDir + inputFilePrefix + ".neg.txt");
 
         List<String> allTrainFiles = new ArrayList<String>();
         allTrainFiles.addAll(posFiles);
@@ -58,7 +61,7 @@ public class BinaryHybridRankingMain {
         int lossC = 0;
         for(int round = 0; round < trainRound; round++)
         {
-            System.out.println("running round = " + round);
+            System.out.println("Running round: " + round);
 
             Collections.shuffle(posFiles);
             Collections.shuffle(negFiles);
@@ -72,8 +75,8 @@ public class BinaryHybridRankingMain {
                 Funcs.readTrainFile(negFiles.get(fileIdx), "utf8",
                         1, trainingDatas);
 
-                System.out.println("running pos-file: " + posFiles.get(fileIdx));
-                System.out.println("running neg-file: " + negFiles.get(fileIdx));
+                System.out.println("Running pos-file: " + posFiles.get(fileIdx));
+                System.out.println("Running neg-file: " + negFiles.get(fileIdx));
 
                 Collections.shuffle(trainingDatas);
 

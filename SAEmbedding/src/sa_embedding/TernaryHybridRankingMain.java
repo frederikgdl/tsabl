@@ -52,6 +52,7 @@ public class TernaryHybridRankingMain {
         HashMap<String, Integer> vocabMap  = new HashMap<String, Integer>();
 
         // Funcs.getVocab(vocabFile, vocabMap, "utf8");
+        Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5);
         System.out.println("vocab.size(): " + vocabMap.size());
 
         TernaryHybridRankingMain posMain = new TernaryHybridRankingMain(
@@ -66,7 +67,7 @@ public class TernaryHybridRankingMain {
         int lossC = 0;
         for(int round = 0; round < trainRound; round++)
         {
-            System.out.println("running round = " + round);
+            System.out.println("Running round: " + round);
 
             Collections.shuffle(posFiles);
             Collections.shuffle(negFiles);
@@ -83,9 +84,9 @@ public class TernaryHybridRankingMain {
                 Funcs.readTrainFile(neuFiles.get(fileIdx), "utf8",
                         2, trainingDatas);
 
-                System.out.println("running pos-file: " + posFiles.get(fileIdx));
-                System.out.println("running neg-file: " + negFiles.get(fileIdx));
-                System.out.println("running neu-file: " + neuFiles.get(fileIdx));
+                System.out.println("Running pos-file: " + posFiles.get(fileIdx));
+                System.out.println("Running neg-file: " + negFiles.get(fileIdx));
+                System.out.println("Running neu-file: " + neuFiles.get(fileIdx));
 
                 Collections.shuffle(trainingDatas);
 
