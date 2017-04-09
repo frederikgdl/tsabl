@@ -55,13 +55,13 @@ public class TernaryHybridRankingMain {
         Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5);
         System.out.println("vocab.size(): " + vocabMap.size());
 
-        TernaryHybridRankingMain posMain = new TernaryHybridRankingMain(
+        TernaryHybridRanking posMain = new TernaryHybridRanking(
                 xWindowSize, vocabMap.size(), xHiddenSize, xEmbeddingLength);
 
         Random rnd = new Random();
         posMain.randomize(rnd, -randomBase, randomBase);
 
-        TernaryHybridRankingMain negMain = posMain.cloneWithTiedParams();
+        TernaryHybridRanking negMain = posMain.cloneWithTiedParams();
 
         double lossV = 0.0;
         int lossC = 0;
