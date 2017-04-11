@@ -48,7 +48,7 @@ def load_labeled_data(file_name):
     """
     Load a tab separated file with tweet in first column and label in second column
     :param file_name: The tab separated file to load
-    :return: A three element tuple of original tweet, split tweet, and labels
+    :return: A two-element tuple of original tweets and labels
     """
     tweets = []
     labels = []
