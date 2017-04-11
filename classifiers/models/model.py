@@ -1,5 +1,6 @@
 from classifiers.funcs import load_model, save_model
 import classifiers.metrics as metrics
+from classifiers.models.results import Results
 
 
 class Model:
@@ -11,8 +12,8 @@ class Model:
         self.predictions = []
         self.num_tweets = -1
         self.run_time = -1
-        self.f1_pn = 0.0
         self.model = None
+        self.results = None
 
     def train(self, tweets, train_embeddings, numeric_test_labels):
         return NotImplemented
@@ -22,14 +23,15 @@ class Model:
 
     def test(self, test_labels):
         """
-        Calculates the F1-score
+        Calculates the scores from predictions
         :type test_labels: list
         :param test_labels: Numeric test labels
         :return: F1-score
         """
         if len(self.predictions) < len(test_labels):
             print("ERROR", self.name, "predictions list not same length as test_labels")
-        self.f1_pn = metrics.f1_pn_score(self.predictions, test_labels)
+
+        self.results = Results(self.predictions, test_labels)
 
         return self
 
@@ -43,12 +45,13 @@ class Model:
 
     def save_results(self, out_file):
         with open(out_file, "w+") as f:
-            f.write(str(self.f1_pn) + "\n")
+            f.write(str(self.results))
 
     def print(self):
         """
         Prints a line of execution stats
         :return: self
         """
-        print('{:32}'.format("F1-score " + self.name + ":") + '{:>10}'.format(str(self.f1_pn)))
+        print(self.name)
+        print(self.results)
         return self
