@@ -1,3 +1,5 @@
+import re
+
 import preprocessor
 from lib.twokenize import twokenize
 
@@ -23,3 +25,16 @@ def clean_and_twokenize(text):
     twokenized_text = twokenize.tokenize(cleaned_text)
 
     return twokenized_text
+
+
+# Return text with maximum 3 repeating characters
+def reduce_lengthening(text):
+    pattern = re.compile(r'(.)\1{2,}')
+    return pattern.sub(r'\1\1\1', text)
+
+
+# Return text with maximum 10 repeating characters
+# Used to prevent URL matching taking exceptionally long time
+def reduce_excessive_lengthening(text):
+    pattern = re.compile(r'(.)\1{9,}')
+    return pattern.sub(r'\1\1\1\1\1\1\1\1\1\1', text)

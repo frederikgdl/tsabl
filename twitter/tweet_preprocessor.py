@@ -20,6 +20,11 @@ def main():
     t = time()
     preprocessed_texts = []
     for i, text in enumerate(texts):
+
+        # Reduces text to have maximum 10 repeating character
+        # Prevents URL matching from taking very long time due of catastrophic backtracking
+        text = text_processing.reduce_excessive_lengthening(text)
+
         preprocessed_texts.append(' '.join(text_processing.clean_and_twokenize(text)))
         print('Processed tweet nr. {}'.format(i + 1), end='\r')
     texts = preprocessed_texts
@@ -29,6 +34,12 @@ def main():
         logging.info('Lowercasing tweets')
         t = time()
         texts = [text.lower() for text in texts]
+        logging.debug('Done. {}s'.format(str(time() - t)))
+
+    if args.reduce_lengthening:
+        logging.info('Reducing elongated word')
+        t = time()
+        texts = [text_processing.reduce_lengthening(text) for text in texts]
         logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Writing preprocessed tweets to file')
@@ -62,6 +73,9 @@ if __name__ == '__main__':
     parser.add_argument('-tsv', action='store_true', help='input file has tsv format')
 
     parser.add_argument('-l', '--lowercase', action='store_true', help='lowercase the tweets')
+
+    parser.add_argument('-r', '--reduce_lengthening', action='store_true',
+                        help='reduce tweets to max 3 repeating letters')
 
     # Directory
     parser.add_argument('--dir', nargs='?', default='.',

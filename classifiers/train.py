@@ -1,10 +1,12 @@
-import numpy as np
+import logging
 from time import time
-from embeddings import word_embedding_dict as wedict
-import config
-import LogRes
-import SVM
-import methods
+import numpy as np
+
+import classifiers.LogRes as LogRes
+import classifiers.SVM as SVM
+import classifiers.config as config
+import classifiers.funcs as funcs
+import classifiers.word_embedding_dict as wedict
 
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
@@ -14,51 +16,86 @@ out_file_logres = config.LOGRES_MODEL_FILE
 
 
 def main():
-    print("Loading word embeddings")
+    logging.info("Loading word embeddings")
     t = time()
     md = wedict.WordEmbeddingDict(embedding_file)
-    print("Done. " + str(time() - t) + "s")
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Loading training data")
+    logging.info("Loading training data")
     t = time()
-    tweets_train, labels_train_txt = methods.load_labeled_data(train_file)
-    print("Done. " + str(time() - t) + "s")
+    tweets_train, labels_train_txt = funcs.load_labeled_data(train_file)
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Calculating tweet embeddings")
+    logging.info("Calculating tweet embeddings")
     t = time()
     embeddings_train = list(map(md.get_tweet_embedding, tweets_train))
     embeddings_train = np.array(embeddings_train)
-    print("Done. " + str(time() - t) + "s")
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Scaling word embedding vectors")
+    logging.info("Scaling word embedding vectors")
     t = time()
-    embeddings_train_scaled = [methods.scale_vector(emb) for emb in embeddings_train]
-    print("Done. " + str(time() - t) + "s")
-    # embeddings_train_scaled = methods.regularize_hor(embeddings_train)
+    embeddings_train_scaled = [funcs.scale_vector(emb) for emb in embeddings_train]
+    logging.debug("Done. " + str(time() - t) + "s")
+    # embeddings_train_scaled = funcs.regularize_hor(embeddings_train)
 
-    print("Converting labels to numerical")
+    logging.info("Converting labels to numerical")
     t = time()
-    labels_train_num = methods.get_labels_numerical(labels_train_txt)
-    print("Done. " + str(time() - t) + "s")
+    labels_train_num = funcs.get_labels_numerical(labels_train_txt)
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Training SVM classifier on training data")
+    logging.info("Training SVM classifier on training data")
     t = time()
     clf_svm = SVM.train(embeddings_train_scaled, labels_train_num, c=1)  # 7.396183688299606)
-    print("Done. " + str(time() - t) + "s")
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Saving model")
+    logging.info("Saving model")
     t = time()
-    methods.save_model(clf_svm, out_file_svm)
-    print("Done. " + str(time() - t) + "s")
+    funcs.save_model(clf_svm, out_file_svm)
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Training Logistic Regression classifier on training data")
+    logging.info("Training Logistic Regression classifier on training data")
     t = time()
     clf_logres = LogRes.train(embeddings_train_scaled, labels_train_num, c=1)
-    print("Done. " + str(time() - t) + "s")
+    logging.debug("Done. " + str(time() - t) + "s")
 
-    print("Saving model")
+    logging.info("Saving model")
     t = time()
-    methods.save_model(clf_logres, out_file_logres)
-    print("Done. " + str(time() - t) + "s")
+    funcs.save_model(clf_logres, out_file_logres)
+    logging.debug("Done. " + str(time() - t) + "s")
 
-main()
+
+def print_intro():
+    print()
+    print('Training classifiers')
+    print()
+    print('config.py settings:')
+    print()
+    print('Word embedding file:\t{}'.format(config.EMBEDDING_FILE))
+    print('Training data file:\t{}'.format(config.TRAIN_FILE))
+    print()
+    print('SVM model file:\t\t{}'.format(config.SVM_MODEL_FILE))
+    print('LogRes model file:\t{}'.format(config.LOGRES_MODEL_FILE))
+    print()
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='tsabl - train classifiers')
+
+    # Logger verbosity parameters
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
+    parser.add_argument('-q', '--quiet', action='store_true', help='no print to console')
+
+    args = parser.parse_args()
+
+    levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
+    level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
+    logging.basicConfig(level=level, format="%(asctime)s\t%(levelname)s\t%(message)s")
+
+    if args.quiet:
+        logging.disable(levels[0])
+    else:
+        print_intro()
+
+    main()

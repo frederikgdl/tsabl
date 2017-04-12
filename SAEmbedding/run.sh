@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 WINDOW_SIZE=7
 HIDDEN_LENGTH=20
@@ -10,7 +10,7 @@ TRAINING_ROUND=20
 LEARNING_RATE=0.1
 MARGIN=1
 OUTPUT_FILE=../data/embeddings/sa_embedding/ext_output
-RANDOM_BASE=322
+RANDOM_BASE=0.01
 SENTIMENT_ALPHA=0.5
 
 java -classpath bin sa_embedding.ExtendedHybridRankingMain -windowSize ${WINDOW_SIZE} \

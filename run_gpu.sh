@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 source venv/bin/activate
 
 # Set to theano or tensorflow

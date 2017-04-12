@@ -13,7 +13,7 @@ import java.util.Random;
 import funcs.Data;
 import funcs.Funcs;
 
-public class ExtendedHybridRankingMain {
+public class TernaryHybridRankingMain {
     public static void train(HashMap<String, String> argsMap) throws Exception
     {
         int xWindowSize = Integer.parseInt(argsMap.get("-windowSize"));
@@ -29,16 +29,20 @@ public class ExtendedHybridRankingMain {
         String outputFile = argsMap.get("-outputFile");
         double randomBase = Double.parseDouble(argsMap.get("-randomBase"));
         double sentimentAlpha = Double.parseDouble(argsMap.get("-sentimentAlpha"));
+        String inputFilePrefix = argsMap.get("-inputFilePrefix");
 
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
         List<String> neuFiles = new ArrayList<String>();
-        for(int i = 0; i < trainFileNum; i++)
-        {
-            posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
-            negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
-            neuFiles.add(inputDir + "emoticon.neu." + i + ".txt");
-        }
+//        for(int i = 0; i < trainFileNum; i++)
+//        {
+//            posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
+//            negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
+//            neuFiles.add(inputDir + "emoticon.neu." + i + ".txt");
+//        }
+        posFiles.add(inputDir + inputFilePrefix + ".pos.txt");
+        negFiles.add(inputDir + inputFilePrefix + ".neg.txt");
+        neuFiles.add(inputDir + inputFilePrefix + ".neu.txt");
 
         List<String> allTrainFiles = new ArrayList<String>();
         allTrainFiles.addAll(posFiles);
@@ -51,19 +55,19 @@ public class ExtendedHybridRankingMain {
         Funcs.getVocab(allTrainFiles, "utf8", vocabMap, 5);
         System.out.println("vocab.size(): " + vocabMap.size());
 
-        ExtendedHybridRanking posMain = new ExtendedHybridRanking(
+        TernaryHybridRanking posMain = new TernaryHybridRanking(
                 xWindowSize, vocabMap.size(), xHiddenSize, xEmbeddingLength);
 
         Random rnd = new Random();
         posMain.randomize(rnd, -randomBase, randomBase);
 
-        ExtendedHybridRanking negMain = posMain.cloneWithTiedParams();
+        TernaryHybridRanking negMain = posMain.cloneWithTiedParams();
 
         double lossV = 0.0;
         int lossC = 0;
         for(int round = 0; round < trainRound; round++)
         {
-            System.out.println("running round = " + round);
+            System.out.println("Running round: " + round);
 
             Collections.shuffle(posFiles);
             Collections.shuffle(negFiles);
@@ -80,9 +84,9 @@ public class ExtendedHybridRankingMain {
                 Funcs.readTrainFile(neuFiles.get(fileIdx), "utf8",
                         2, trainingDatas);
 
-                System.out.println("running pos-file: " + posFiles.get(fileIdx));
-                System.out.println("running neg-file: " + negFiles.get(fileIdx));
-                System.out.println("running neu-file: " + neuFiles.get(fileIdx));
+                System.out.println("Running pos-file: " + posFiles.get(fileIdx));
+                System.out.println("Running neg-file: " + negFiles.get(fileIdx));
+                System.out.println("Running neu-file: " + neuFiles.get(fileIdx));
 
                 Collections.shuffle(trainingDatas);
 
