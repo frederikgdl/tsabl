@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import classifiers.metrics as metrics
 
 
@@ -10,30 +11,30 @@ class Results:
         self.predictions = predictions
         self.truth = truth
 
-        self.results = {
-            "f1_pn_score": metrics.f1_pn_score(predictions, truth),
-            "ternary_macro_f1_score": metrics.ternary_macro_f1_score(predictions, truth),
+        self.results = OrderedDict()
+        self.results["f1_pn_score"] = metrics.f1_pn_score(predictions, truth)
+        self.results["ternary_macro_f1_score"] = metrics.ternary_macro_f1_score(predictions, truth)
 
-            "positive_precision": metrics.ternary_precision(predictions, truth, 1),
-            "positive_recall": metrics.ternary_precision(predictions, truth, 1),
-            "positive_f1_score": metrics.ternary_f1_score(predictions, truth, 1),
+        self.results["positive_precision"] = metrics.ternary_precision(predictions, truth, 1)
+        self.results["positive_recall"] = metrics.ternary_precision(predictions, truth, 1)
+        self.results["positive_f1_score"] = metrics.ternary_f1_score(predictions, truth, 1)
 
-            "negative_precision": metrics.ternary_precision(predictions, truth, -1),
-            "negative_recall": metrics.ternary_precision(predictions, truth, -1),
-            "negative_f1_score": metrics.ternary_f1_score(predictions, truth, -1),
+        self.results["negative_precision"] = metrics.ternary_precision(predictions, truth, -1)
+        self.results["negative_recall"] = metrics.ternary_precision(predictions, truth, -1)
+        self.results["negative_f1_score"] = metrics.ternary_f1_score(predictions, truth, -1)
 
-            "neutral_precision": metrics.ternary_precision(predictions, truth, 0),
-            "neutral_recall": metrics.ternary_precision(predictions, truth, 0),
-            "neutral_f1_score": metrics.ternary_f1_score(predictions, truth, 0),
-        }
+        self.results["neutral_precision"] = metrics.ternary_precision(predictions, truth, 0)
+        self.results["neutral_recall"] = metrics.ternary_precision(predictions, truth, 0)
+        self.results["neutral_f1_score"] = metrics.ternary_f1_score(predictions, truth, 0)
 
     def __str__(self):
         """
         Return string representation of results
-        :return: 
+        :return: string including all result metrics
         """
-        s = ""
-        for key, value in self.results.items():
-            s += '{:32}'.format(key) + '{:>10}'.format(str(value)) + "\n"
+        results_string = ""
 
-        return s
+        for key, value in self.results.items():
+            results_string += '{:32}'.format(key) + '{:>10}'.format(str(value)) + "\n"
+
+        return results_string
