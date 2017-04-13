@@ -142,6 +142,12 @@ def save_classifier_results():
         classifier.save_results(path.join(config.RESULTS_DIR, classifier.name.lower() + ".txt"))
 
 
+# TODO: Parallelize
+def save_baseline_results():
+    for baseline in baselines:
+        baseline.save_results(path.join(config.RESULTS_DIR, baseline.name.lower() + ".txt"))
+
+
 def print_results(models):
     for model in models:
         model.print()
@@ -180,6 +186,7 @@ def main(arguments):
 
         # Test baselines
         test_baselines(tweets_test, embeddings_test_scaled, labels_test_num)
+        # save_baseline_results()
 
         # Print results
         print_results(classifiers)
