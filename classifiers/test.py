@@ -16,8 +16,8 @@ if __name__ == "__main__":
     level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
     logging.basicConfig(level=level, format="%(asctime)s\t%(levelname)s\t%(message)s")
 
-    args.no_test = False
-    args.no_train = True
+    args.skip_testing = False
+    args.skip_training = True
 
     if args.quiet:
         logging.disable(levels[0])
