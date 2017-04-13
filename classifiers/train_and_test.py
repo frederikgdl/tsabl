@@ -188,11 +188,11 @@ def main(arguments):
 
 def print_intro(arguments):
     print()
-    if not arguments.no_train and not arguments.no_test:
+    if not arguments.skip_training and not arguments.skip_testing:
         print('Training and testing classifiers')
-    if arguments.no_test:
+    if arguments.skip_testing:
         print('Training classifiers')
-    if arguments.no_train:
+    if arguments.skip_training:
         print('Testing classifiers')
 
     print()
@@ -200,9 +200,10 @@ def print_intro(arguments):
     print()
     print('{:24}'.format('Word embedding file:'), config.EMBEDDING_FILE)
     print('{:24}'.format('Training data file:'), config.TRAIN_FILE)
+    print('{:24}'.format('Test data file:'), config.TEST_FILE)
     print()
-    print('{:24}'.format('SVM model file:'), config.SVM_MODEL_FILE)
-    print('{:24}'.format('LogRes model file:'), config.LOGRES_MODEL_FILE)
+    print('{:24}'.format('Model directory:'), config.MODELS_DIR)
+    print('{:24}'.format('Results directory:'), config.RESULTS_DIR)
     print()
 
 
