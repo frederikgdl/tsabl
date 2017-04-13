@@ -150,7 +150,7 @@ def print_results(models):
 def main(arguments):
     word_embeddings = load_word_embeddings()
 
-    if not arguments.no_train:
+    if not arguments.skip_training:
         # Prepare training data
         tweets_train, labels_train_txt = load_training_data()
         embeddings_train = calculate_tweet_embeddings(word_embeddings, tweets_train)
@@ -167,7 +167,7 @@ def main(arguments):
     else:
         load_classifier_models()
 
-    if not arguments.no_test:
+    if not arguments.skip_testing:
         # Prepare test data
         tweets_test, labels_test_txt = load_test_data()
         embeddings_test = calculate_tweet_embeddings(word_embeddings, tweets_test)
@@ -211,8 +211,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='tsabl - train classifiers')
 
-    parser.add_argument('--no-train', action='store_true', help='do not train classifiers')
-    parser.add_argument('--no-test', action='store_true', help='do not test classifiers')
+    parser.add_argument('--skip-training', action='store_true', help='do not train classifiers')
+    parser.add_argument('--skip-testing', action='store_true', help='do not test classifiers')
 
     # Logger verbosity parameters
     parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
