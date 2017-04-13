@@ -2,6 +2,7 @@ package funcs;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class Funcs {
 	
 //	public static DecimalFormat dFormat = new DecimalFormat("0.0000000000");
 	
-	public static void dumpEmbedFile(String embedFile, 
+	public static void dumpEmbedFile(String filePath,
 			String encoding,
 			HashMap<String, Integer> vocabMap,
 			double[][] table,
@@ -37,6 +38,10 @@ public class Funcs {
 		}
 		
 		try{
+			File embedFile = new File(filePath);
+			embedFile.getParentFile().mkdirs();
+			embedFile.createNewFile();
+
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 			          new FileOutputStream(embedFile), encoding)));
 			for(int idx: inverseVocabMap.keySet())
