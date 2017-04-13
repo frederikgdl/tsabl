@@ -8,7 +8,7 @@ from classifiers.models.log_res import LogRes
 
 import classifiers.config as config
 import classifiers.funcs as funcs
-import classifiers.word_embedding_dict as wedict
+from classifiers.word_embedding_dict import WordEmbeddingDict
 from classifiers.models.afinn import AfinnModel
 from classifiers.models.combo_average import ComboAverage
 from classifiers.models.random_uniform import RandomUniform
@@ -38,7 +38,7 @@ baselines = [
 def load_word_embeddings():
     logging.info("Loading word embeddings")
     t = time()
-    md = wedict.WordEmbeddingDict(embedding_file)
+    md = WordEmbeddingDict(embedding_file)
     logging.debug("Done. " + str(time() - t) + "s")
     return md
 
