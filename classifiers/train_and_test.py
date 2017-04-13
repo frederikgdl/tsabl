@@ -38,9 +38,9 @@ baselines = [
 def load_word_embeddings():
     logging.info("Loading word embeddings")
     t = time()
-    md = WordEmbeddingDict(embedding_file)
+    word_embeddings = WordEmbeddingDict(embedding_file)
     logging.debug("Done. " + str(time() - t) + "s")
-    return md
+    return word_embeddings
 
 
 def load_training_data():
@@ -148,12 +148,12 @@ def print_results(models):
 
 
 def main(arguments):
-    md = load_word_embeddings()
+    word_embeddings = load_word_embeddings()
 
     if not arguments.no_train:
         # Prepare training data
         tweets_train, labels_train_txt = load_training_data()
-        embeddings_train = calculate_tweet_embeddings(md, tweets_train)
+        embeddings_train = calculate_tweet_embeddings(word_embeddings, tweets_train)
         embeddings_train_scaled = scale_word_embeddings(embeddings_train)
         labels_train_num = convert_labels_to_numerical(labels_train_txt)
 
@@ -170,7 +170,7 @@ def main(arguments):
     if not arguments.no_test:
         # Prepare test data
         tweets_test, labels_test_txt = load_test_data()
-        embeddings_test = calculate_tweet_embeddings(md, tweets_test)
+        embeddings_test = calculate_tweet_embeddings(word_embeddings, tweets_test)
         embeddings_test_scaled = scale_word_embeddings(embeddings_test)
         labels_test_num = convert_labels_to_numerical(labels_test_txt)
 
