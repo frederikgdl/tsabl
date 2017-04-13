@@ -1,20 +1,21 @@
 import logging
-import numpy as np
-from time import time
 from os import path
+from time import time
 
-from classifiers.models.svm import SVM
-from classifiers.models.log_res import LogRes
+import numpy as np
 
 import classifiers.config as config
 import classifiers.funcs as funcs
-from classifiers.word_embedding_dict import WordEmbeddingDict
 from classifiers.models.afinn import AfinnModel
 from classifiers.models.combo_average import ComboAverage
+from classifiers.models.lexicon_classifier import LexiconClassifier
+from classifiers.models.log_res import LogRes
 from classifiers.models.random_uniform import RandomUniform
 from classifiers.models.random_weighted import RandomWeighted
+from classifiers.models.svm import SVM
 from classifiers.models.textblob import Textblob
 from classifiers.models.vader import Vader
+from classifiers.word_embedding_dict import WordEmbeddingDict
 
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
@@ -31,7 +32,8 @@ baselines = [
     AfinnModel(),
     Vader(threshold=0.1),
     Textblob(subjectivity_threshold=0.1, polarity_threshold=0.5),
-    ComboAverage()
+    ComboAverage(),
+    LexiconClassifier()
 ]
 
 

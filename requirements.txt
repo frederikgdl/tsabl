@@ -9,3 +9,4 @@ sklearn
 afinn
 textblob
 vaderSentiment
+fjlc
