@@ -1,6 +1,7 @@
 from classifiers.funcs import load_model, save_model
 import classifiers.metrics as metrics
 from classifiers.models.results import Results
+from utils.file_ops import write_to_file
 
 
 class Model:
@@ -44,8 +45,7 @@ class Model:
         save_model(self.model, out_file)
 
     def save_results(self, out_file):
-        with open(out_file, "w+") as f:
-            f.write(str(self.results))
+        write_to_file(str(self.results), out_file)
 
     def print(self):
         """
