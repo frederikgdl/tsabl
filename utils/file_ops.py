@@ -27,6 +27,20 @@ def read_tweets_tsv_file(file_path, index=1):
     return tweets
 
 
+def write_to_file(data_string, file_path):
+    """
+    Generic write function that writes a string to a given file.
+    Will create necessary parent directories if they don't exist already.
+    Will overwrite file if it exists already.
+
+    :param data_string: The string to write
+    :param file_path:   The path to the output file
+    """
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w+') as f:
+        f.write(data_string)
+
+
 # Saves the text of each tweet on separate lines in a new file
 def write_tweets(tweets, file_path):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)

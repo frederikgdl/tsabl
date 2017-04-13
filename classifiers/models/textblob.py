@@ -1,26 +1,29 @@
 from textblob import TextBlob
 
-from classifiers.baselines.method import Method
+from classifiers.models.model import Model
 
 
-class TextblobTweets(Method):
-    def __init__(self, tweets, tokenized_tweets, labels, subjectivity_threshold=0.1, polarity_threshold=0.4):
-        Method.__init__(self, tweets, tokenized_tweets, labels, "TEXTBLOB")
+class Textblob(Model):
+    def __init__(self, subjectivity_threshold=0.1, polarity_threshold=0.4):
+        Model.__init__(self, name="TEXTBLOB")
         self.subjectivity_threshold = subjectivity_threshold
         self.polarity_threshold = polarity_threshold
 
-    def classify(self, tweet, tokenized_tweet):
-
+    def classify(self, tweet):
         # Calculate sentiment scores
         blob = TextBlob(tweet)
         polarity = blob.sentiment.polarity
         subjectivity = blob.sentiment.subjectivity
 
         if subjectivity <= self.subjectivity_threshold and abs(polarity) < self.polarity_threshold:
-            return "neutral"
+            return 0
         elif polarity >= self.polarity_threshold:
-            return "positive"
+            return 1
         elif polarity <= -self.polarity_threshold:
-            return "negative"
+            self.predictions.append(-1)
+            return -1
+        return 0
 
-        return "neutral"
+    def predict(self, tweets, embeddings_train_scaled):
+        self.predictions = list(map(self.classify, tweets))
+        return self.predictions

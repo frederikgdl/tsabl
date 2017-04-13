@@ -45,17 +45,46 @@ def save_tweets(tweets, file_path):
 
 
 def load_labeled_data(file_name):
-    features = []
+    """
+    Load a tab separated file with tweet in first column and label in second column
+    :param file_name: The tab separated file to load
+    :return: A two-element tuple of original tweets and labels
+    """
+    tweets = []
     labels = []
+
+    valid_labels = ["positive", "negative", "neutral"]
+
+    file_extension = os.path.splitext(file_name)[1]
 
     with open(file_name) as f:
         for line in f:
-            line = line.strip().replace('\t', ' ').split(' ')
-            features.append(line[:-1])
-            labels.append(line[-1])
 
-    # labels = np.loadtxt(labels)
-    return features, labels
+            # If .tsv, assume tweet and label are separated by a tab character, and that there is only one tab per line.
+            if file_extension == ".tsv":
+                split_line = line.strip().split('\t')
+                if len(split_line) != 2:
+                    print(file_name, "contained line with" + str(len(split_line) - 1), "tabs, not 1.")
+                    raise ValueError
+
+                tweet = split_line[0]
+                label = split_line[1]
+
+            # If not .tsv, assume text file where last word in line is label
+            else:
+                split_line = line.strip().split(" ")
+                tweet = ' '.join(split_line[:-1])
+                label = split_line[-1]
+
+            # Validate label
+            if label not in valid_labels:
+                print(file_name, "has invalid label: \"" + label + "\" on line", len(tweets) + 1)
+                raise ValueError
+
+            tweets.append(tweet)
+            labels.append(label)
+
+    return tweets, labels
 
 
 def load_word_embeddings(file_name):

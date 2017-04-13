@@ -2,17 +2,17 @@ from afinn import Afinn
 from textblob import TextBlob
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-from classifiers.baselines.method import Method
+from classifiers.models.model import Model
 
 
-class ComboTweets(Method):
+class ComboAverage(Model):
     """
     Uses a combination of AFINN, VADER and TextBlob.
     The scores from the three methods are normalized to be between -1 and 1, then combined as a weighted average.
     The weights a, b, c can be set as arguments.
     """
-    def __init__(self, tweets, tokenized_tweets, labels, a=1, b=1, c=1, d=1):
-        Method.__init__(self, tweets, tokenized_tweets, labels, "Combo")
+    def __init__(self, a=1, b=1, c=1, d=1):
+        Model.__init__(self, name="Combo Average")
         self.afinn = Afinn(emoticons=True)
         self.vader = SentimentIntensityAnalyzer()
 
@@ -21,8 +21,7 @@ class ComboTweets(Method):
         self.c = c
         self.d = d
 
-    def classify(self, tweet, tokenized_tweet):
-
+    def classify(self, tweet):
         if self.a + self.b + self.c == 0:
             return "neutral"
 
@@ -40,8 +39,12 @@ class ComboTweets(Method):
         score = (self.a * norm_afinn + self.b * norm_vader + self.c * norm_blob) / (self.a + self.b + self.c)
 
         if score > self.d / 10.:
-            return "positive"
+            return 1
         if score < -self.d / 10.:
-            return "negative"
+            return -1
 
-        return "neutral"
+        return 0
+
+    def predict(self, tweets, embeddings_train_scaled):
+        self.predictions = list(map(self.classify, tweets))
+        return self.predictions
