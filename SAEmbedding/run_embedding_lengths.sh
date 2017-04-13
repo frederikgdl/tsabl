@@ -20,10 +20,10 @@ DATASET='AFINN'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-OUTPUT_FILE=${OUTPUT_DIR}${DATASET}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
-
 for EMBEDDING_LENGTH in 50 100 150
 do
+    OUTPUT_FILE=${OUTPUT_DIR}'embeddinglen-'${EMBEDDING_LENGTH}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
+
     java -classpath bin sa_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \

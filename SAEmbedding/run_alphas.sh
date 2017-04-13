@@ -20,10 +20,10 @@ DATASET='AFINN'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-OUTPUT_FILE=${OUTPUT_DIR}${DATASET}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
-
 for SENTIMENT_ALPHA in 0.0 0.2 0.4 0.5 0.6 0.8 1.0
 do
+    OUTPUT_FILE=${OUTPUT_DIR}'alpha-'${SENTIMENT_ALPHA}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
+
     java -classpath bin sa_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
