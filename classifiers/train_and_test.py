@@ -6,6 +6,7 @@ import numpy as np
 
 import classifiers.config as config
 import classifiers.funcs as funcs
+from classifiers.k_fold import KFoldValidator
 from classifiers.models.afinn import AfinnModel
 from classifiers.models.combo_average import ComboAverage
 from classifiers.models.lexicon_classifier import LexiconClassifier
@@ -165,6 +166,11 @@ def main(arguments):
         embeddings_train_scaled = scale_word_embeddings(embeddings_train)
         labels_train_num = convert_labels_to_numerical(labels_train_txt)
 
+        kfold = KFoldValidator(10, tweets_train, embeddings_train_scaled, labels_train_num)
+        kfold.run(RandomWeighted())
+
+        return
+
         # Train classifiers and save the models
         train_classifiers(tweets_train, embeddings_train_scaled, labels_train_num)
         save_classifier_models()
@@ -175,7 +181,7 @@ def main(arguments):
     else:
         load_classifier_models()
 
-    if not arguments.skip_testing:
+    if False and not arguments.skip_testing:
         # Prepare test data
         tweets_test, labels_test_txt = load_test_data()
         embeddings_test = calculate_tweet_embeddings(word_embeddings, tweets_test)
