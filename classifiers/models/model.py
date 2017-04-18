@@ -1,5 +1,4 @@
 from classifiers.funcs import load_model, save_model
-import classifiers.metrics as metrics
 from classifiers.models.results import Results
 from utils.file_ops import write_to_file
 
@@ -11,7 +10,6 @@ class Model:
         """
         self.name = name
         self.predictions = []
-        self.num_tweets = -1
         self.run_time = -1
         self.model = None
         self.results = None
@@ -55,3 +53,13 @@ class Model:
         print(self.name)
         print(self.results)
         return self
+
+    def reset(self):
+        """
+        Resets training model and results so it can be retrained
+        :return: None
+        """
+        self.predictions = []
+        self.run_time = -1
+        self.model = None
+        self.results = None

@@ -1,7 +1,5 @@
 from sklearn.model_selection import KFold
 
-from classifiers.models.random_weighted import RandomWeighted
-
 
 class KFoldValidator:
 
@@ -46,7 +44,6 @@ class KFoldValidator:
         :type classifier: classifiers.models.Model
 
         """
-
         results = []
 
         for i in range(self.k):
@@ -56,14 +53,9 @@ class KFoldValidator:
             classifier.predict(test_tweets, test_embeddings)
             classifier.test(test_labels)
             results.append(classifier.results.clone())
+            classifier.reset()
 
-        print(sum(results) / self.k)
-
-"""
-
-kfold = KFoldValidator(10, list(range(40)))
-
-kfold.run(RandomWeighted())
-for x in range(kfold.k):
-    print(kfold.train_partitions[x], kfold.test_partitions[x])
-"""
+        # Return the average score
+        average_score = sum(results) / self.k
+        classifier.results = average_score
+        return average_score

@@ -1,3 +1,4 @@
+import copy
 from collections import OrderedDict
 import classifiers.metrics as metrics
 
@@ -7,9 +8,13 @@ class Results:
     A class for calculating and holding classifier evaluation metrics
     """
 
-    def __init__(self, predictions, truth):
+    def __init__(self, predictions, truth, results=None):
         self.predictions = predictions
         self.truth = truth
+
+        if results is not None:
+            self.results = results
+            return
 
         self.results = OrderedDict()
         self.results["f1_pn_score"] = metrics.f1_pn_score(predictions, truth)
@@ -74,14 +79,8 @@ class Results:
     def __radd__(self, other):
         return self + other
 
-    def __rsub__(self, other):
-        return self - other
-
     def __rmul__(self, other):
         return self * other
 
-    def __rtruediv__(self, other):
-        return self / other
-
     def clone(self):
-        return Results(self.predictions, self.truth)
+        return Results(copy.deepcopy(self.predictions), copy.deepcopy(self.truth), copy.deepcopy(self.results))
