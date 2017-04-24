@@ -9,7 +9,7 @@ EPOCHS = 20
 
 MARGIN = 1
 
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 
 EMBEDDING_LENGTH = 50
 
@@ -39,13 +39,11 @@ LOWERCASE = True
 
 # File options
 
-DATA_FILE = path.abspath('data/filtered/tweets.txt')
-DATA_FILE_LABELED = True
+#DATA_FILE = path.abspath('data/filtered/tweets.txt')
+#DATA_FILE_LABELED = True
 
-VOCAB_FILE = path.abspath('data/raw/vocab.txt')
+OUTPUT_FILE = path.abspath('data/embeddings/binary.AFINN.batch32.txt')
 
-OUTPUT_FILE = path.abspath('data/embeddings/embeddings.txt')
+POS_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.pos.txt')
 
-POS_DATA_FILE = path.abspath('data/preprocessed/emoticon.pos.0.txt')
-
-NEG_DATA_FILE = path.abspath('data/preprocessed/emoticon.neg.0.txt')
+NEG_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neg.txt')

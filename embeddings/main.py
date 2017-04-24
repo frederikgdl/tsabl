@@ -107,8 +107,8 @@ def main():
     hidden_size = config.HIDDEN_SIZE
     embedding_length = config.EMBEDDING_LENGTH
 
-    data_file = config.DATA_FILE
-    data_file_labeled = config.DATA_FILE_LABELED
+    #data_file = config.DATA_FILE
+    #data_file_labeled = config.DATA_FILE_LABELED
     output_file = config.OUTPUT_FILE
 
     pos_file = config.POS_DATA_FILE
@@ -224,8 +224,8 @@ def print_intro():
     print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
     print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
     print()
-    print('Data file:\t\t{}'.format(config.DATA_FILE))
-    print('Data file labeled:\t{}'.format(config.DATA_FILE_LABELED))
+    #print('Data file:\t\t{}'.format(config.DATA_FILE))
+    #print('Data file labeled:\t{}'.format(config.DATA_FILE_LABELED))
     print('Output file:\t\t{}'.format(config.OUTPUT_FILE))
     print()
     print('Pos file:\t\t{}'.format(config.POS_DATA_FILE))
