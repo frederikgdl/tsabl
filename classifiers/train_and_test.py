@@ -6,6 +6,7 @@ import numpy as np
 
 import classifiers.config as config
 import classifiers.funcs as funcs
+from classifiers.k_fold import KFoldValidator
 from classifiers.models.afinn import AfinnModel
 from classifiers.models.combo_average import ComboAverage
 from classifiers.models.lexicon_classifier import LexiconClassifier
@@ -16,6 +17,7 @@ from classifiers.models.svm import SVM
 from classifiers.models.textblob import Textblob
 from classifiers.models.vader import Vader
 from classifiers.word_embedding_dict import WordEmbeddingDict
+from utils.file_ops import write_to_file
 
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
@@ -104,6 +106,15 @@ def train_baselines(tweets_train, embeddings_train_scaled, labels_train_num):
     train(baselines, tweets_train, embeddings_train_scaled, labels_train_num)
 
 
+def do_k_fold_validation(k, embeddings_train_scaled, labels_train_num, tweets_train):
+    kfold = KFoldValidator(k, tweets_train, embeddings_train_scaled, labels_train_num)
+    for classifier in classifiers:
+        res = kfold.run(classifier)
+        write_to_file(str(res), path.join(config.RESULTS_DIR, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
+    for baseline in baselines:
+        kfold.run(baseline)
+
+
 # TODO: Parallelize
 def load_classifier_models():
     for classifier in classifiers:
@@ -158,12 +169,22 @@ def print_results(models):
 def main(arguments):
     word_embeddings = load_word_embeddings()
 
-    if not arguments.skip_training:
+    if arguments.skip_training:
+        # Load saved classifier models from files
+        load_classifier_models()
+    else:
         # Prepare training data
         tweets_train, labels_train_txt = load_training_data()
         embeddings_train = calculate_tweet_embeddings(word_embeddings, tweets_train)
         embeddings_train_scaled = scale_word_embeddings(embeddings_train)
         labels_train_num = convert_labels_to_numerical(labels_train_txt)
+
+        # Do K-fold validation. This does both training and testing, so we return after it's done.
+        if arguments.k_fold > 1:
+            do_k_fold_validation(arguments.k_fold, embeddings_train_scaled, labels_train_num, tweets_train)
+            print_results(classifiers)
+            print_results(baselines)
+            return
 
         # Train classifiers and save the models
         train_classifiers(tweets_train, embeddings_train_scaled, labels_train_num)
@@ -172,27 +193,27 @@ def main(arguments):
         # Train baselines
         train_baselines(tweets_train, embeddings_train_scaled, labels_train_num)
 
-    else:
-        load_classifier_models()
+    # If we are to skip testing, there's not more to do, so we can return from the function
+    if arguments.skip_testing:
+        return
 
-    if not arguments.skip_testing:
-        # Prepare test data
-        tweets_test, labels_test_txt = load_test_data()
-        embeddings_test = calculate_tweet_embeddings(word_embeddings, tweets_test)
-        embeddings_test_scaled = scale_word_embeddings(embeddings_test)
-        labels_test_num = convert_labels_to_numerical(labels_test_txt)
+    # Prepare test data
+    tweets_test, labels_test_txt = load_test_data()
+    embeddings_test = calculate_tweet_embeddings(word_embeddings, tweets_test)
+    embeddings_test_scaled = scale_word_embeddings(embeddings_test)
+    labels_test_num = convert_labels_to_numerical(labels_test_txt)
 
-        # Test classifiers and save the results
-        test_classifiers(tweets_test, embeddings_test_scaled, labels_test_num)
-        save_classifier_results()
+    # Test classifiers and save the results
+    test_classifiers(tweets_test, embeddings_test_scaled, labels_test_num)
+    save_classifier_results()
 
-        # Test baselines
-        test_baselines(tweets_test, embeddings_test_scaled, labels_test_num)
-        # save_baseline_results()
+    # Test baselines
+    test_baselines(tweets_test, embeddings_test_scaled, labels_test_num)
+    # save_baseline_results()
 
-        # Print results
-        print_results(classifiers)
-        print_results(baselines)
+    # Print results
+    print_results(classifiers)
+    print_results(baselines)
 
 
 def print_intro(arguments):
@@ -221,6 +242,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='tsabl - train classifiers')
 
+    parser.add_argument('-k', '--k-fold', type=int, default=config.K, help='perform k-fold validation with given k, must be greater than 1')
     parser.add_argument('--skip-training', action='store_true', help='do not train classifiers')
     parser.add_argument('--skip-testing', action='store_true', help='do not test classifiers')
 

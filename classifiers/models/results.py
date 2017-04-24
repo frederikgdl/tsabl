@@ -1,3 +1,4 @@
+import copy
 from collections import OrderedDict
 import classifiers.metrics as metrics
 
@@ -7,9 +8,13 @@ class Results:
     A class for calculating and holding classifier evaluation metrics
     """
 
-    def __init__(self, predictions, truth):
+    def __init__(self, predictions, truth, results=None):
         self.predictions = predictions
         self.truth = truth
+
+        if results is not None:
+            self.results = results
+            return
 
         self.results = OrderedDict()
         self.results["f1_pn_score"] = metrics.f1_pn_score(predictions, truth)
@@ -38,3 +43,44 @@ class Results:
             results_string += '{:32}'.format(key) + '{:>10}'.format(str(value)) + "\n"
 
         return results_string
+
+    def apply_operator(self, operand, operator):
+        """
+        Add metrics of other results instance to this instance's metrics
+
+        :param operand: Operand
+        :param operator: Operator function that takes self and operand as arguments
+        :type operator: function
+        :return: A clone of this Results instance with updated metrics
+        """
+        if not isinstance(operand, (Results, int, float)):
+            return NotImplemented
+
+        clone = self.clone()
+
+        for key, value in clone.results.items():
+            other_value = operand.results[key] if isinstance(operand, Results) else operand
+            clone.results[key] = operator(clone.results[key], other_value)
+
+        return clone
+
+    def __add__(self, other):
+        return self.apply_operator(other, lambda a, b: a + b)
+
+    def __sub__(self, other):
+        return self.apply_operator(other, lambda a, b: a - b)
+
+    def __mul__(self, other):
+        return self.apply_operator(other, lambda a, b: a * b)
+
+    def __truediv__(self, other):
+        return self.apply_operator(other, lambda a, b: a / float(b))
+
+    def __radd__(self, other):
+        return self + other
+
+    def __rmul__(self, other):
+        return self * other
+
+    def clone(self):
+        return Results(copy.deepcopy(self.predictions), copy.deepcopy(self.truth), copy.deepcopy(self.results))
