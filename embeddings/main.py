@@ -162,7 +162,6 @@ def main():
     logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
-
     labels = funcs.get_numeric_labels(labels, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
