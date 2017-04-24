@@ -23,7 +23,7 @@ DROPOUT_P = 0
 
 ALPHA = 0.5
 
-SENTIMENT_CLASSES = 2
+SENTIMENT_CLASSES = 3
 
 
 # Tokenizer options
@@ -39,11 +39,16 @@ LOWERCASE = True
 
 # File options
 
-#DATA_FILE = path.abspath('data/filtered/tweets.txt')
-#DATA_FILE_LABELED = True
+OUTPUT_FILE = path.abspath('data/embeddings/test_embeddings.txt')
 
-OUTPUT_FILE = path.abspath('data/embeddings/binary.AFINN.batch32.txt')
+POS_DATA_FILE = path.abspath('data/filtered/emoticon.pos.0.txt')
 
-POS_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.pos.txt')
+NEG_DATA_FILE = path.abspath('data/filtered/emoticon.neg.0.txt')
 
-NEG_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neg.txt')
+NEU_DATA_FILE = path.abspath('data/filtered/emoticon.neu.0.txt')
+
+# POS_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.pos.txt')
+#
+# NEG_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neg.txt')
+#
+# NEU_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neu.txt')
