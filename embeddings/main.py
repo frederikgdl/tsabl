@@ -103,21 +103,13 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
 
 
 def main():
-    window_size = config.WINDOW_SIZE
-    hidden_size = config.HIDDEN_SIZE
-    embedding_length = config.EMBEDDING_LENGTH
-
-    #data_file = config.DATA_FILE
-    #data_file_labeled = config.DATA_FILE_LABELED
-    output_file = config.OUTPUT_FILE
-
-    pos_file = config.POS_DATA_FILE
-    neg_file = config.NEG_DATA_FILE
-
     min_freq = config.MIN_WORD_FREQUENCY
     max_nb_words = config.MAX_NUMBER_WORDS
     lowercase = config.LOWERCASE
 
+    window_size = config.WINDOW_SIZE
+    hidden_size = config.HIDDEN_SIZE
+    embedding_length = config.EMBEDDING_LENGTH
     nb_epochs = config.EPOCHS
     margin = config.MARGIN
     batch_size = config.BATCH_SIZE
@@ -126,10 +118,28 @@ def main():
     adagrad_lr = config.ADAGRAD_LR
     sentiment_classes = config.SENTIMENT_CLASSES
 
+    if sentiment_classes not in [2, 3]:
+        logging.critical('The number of supported sentiment classes is 2 or 3. Number given: {}'
+                         .format(sentiment_classes))
+        exit(1)
+
+    output_file = config.OUTPUT_FILE
+
+    pos_file = config.POS_DATA_FILE
+    neg_file = config.NEG_DATA_FILE
+
+    file_paths = [pos_file, neg_file]
+    sentiment_labels = ['positive', 'negative']
+
+    if sentiment_classes == 3:
+        neu_file = config.NEU_DATA_FILE
+        file_paths.append(neu_file)
+        sentiment_labels.append('neutral')
+
     # Read data
     logging.info('Loading tweet data')
     t = time()
-    texts, labels = funcs.get_training_data(pos_file, neg_file)
+    texts, labels = funcs.get_training_data(file_paths, sentiment_labels)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Shuffling tweet data')
@@ -152,10 +162,7 @@ def main():
     logging.info('Converting labels')
     t = time()
     # Turn 'positive' to [1, -1, -1], 'neutral' to [-1, 1, -1] and negative to [-1, -1, 1].
-    if sentiment_classes not in [2, 3]:
-        logging.critical('The number of supported sentiment classes is 2 or 3. Number given: {}'
-                         .format(sentiment_classes))
-        exit(1)
+
     labels = funcs.get_numeric_labels(labels, sentiment_classes)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
@@ -220,16 +227,12 @@ def print_intro():
     print()
     print('config.py settings:')
     print()
-    print('Window size:\t\t{}'.format(config.WINDOW_SIZE))
-    print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
-    print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
-    print()
-    #print('Data file:\t\t{}'.format(config.DATA_FILE))
-    #print('Data file labeled:\t{}'.format(config.DATA_FILE_LABELED))
     print('Output file:\t\t{}'.format(config.OUTPUT_FILE))
     print()
-    print('Pos file:\t\t{}'.format(config.POS_DATA_FILE))
-    print('Neg file:\t\t{}'.format(config.NEG_DATA_FILE))
+    print('Positive file:\t{}'.format(config.POS_DATA_FILE))
+    print('Negative file:\t{}'.format(config.NEG_DATA_FILE))
+    if config.SENTIMENT_CLASSES == 3:
+        print('Neutral file:\t{}'.format(config.NEG_DATA_FILE))
     print()
     print('Min frequency:\t\t{}'.format(config.MIN_WORD_FREQUENCY))
     print('Max number of words:\t{}'.format(config.MAX_NUMBER_WORDS))
@@ -242,6 +245,9 @@ def print_intro():
     print('Alpha:\t\t\t{}'.format(config.ALPHA))
     print('Adagrad learning rate:\t{}'.format(config.ADAGRAD_LR))
     print('Sentiment classes:\t{}'.format(config.SENTIMENT_CLASSES))
+    print('Window size:\t\t{}'.format(config.WINDOW_SIZE))
+    print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
+    print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
     print()
 
 

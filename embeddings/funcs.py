@@ -4,14 +4,21 @@ import os
 from utils import file_ops
 
 
-def get_training_data(pos_file, neg_file):
-    positive_tweets = file_ops.read_lines(pos_file)
-    positive_labels = ['positive']*len(positive_tweets)
+# Returns tweets and labels for tweets in files in file_paths
+# Parameter sentiment_labels contains labels for all tweets in file_paths
+# All tweets in the file given by the first file path is labeled by the first label in sentiment_labels
+def get_training_data(file_paths, sentiment_labels):
+    assert len(file_paths) == len(sentiment_labels)
 
-    negative_tweets = file_ops.read_lines(neg_file)
-    negative_labels = ['negative']*len(negative_tweets)
+    tweets, labels = [], []
+    for i, file_path in enumerate(file_paths):
+        new_tweets = file_ops.read_lines(file_path)
+        new_labels = [sentiment_labels[i]]*len(new_tweets)
 
-    return positive_tweets + negative_tweets, positive_labels + negative_labels
+        tweets += new_tweets
+        labels += new_labels
+
+    return tweets, labels
 
 
 def shuffle_data(texts, labels):
