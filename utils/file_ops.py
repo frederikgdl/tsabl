@@ -114,21 +114,22 @@ def load_word_embeddings(file_name):
     with open(file_name) as f:
         # Get dimensionality from length of first vector
         first_line = f.readline()
-        dimensionality = len(first_line.split(' ')) - 1
+        dimensionality = len(first_line.split()) - 1
         embeddings = {}
 
         # Add the first line to embeddings
-        split_first_line = first_line.split(' ', 1)
+        split_first_line = first_line.split(None, 1)
         embeddings[split_first_line[0]] = np.fromstring(split_first_line[1], dtype=float, sep=' ')
 
         # Add the rest of the vectors
         for i, line in enumerate(f):
-            split_line = line.strip().split(' ', 1)
+            split_line = line.split(None, 1)
             word = split_line[0]
 
-            # GloVe had a space as char, first number used instead
-            # Plus erroneous files
-            if len(split_line[1].split(' ')) == dimensionality:
+            # Only add lines if they have same length as first
+            if len(split_line[1].split()) == dimensionality:
                 embeddings[word] = np.fromstring(split_line[1], dtype=float, sep=' ')
+            else:
+                print('#####################################################################################LULWUT')
 
     return embeddings
