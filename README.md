@@ -60,3 +60,8 @@ Embeddings can be trained on GPU using either Theano or TensorFlow backend.
 ```bash
 ./run_gpu.sh
 ```
+
+## Tests
+```bash
+python -m unittest
+```
