@@ -1,6 +1,5 @@
-from classifiers.funcs import load_model, save_model
 from classifiers.models.results import Results
-from utils.file_ops import write_to_file
+from utils.file_ops import write_to_file, load_model, save_model
 
 
 class Model:

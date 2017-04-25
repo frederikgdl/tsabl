@@ -1,5 +1,6 @@
 import re
 import os
+import pickle
 from functools import reduce
 from json import dumps
 from os.path import join, isfile
@@ -90,7 +91,6 @@ def read_and_concatenate_files(dir_path, extension=""):
 # Returns the text from a tweet object
 def get_text(tweet):
     return re.sub('\s+', ' ', tweet["text"])
-    # return tweet["text"].replace("\n", " ")
 
 
 # Saves every JSON tweet object on a separate line in a new file
@@ -129,7 +129,67 @@ def load_word_embeddings(file_name):
             # Only add lines if they have same length as first
             if len(split_line[1].split()) == dimensionality:
                 embeddings[word] = np.fromstring(split_line[1], dtype=float, sep=' ')
-            else:
-                print('#####################################################################################LULWUT')
 
     return embeddings
+
+
+def load_labeled_data(file_name):
+    """
+    Load a tab separated file with tweet in first column and label in second column
+    :param file_name: The tab separated file to load
+    :return: A two-element tuple of original tweets and labels
+    """
+    tweets = []
+    labels = []
+
+    valid_labels = ["positive", "negative", "neutral"]
+
+    file_extension = os.path.splitext(file_name)[1]
+
+    with open(file_name) as f:
+        for line in f:
+
+            # If .tsv, assume tweet and label are separated by a tab character, and that there is only one tab per line.
+            if file_extension == ".tsv":
+                split_line = line.strip().split('\t')
+                if len(split_line) != 2:
+                    print(file_name, "contained line with" + str(len(split_line) - 1), "tabs, not 1.")
+                    raise ValueError
+
+                tweet = split_line[0]
+                label = split_line[1]
+
+            # If not .tsv, assume text file where last word in line is label
+            else:
+                split_line = line.strip().split(" ")
+                tweet = ' '.join(split_line[:-1])
+                label = split_line[-1]
+
+            # Validate label
+            if label not in valid_labels:
+                print(file_name, "has invalid label: \"" + label + "\" on line", len(tweets) + 1)
+                raise ValueError
+
+            tweets.append(tweet)
+            labels.append(label)
+
+    return tweets, labels
+
+
+def save_model(model, file_path):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "wb+") as f:
+        pickle.dump(model, f, pickle.HIGHEST_PROTOCOL)
+
+
+def load_model(file_name):
+    with open(file_name, "rb") as f:
+        data = pickle.load(f)
+    return data
+
+
+def dump_embed_file(output_file, inverse_vocab_map, embeddings):
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, 'w+') as f:
+        for k in inverse_vocab_map.keys():
+            f.write(str(inverse_vocab_map[k]) + ' ' + ' '.join([str(num) for num in embeddings[k]]) + '\n')
