@@ -38,10 +38,13 @@ class WordEmbeddingDict:
     # TODO Implement more sentence embedding methods
     #
     def get_tweet_embedding(self, tweet, mode="avg"):
-        if mode == "avg":
-            return self.calc_avg(tweet)
+        if isinstance(tweet, list):
+            if mode == "avg":
+                return self.calc_avg(tweet)
+            else:
+                print("Unsupported mode " + mode)
         else:
-            print("Unsupported mode " + mode)
+            raise ValueError('Tweet must be represented as a list of strings')
 
     # Returns the average vector of the word embeddings
     # for the words in the list of strings words

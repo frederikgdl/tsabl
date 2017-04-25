@@ -67,6 +67,7 @@ def load_test_data():
 def calculate_tweet_embeddings(md, tweets):
     logging.info("Calculating tweet embeddings")
     t = time()
+    tweets = [tweet.split() for tweet in tweets]
     embeddings = list(map(md.get_tweet_embedding, tweets))
     embeddings = np.array(embeddings)
     logging.debug("Done. " + str(time() - t) + "s")

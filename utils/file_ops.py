@@ -161,7 +161,7 @@ def load_labeled_data(file_name):
 
             # If not .tsv, assume text file where last word in line is label
             else:
-                split_line = line.strip().split(" ")
+                split_line = line.strip().split()
                 tweet = ' '.join(split_line[:-1])
                 label = split_line[-1]
 
