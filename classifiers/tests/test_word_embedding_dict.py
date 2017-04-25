@@ -16,11 +16,11 @@ class TestWordEmbeddingDict(unittest.TestCase):
 
     def test_init(self):
         for word_embeddings_dict in self.word_embeddings:
-            self.assertEquals(4, word_embeddings_dict.n_vecs)
-            self.assertEquals(4, word_embeddings_dict.d)
-            self.assertEquals(4, len(word_embeddings_dict.embeddings))
+            self.assertEqual(4, word_embeddings_dict.n_vecs)
+            self.assertEqual(4, word_embeddings_dict.d)
+            self.assertEqual(4, len(word_embeddings_dict.embeddings))
             for word in word_embeddings_dict.embeddings.keys():
-                self.assertEquals(4, len(word_embeddings_dict.embeddings[word]))
+                self.assertEqual(4, len(word_embeddings_dict.embeddings[word]))
 
 if __name__ == '__main__':
     unittest.main()
