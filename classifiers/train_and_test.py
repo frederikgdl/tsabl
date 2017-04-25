@@ -40,62 +40,62 @@ baselines = [
 
 
 def load_word_embeddings():
-    logging.info("Loading word embeddings")
+    logger.info("Loading word embeddings")
     t = time()
     word_embeddings = WordEmbeddingDict(embedding_file)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     return word_embeddings
 
 
 def load_training_data():
-    logging.info("Loading training data")
+    logger.info("Loading training data")
     t = time()
     tweets_train, labels_train_txt = funcs.load_labeled_data(train_file)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     return tweets_train, labels_train_txt
 
 
 def load_test_data():
-    logging.info("Loading test data")
+    logger.info("Loading test data")
     t = time()
     tweets_test, labels_test_txt = funcs.load_labeled_data(test_file)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     return tweets_test, labels_test_txt
 
 
 def calculate_tweet_embeddings(md, tweets):
-    logging.info("Calculating tweet embeddings")
+    logger.info("Calculating tweet embeddings")
     t = time()
     embeddings = list(map(md.get_tweet_embedding, tweets))
     embeddings = np.array(embeddings)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     return embeddings
 
 
 def scale_word_embeddings(embeddings_train):
-    logging.info("Scaling word embedding vectors")
+    logger.info("Scaling word embedding vectors")
     t = time()
     embeddings_train_scaled = [funcs.scale_vector(emb) for emb in embeddings_train]
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     # embeddings_train_scaled = funcs.regularize_hor(embeddings_train)
     return embeddings_train_scaled
 
 
 def convert_labels_to_numerical(labels_train_txt):
-    logging.info("Converting labels to numerical")
+    logger.info("Converting labels to numerical")
     t = time()
     labels_train_num = funcs.get_labels_numerical(labels_train_txt)
-    logging.debug("Done. " + str(time() - t) + "s")
+    logger.debug("Done. " + str(time() - t) + "s")
     return labels_train_num
 
 
 # TODO: Parallelize
 def train(models, tweets, embeddings_train_scaled, labels_train_num):
     for model in models:
-        logging.info("Training " + model.name + " classifier on training data")
+        logger.info("Training " + model.name + " classifier on training data")
         t = time()
         model.train(tweets, embeddings_train_scaled, labels_train_num)  # 7.396183688299606)
-        logging.debug("Done. " + str(time() - t) + "s")
+        logger.debug("Done. " + str(time() - t) + "s")
 
 
 def train_classifiers(tweets_train, embeddings_train_scaled, labels_train_num):
@@ -119,19 +119,19 @@ def do_k_fold_validation(k, embeddings_train_scaled, labels_train_num, tweets_tr
 def load_classifier_models():
     for classifier in classifiers:
         model_file = path.join(config.MODELS_DIR, classifier.name + ".pickle")
-        logging.info("Loading " + classifier.name + " model from " + model_file)
+        logger.info("Loading " + classifier.name + " model from " + model_file)
         t = time()
         classifier.load_model(model_file)
-        logging.debug("Done. " + str(time() - t) + "s")
+        logger.debug("Done. " + str(time() - t) + "s")
 
 
 # TODO: Parallelize
 def save_classifier_models():
     for classifier in classifiers:
-        logging.info("Saving " + classifier.name + " model")
+        logger.info("Saving " + classifier.name + " model")
         t = time()
         classifier.save_model(path.join(config.MODELS_DIR, classifier.name + ".pickle"))
-        logging.debug("Done. " + str(time() - t) + "s")
+        logger.debug("Done. " + str(time() - t) + "s")
 
 
 # TODO: Parallelize
@@ -237,6 +237,30 @@ def print_intro(arguments):
     print()
 
 
+def setup_logger():
+    # logger level
+    levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
+    level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
+
+    # create logger
+    new_logger = logging.getLogger('train_and_test')
+    new_logger.setLevel(level)
+    new_logger.propagate = False
+
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(message)s")
+
+    # add formatter to ch
+    ch.setFormatter(formatter)
+
+    # add ch to logger
+    new_logger.addHandler(ch)
+    return new_logger
+
 if __name__ == "__main__":
     import argparse
 
@@ -252,13 +276,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
-    level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
-    logging.basicConfig(level=level, format="%(asctime)s\t%(levelname)s\t%(message)s")
-
     if args.quiet:
-        logging.disable(levels[0])
+        logging.disable(logging.ERROR)
     else:
         print_intro(args)
+
+    logger = setup_logger()
 
     main(args)
