@@ -21,15 +21,15 @@ class Results:
         self.results["ternary_macro_f1_score"] = metrics.ternary_macro_f1_score(predictions, truth)
 
         self.results["positive_precision"] = metrics.ternary_precision(predictions, truth, 1)
-        self.results["positive_recall"] = metrics.ternary_precision(predictions, truth, 1)
+        self.results["positive_recall"] = metrics.ternary_recall(predictions, truth, 1)
         self.results["positive_f1_score"] = metrics.ternary_f1_score(predictions, truth, 1)
 
         self.results["negative_precision"] = metrics.ternary_precision(predictions, truth, -1)
-        self.results["negative_recall"] = metrics.ternary_precision(predictions, truth, -1)
+        self.results["negative_recall"] = metrics.ternary_recall(predictions, truth, -1)
         self.results["negative_f1_score"] = metrics.ternary_f1_score(predictions, truth, -1)
 
         self.results["neutral_precision"] = metrics.ternary_precision(predictions, truth, 0)
-        self.results["neutral_recall"] = metrics.ternary_precision(predictions, truth, 0)
+        self.results["neutral_recall"] = metrics.ternary_recall(predictions, truth, 0)
         self.results["neutral_f1_score"] = metrics.ternary_f1_score(predictions, truth, 0)
 
     def __str__(self):
