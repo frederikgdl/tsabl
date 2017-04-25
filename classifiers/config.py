@@ -1,10 +1,12 @@
 from os import path
 
+SUFFIX = "binary/AFINN/embeddings-50-AFINN-round-19"
+
 # File options
-# EMBEDDING_FILE = path.abspath("data/embeddings/binary_sa_embedding/afinn-1M-round-19")
-EMBEDDING_FILE = path.abspath("data/embeddings/embeddings.txt")
-TRAIN_FILE = path.abspath("data/preprocessed/twitter-2016train-A.txt")
-TEST_FILE = path.abspath("data/preprocessed/twitter-2016devtest-A.txt")
+EMBEDDING_FILE = path.abspath("data/embeddings/" + SUFFIX)
+# EMBEDDING_FILE = path.abspath("data/embeddings/embeddings.txt")
+TRAIN_FILE = path.abspath("data/preprocessed/twitter-2013train-A.txt")
+TEST_FILE = path.abspath("data/preprocessed/twitter-2013test-A.txt")
 
 # K-fold validation
 # Set K to a number greater than 1 to activate K-fold validation.
@@ -14,4 +16,4 @@ TEST_FILE = path.abspath("data/preprocessed/twitter-2016devtest-A.txt")
 K = -1
 
 MODELS_DIR = path.abspath("models")
-RESULTS_DIR = path.abspath("results")
+RESULTS_DIR = path.abspath("results/" + SUFFIX)

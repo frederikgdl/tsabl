@@ -209,7 +209,7 @@ def main(arguments):
 
     # Test baselines
     test_baselines(tweets_test, embeddings_test_scaled, labels_test_num)
-    # save_baseline_results()
+    save_baseline_results()
 
     # Print results
     print_results(classifiers)
