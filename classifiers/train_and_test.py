@@ -17,7 +17,8 @@ from classifiers.models.svm import SVM
 from classifiers.models.textblob import Textblob
 from classifiers.models.vader import Vader
 from classifiers.word_embedding_dict import WordEmbeddingDict
-from utils.file_ops import write_to_file
+
+from utils import file_ops
 
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
@@ -50,7 +51,7 @@ def load_word_embeddings():
 def load_training_data():
     logger.info("Loading training data")
     t = time()
-    tweets_train, labels_train_txt = funcs.load_labeled_data(train_file)
+    tweets_train, labels_train_txt = file_ops.load_labeled_data(train_file)
     logger.debug("Done. " + str(time() - t) + "s")
     return tweets_train, labels_train_txt
 
@@ -58,7 +59,7 @@ def load_training_data():
 def load_test_data():
     logger.info("Loading test data")
     t = time()
-    tweets_test, labels_test_txt = funcs.load_labeled_data(test_file)
+    tweets_test, labels_test_txt = file_ops.load_labeled_data(test_file)
     logger.debug("Done. " + str(time() - t) + "s")
     return tweets_test, labels_test_txt
 
@@ -66,6 +67,7 @@ def load_test_data():
 def calculate_tweet_embeddings(md, tweets):
     logger.info("Calculating tweet embeddings")
     t = time()
+    tweets = [tweet.split() for tweet in tweets]
     embeddings = list(map(md.get_tweet_embedding, tweets))
     embeddings = np.array(embeddings)
     logger.debug("Done. " + str(time() - t) + "s")
@@ -110,7 +112,8 @@ def do_k_fold_validation(k, embeddings_train_scaled, labels_train_num, tweets_tr
     kfold = KFoldValidator(k, tweets_train, embeddings_train_scaled, labels_train_num)
     for classifier in classifiers:
         res = kfold.run(classifier)
-        write_to_file(str(res), path.join(config.RESULTS_DIR, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
+        file_ops.write_to_file(str(res),
+                               path.join(config.RESULTS_DIR, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
     for baseline in baselines:
         kfold.run(baseline)
 

@@ -12,9 +12,9 @@ class WordEmbeddingDict:
 
     # Loads words and word embeddings and stores in self.words and self.embeddings
     # Decodes utf-8
-    # File format (multivec):
-    # nWords nDimensions
-    # word embedding0 embedding1 ...
+    # File format:
+    # word0 embedding0 embedding1 ...
+    # word1 embedding0 embedding1 ...
     # ...
     def load_embeddings(self):
         self.embeddings = file_ops.load_word_embeddings(self.data_file_name)
@@ -38,10 +38,13 @@ class WordEmbeddingDict:
     # TODO Implement more sentence embedding methods
     #
     def get_tweet_embedding(self, tweet, mode="avg"):
-        if mode == "avg":
-            return self.calc_avg(tweet)
+        if isinstance(tweet, list):
+            if mode == "avg":
+                return self.calc_avg(tweet)
+            else:
+                print("Unsupported mode " + mode)
         else:
-            print("Unsupported mode " + mode)
+            raise ValueError('Tweet must be represented as a list of strings')
 
     # Returns the average vector of the word embeddings
     # for the words in the list of strings words

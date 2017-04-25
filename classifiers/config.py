@@ -1,6 +1,6 @@
 from os import path
 
-SUFFIX = "binary/AFINN/embeddings-50-AFINN-round-19"
+SUFFIX = "sswe/sswe-u.txt"
 
 # File options
 EMBEDDING_FILE = path.abspath("data/embeddings/" + SUFFIX)
