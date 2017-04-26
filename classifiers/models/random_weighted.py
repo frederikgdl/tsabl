@@ -7,8 +7,8 @@ class RandomWeighted(Model):
     """
     Picks random label based on a probability distribution built from the test set
     """
-    def __init__(self):
-        Model.__init__(self, name="Random Weighted")
+    def __init__(self, name="Random Weighted"):
+        Model.__init__(self, name=name)
         self.probability_distribution = [1/3., 1/3., 1/3.]
 
     def train(self, tweets, embeddings, labels):

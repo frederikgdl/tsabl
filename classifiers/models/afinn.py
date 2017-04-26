@@ -5,8 +5,8 @@ from classifiers.models.model import Model
 
 
 class AfinnModel(Model):
-    def __init__(self):
-        Model.__init__(self, "AFINN")
+    def __init__(self, name="AFINN"):
+        Model.__init__(self, name=name)
         self.afinn = Afinn(emoticons=True)
 
     def predict(self, tweets, embeddings_train_scaled):

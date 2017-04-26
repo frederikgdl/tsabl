@@ -4,8 +4,8 @@ from classifiers.models.model import Model
 
 
 class Vader(Model):
-    def __init__(self, threshold=0.3):
-        Model.__init__(self, "VADER")
+    def __init__(self, name="VADER", threshold=0.3):
+        Model.__init__(self, name=name)
         self.vader = SentimentIntensityAnalyzer()
         self.threshold = threshold
 

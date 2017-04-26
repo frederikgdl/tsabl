@@ -7,7 +7,6 @@ class Results:
     """
     A class for calculating and holding classifier evaluation metrics
     """
-
     def __init__(self, predictions, truth, results=None):
         self.predictions = predictions
         self.truth = truth

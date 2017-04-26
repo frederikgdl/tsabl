@@ -4,8 +4,8 @@ from classifiers.models.model import Model
 
 
 class Textblob(Model):
-    def __init__(self, subjectivity_threshold=0.1, polarity_threshold=0.4):
-        Model.__init__(self, name="TEXTBLOB")
+    def __init__(self, name="TEXTBLOB", subjectivity_threshold=0.1, polarity_threshold=0.4):
+        Model.__init__(self, name=name)
         self.subjectivity_threshold = subjectivity_threshold
         self.polarity_threshold = polarity_threshold
 
