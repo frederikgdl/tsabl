@@ -4,15 +4,16 @@ from classifiers.models.model import Model
 
 class LogRes(Model):
 
-    def __init__(self):
+    def __init__(self, c=1, solver='sag', multi_class='multinomial', max_iter=1000):
         Model.__init__(self, "LogRes")
+
+        # Create classifier
+        self.model = linear_model.LogisticRegression(C=c, solver=solver, multi_class=multi_class, max_iter=max_iter)
 
     # Creates and returns Logistic Regression classifier trained on samples and labels
     # Parameters sample and labels of type array-like
-    def train(self, tweets, embeddings, labels, c=1, solver='sag', multi_class='multinomial'):
-        clf = linear_model.LogisticRegression(C=c, solver=solver, multi_class=multi_class, max_iter=1000)
-        clf.fit(embeddings, labels)
-        self.model = clf
+    def train(self, tweets, embeddings, labels):
+        self.model.fit(embeddings, labels)
         return self
 
     def predict(self, tweets, embeddings_train_scaled):

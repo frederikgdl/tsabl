@@ -20,5 +20,5 @@ class RandomWeighted(Model):
         self.probability_distribution = [p_positive, p_negative, p_neutral]
 
     def predict(self, tweets, embeddings_train_scaled):
-        self.predictions = [numpy_random.choice([1, -1, 0], p=self.probability_distribution) for t in tweets]
+        self.predictions = [numpy_random.choice([1, -1, 0], p=self.probability_distribution) for _ in tweets]
         return self.predictions
