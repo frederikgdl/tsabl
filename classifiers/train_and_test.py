@@ -91,7 +91,6 @@ def convert_labels_to_numerical(labels_train_txt):
     return labels_train_num
 
 
-# TODO: Parallelize
 def train(models, tweets, embeddings_train_scaled, labels_train_num):
     for model in models:
         logger.info("Training " + model.name + " classifier on training data")
@@ -118,7 +117,6 @@ def do_k_fold_validation(k, embeddings_train_scaled, labels_train_num, tweets_tr
         kfold.run(baseline)
 
 
-# TODO: Parallelize
 def load_classifier_models():
     for classifier in classifiers:
         model_file = path.join(config.MODELS_DIR, classifier.name + ".pickle")
@@ -128,7 +126,6 @@ def load_classifier_models():
         logger.debug("Done. " + str(time() - t) + "s")
 
 
-# TODO: Parallelize
 def save_classifier_models():
     for classifier in classifiers:
         logger.info("Saving " + classifier.name + " model")
@@ -137,7 +134,6 @@ def save_classifier_models():
         logger.debug("Done. " + str(time() - t) + "s")
 
 
-# TODO: Parallelize
 def test(models, tweets, embeddings, numeric_test_labels):
     for model in models:
         model.predict(tweets, embeddings)
@@ -152,13 +148,11 @@ def test_baselines(tweets, embeddings, numeric_test_labels):
     test(baselines, tweets, embeddings, numeric_test_labels)
 
 
-# TODO: Parallelize
 def save_classifier_results():
     for classifier in classifiers:
         classifier.save_results(path.join(config.RESULTS_DIR, classifier.name.lower() + ".txt"))
 
 
-# TODO: Parallelize
 def save_baseline_results():
     for baseline in baselines:
         baseline.save_results(path.join(config.RESULTS_DIR, baseline.name.lower() + ".txt"))
