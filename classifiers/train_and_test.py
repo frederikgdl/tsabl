@@ -7,37 +7,24 @@ import numpy as np
 import classifiers.config as config
 import classifiers.funcs as funcs
 from classifiers.k_fold import KFoldValidator
-from classifiers.models.afinn import AfinnModel
-from classifiers.models.combo_average import ComboAverage
-from classifiers.models.lexicon_classifier import LexiconClassifier
-from classifiers.models.log_res import LogRes
-from classifiers.models.random_uniform import RandomUniform
-from classifiers.models.random_weighted import RandomWeighted
-from classifiers.models.svm import SVM
-from classifiers.models.textblob import Textblob
-from classifiers.models.vader import Vader
 from classifiers.word_embedding_dict import WordEmbeddingDict
-
 from utils import file_ops
 
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
 test_file = config.TEST_FILE
+k = config.K
+skip_training = config.SKIP_TRAINING
+skip_testing = config.SKIP_TESTING
+save_format = config.SAVE_FORMAT
+models_dir = config.MODELS_DIR
+results_dir = config.RESULTS_DIR
+classifiers = config.CLASSIFIERS
+baselines = config.BASELINES
+verbose = config.VERBOSE
+quiet = config.QUIET
 
-classifiers = [
-    SVM(),
-    LogRes()
-]
-
-baselines = [
-    RandomUniform(),
-    RandomWeighted(),
-    AfinnModel(),
-    Vader(threshold=0.1),
-    Textblob(subjectivity_threshold=0.1, polarity_threshold=0.5),
-    ComboAverage(),
-    LexiconClassifier()
-]
+logger = None
 
 
 def load_word_embeddings():
@@ -148,14 +135,9 @@ def test_baselines(tweets, embeddings, numeric_test_labels):
     test(baselines, tweets, embeddings, numeric_test_labels)
 
 
-def save_classifier_results():
-    for classifier in classifiers:
-        classifier.save_results(path.join(config.RESULTS_DIR, classifier.name.lower() + ".txt"))
-
-
-def save_baseline_results():
-    for baseline in baselines:
-        baseline.save_results(path.join(config.RESULTS_DIR, baseline.name.lower() + ".txt"))
+def save_results(models):
+    for model in models:
+        model.save_results(save_format, path.join(results_dir, model.name.lower()))
 
 
 def print_results(models):
@@ -163,10 +145,13 @@ def print_results(models):
         model.print()
 
 
-def main(arguments):
+def main():
+    global logger
+    logger = setup_logger()
+
     word_embeddings = load_word_embeddings()
 
-    if arguments.skip_training:
+    if skip_training:
         # Load saved classifier models from files
         load_classifier_models()
     else:
@@ -177,8 +162,8 @@ def main(arguments):
         labels_train_num = convert_labels_to_numerical(labels_train_txt)
 
         # Do K-fold validation. This does both training and testing, so we return after it's done.
-        if arguments.k_fold > 1:
-            do_k_fold_validation(arguments.k_fold, tweets_train, embeddings_train_scaled, labels_train_num)
+        if k > 1:
+            do_k_fold_validation(k, tweets_train, embeddings_train_scaled, labels_train_num)
             print_results(classifiers)
             print_results(baselines)
             return
@@ -191,7 +176,7 @@ def main(arguments):
         train_baselines(tweets_train, embeddings_train_scaled, labels_train_num)
 
     # If we are to skip testing, there's not more to do, so we can return from the function
-    if arguments.skip_testing:
+    if skip_testing:
         return
 
     # Prepare test data
@@ -202,11 +187,11 @@ def main(arguments):
 
     # Test classifiers and save the results
     test_classifiers(tweets_test, embeddings_test_scaled, labels_test_num)
-    save_classifier_results()
+    save_results(classifiers)
 
     # Test baselines
     test_baselines(tweets_test, embeddings_test_scaled, labels_test_num)
-    save_baseline_results()
+    save_results(baselines)
 
     # Print results
     print_results(classifiers)
@@ -235,9 +220,8 @@ def print_intro(arguments):
 
 
 def setup_logger():
-    # logger level
     levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
-    level = levels[min(len(levels) - 1, args.verbose + 2)]  # capped to number of levels
+    level = levels[min(len(levels) - 1, verbose + 2)]  # capped to number of levels
 
     # create logger
     new_logger = logging.getLogger('train_and_test')
@@ -263,9 +247,24 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='tsabl - train classifiers')
 
-    parser.add_argument('-k', '--k-fold', type=int, default=config.K, help='perform k-fold validation with given k, must be greater than 1')
+    # File arguments
+    parser.add_argument('-e', '--embedding-file', default=config.EMBEDDING_FILE, help='file containing word embeddings')
+    parser.add_argument('-tr', '--train-file', default=config.TRAIN_FILE, help='file containing training data')
+    parser.add_argument('-te', '--test-file', default=config.TEST_FILE, help='file containing test data')
+
+    # Directory arguments
+    parser.add_argument('-m', '--models-dir', default=config.MODELS_DIR, help='file containing training data')
+    parser.add_argument('-r', '--results-dir', default=config.RESULTS_DIR, help='file containing test data')
+
+    # Training and testing arguments
+    parser.add_argument('-k', '--k-fold', type=int, default=config.K,
+                        help='perform k-fold validation with given k, must be greater than 1')
     parser.add_argument('--skip-training', action='store_true', help='do not train classifiers')
     parser.add_argument('--skip-testing', action='store_true', help='do not test classifiers')
+
+    # Results arguments
+    parser.add_argument('-f', '--save-format', choices=['human', 'data'], default='human',
+                        help='Save results in human-readable .txt file or .csv file for data processing.')
 
     # Logger verbosity parameters
     parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
@@ -273,11 +272,21 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    embedding_file = args.embedding_file
+    train_file = args.train_file
+    test_file = args.test_file
+    k = args.k_fold
+    skip_training = args.skip_training
+    skip_testing = args.skip_testing
+    save_format = args.save_format
+    models_dir = args.models_dir
+    results_dir = args.results_dir
+    verbose = args.verbose
+    quiet = args.quiet
+
     if args.quiet:
         logging.disable(logging.ERROR)
     else:
         print_intro(args)
 
-    logger = setup_logger()
-
-    main(args)
+    main()
