@@ -8,5 +8,5 @@ class RandomUniform(Model):
         Model.__init__(self, "RandomUniform")
 
     def predict(self, tweets, embeddings_train_scaled):
-        self.predictions = [choice([0, 1, -1]) for t in tweets]
+        self.predictions = [choice([0, 1, -1]) for _ in tweets]
         return self.predictions

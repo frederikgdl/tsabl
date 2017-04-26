@@ -64,51 +64,51 @@ def load_test_data():
     return tweets_test, labels_test_txt
 
 
-def calculate_tweet_embeddings(md, tweets):
+def calculate_tweet_embeddings(word_embeddings, tweets):
     logger.info("Calculating tweet embeddings")
     t = time()
     tweets = [tweet.split() for tweet in tweets]
-    embeddings = list(map(md.get_tweet_embedding, tweets))
+    embeddings = list(map(word_embeddings.get_tweet_embedding, tweets))
     embeddings = np.array(embeddings)
     logger.debug("Done. " + str(time() - t) + "s")
     return embeddings
 
 
-def scale_word_embeddings(embeddings_train):
+def scale_word_embeddings(embeddings):
     logger.info("Scaling word embedding vectors")
     t = time()
-    embeddings_train_scaled = [funcs.scale_vector(emb) for emb in embeddings_train]
+    embeddings_scaled = [funcs.scale_vector(emb) for emb in embeddings]
     logger.debug("Done. " + str(time() - t) + "s")
-    # embeddings_train_scaled = funcs.regularize_hor(embeddings_train)
-    return embeddings_train_scaled
+    # embeddings_scaled = funcs.regularize_hor(embeddings)
+    return embeddings_scaled
 
 
-def convert_labels_to_numerical(labels_train_txt):
+def convert_labels_to_numerical(labels_txt):
     logger.info("Converting labels to numerical")
     t = time()
-    labels_train_num = funcs.get_labels_numerical(labels_train_txt)
+    labels_num = funcs.get_labels_numerical(labels_txt)
     logger.debug("Done. " + str(time() - t) + "s")
-    return labels_train_num
+    return labels_num
 
 
-def train(models, tweets, embeddings_train_scaled, labels_train_num):
+def train(models, tweets, embeddings, labels):
     for model in models:
         logger.info("Training " + model.name + " classifier on training data")
         t = time()
-        model.train(tweets, embeddings_train_scaled, labels_train_num)  # 7.396183688299606)
+        model.train(tweets, embeddings, labels)  # 7.396183688299606)
         logger.debug("Done. " + str(time() - t) + "s")
 
 
-def train_classifiers(tweets_train, embeddings_train_scaled, labels_train_num):
-    train(classifiers, tweets_train, embeddings_train_scaled, labels_train_num)
+def train_classifiers(tweets, tweet_embeddings, labels):
+    train(classifiers, tweets, tweet_embeddings, labels)
 
 
-def train_baselines(tweets_train, embeddings_train_scaled, labels_train_num):
-    train(baselines, tweets_train, embeddings_train_scaled, labels_train_num)
+def train_baselines(tweets, tweet_embeddings, labels):
+    train(baselines, tweets, tweet_embeddings, labels)
 
 
-def do_k_fold_validation(k, embeddings_train_scaled, labels_train_num, tweets_train):
-    kfold = KFoldValidator(k, tweets_train, embeddings_train_scaled, labels_train_num)
+def do_k_fold_validation(k, tweets, tweet_embeddings, labels):
+    kfold = KFoldValidator(k, tweets, tweet_embeddings, labels)
     for classifier in classifiers:
         res = kfold.run(classifier)
         file_ops.write_to_file(str(res),
@@ -134,10 +134,10 @@ def save_classifier_models():
         logger.debug("Done. " + str(time() - t) + "s")
 
 
-def test(models, tweets, embeddings, numeric_test_labels):
+def test(models, tweets, embeddings, labels):
     for model in models:
         model.predict(tweets, embeddings)
-        model.test(numeric_test_labels)
+        model.test(labels)
 
 
 def test_classifiers(tweets, embeddings, numeric_test_labels):
@@ -178,7 +178,7 @@ def main(arguments):
 
         # Do K-fold validation. This does both training and testing, so we return after it's done.
         if arguments.k_fold > 1:
-            do_k_fold_validation(arguments.k_fold, embeddings_train_scaled, labels_train_num, tweets_train)
+            do_k_fold_validation(arguments.k_fold, tweets_train, embeddings_train_scaled, labels_train_num)
             print_results(classifiers)
             print_results(baselines)
             return
