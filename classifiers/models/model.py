@@ -41,11 +41,8 @@ class Model:
             return
         save_model(self.model, out_file)
 
-    def save_results(self, format, out_file):
-        if format == 'data':
-            pass
-        else:
-            write_to_file(str(self.results), out_file)
+    def save_results(self, out_file):
+        write_to_file(str(self.results), out_file)
 
     def print(self):
         """

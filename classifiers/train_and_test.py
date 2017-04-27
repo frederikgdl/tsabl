@@ -16,7 +16,6 @@ test_file = config.TEST_FILE
 k = config.K
 skip_training = config.SKIP_TRAINING
 skip_testing = config.SKIP_TESTING
-save_format = config.SAVE_FORMAT
 models_dir = config.MODELS_DIR
 results_dir = config.RESULTS_DIR
 classifiers = config.CLASSIFIERS
@@ -137,7 +136,7 @@ def test_baselines(tweets, embeddings, numeric_test_labels):
 
 def save_results(models):
     for model in models:
-        model.save_results(save_format, path.join(results_dir, model.name.lower()))
+        model.save_results(path.join(results_dir, model.name.lower()))
 
 
 def print_results(models):
@@ -262,10 +261,6 @@ if __name__ == "__main__":
     parser.add_argument('--skip-training', action='store_true', help='do not train classifiers')
     parser.add_argument('--skip-testing', action='store_true', help='do not test classifiers')
 
-    # Results arguments
-    parser.add_argument('-f', '--save-format', choices=['human', 'data'], default='human',
-                        help='Save results in human-readable .txt file or .csv file for data processing.')
-
     # Logger verbosity parameters
     parser.add_argument('-v', '--verbose', action='count', default=0, help='verbosity level, repeat to increase')
     parser.add_argument('-q', '--quiet', action='store_true', help='no print to console')
@@ -278,7 +273,6 @@ if __name__ == "__main__":
     k = args.k_fold
     skip_training = args.skip_training
     skip_testing = args.skip_testing
-    save_format = args.save_format
     models_dir = args.models_dir
     results_dir = args.results_dir
     verbose = args.verbose

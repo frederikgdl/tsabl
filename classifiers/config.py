@@ -27,9 +27,6 @@ K = -1
 SKIP_TRAINING = False
 SKIP_TESTING = False
 
-# Either 'human' or 'data'
-SAVE_FORMAT = 'human'
-
 MODELS_DIR = path.abspath("models")
 RESULTS_DIR = path.abspath("results/" + SUFFIX)
 
