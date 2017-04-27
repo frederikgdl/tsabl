@@ -2,8 +2,8 @@
 import logging
 from os import path, listdir
 
-import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 import classifiers.train_and_test as train_and_test
@@ -26,6 +26,7 @@ quiet = False
 # By having this in a function, we know that fresh instances are trained and tested every epoch.
 def classifiers():
     return [SVM(), LogRes(), LexiconClassifier()]
+
 
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
 metrics = {'ternary_macro_f1_score': 'Macro F1', 'f1_pn_score': 'F1 PN'}
@@ -63,7 +64,6 @@ def setup_logger():
 
 
 # Plot
-# TODO: Two legends, one for color (classifiers) and one for line style (metric)
 def plot():
     x = list(range(1, 1 + len(embeddings_files)))
     colors = ['r', 'g', 'b', 'k']
