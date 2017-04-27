@@ -2,6 +2,8 @@
 import logging
 from os import path, listdir
 
+import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
 import classifiers.train_and_test as train_and_test
@@ -67,24 +69,43 @@ def plot():
     colors = ['r', 'g', 'b', 'k']
     line_styles = ['-', '--', '.-', '---']
 
+    cls = classifiers()
+
     plot_lines = []
-    for i, classifier in enumerate(classifiers()):
+    for i, classifier in enumerate(cls):
         color = colors[i % len(colors)]
         for j, metric in enumerate(metrics.keys()):
             line_style = line_styles[j % len(line_styles)]
-            label = metrics[metric] + ", " + classifier.name
             line = plt.plot(x,
                             list(map(lambda r: r[metric], results[classifier.name])),
                             line_style,
-                            color=color,
-                            label=label)
+                            color=color)
             plot_lines.append(line)
 
     # plt.axis([0, len(embeddings_files), 0, 1])
     plt.xticks(x)
     plt.xlabel('Epoch')
     plt.ylabel('Scores')
-    plt.legend(loc=4)
+
+    # Classifier legend (colors)
+    color_patches = []
+    for i, classifier in enumerate(cls):
+        color = colors[i % len(colors)]
+        patch = mpatches.Patch(color=color, label=classifier.name)
+        color_patches.append(patch)
+
+    classifier_legend = plt.legend(handles=color_patches, loc='upper right')
+
+    # Metric legend (line styles)
+    line_style_handles = []
+    for i, metric in enumerate(metrics.keys()):
+        line_style = line_styles[i % len(line_styles)]
+        line = mlines.Line2D([], [], color='k', linestyle=line_style, label=metrics[metric])
+        line_style_handles.append(line)
+
+    plt.legend(handles=line_style_handles, loc='lower right')
+    plt.gca().add_artist(classifier_legend)
+
     plt.show()
 
 
