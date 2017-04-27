@@ -13,7 +13,7 @@ import java.util.Random;
 import funcs.Data;
 import funcs.Funcs;
 
-public class TernaryHybridRankingMain {
+public class OldTernaryHybridRankingMain {
     public static void train(HashMap<String, String> argsMap) throws Exception
     {
         int xWindowSize = Integer.parseInt(argsMap.get("-windowSize"));
@@ -123,22 +123,15 @@ public class TernaryHybridRankingMain {
                         }
 
                         if(posMain.sentimentLinear2.output[data.goldPol]
-                                < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3] + margin)
+                                < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
+                                + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3] + margin)
                         {
                             lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
+                                    + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
 
                             posMain.sentimentLinear2.outputG[data.goldPol] = sentimentAlpha * 1;
                             posMain.sentimentLinear2.outputG[(data.goldPol + 1) % 3] = sentimentAlpha * -1;
-                        }
-
-                        if(posMain.sentimentLinear2.output[data.goldPol]
-                                < posMain.sentimentLinear2.output[(data.goldPol + 2) % 3] + margin)
-                        {
-                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
-                                    - posMain.sentimentLinear2.output[data.goldPol]);
-
-                            posMain.sentimentLinear2.outputG[data.goldPol] = sentimentAlpha * 1;
                             posMain.sentimentLinear2.outputG[(data.goldPol + 2) % 3] = sentimentAlpha * -1;
                         }
 
