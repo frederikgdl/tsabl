@@ -18,7 +18,7 @@ path_of_this_file = path.dirname(path.realpath(__file__))
 # This is the sub-folder of the directory data/embeddings/ that contain embeddings with different epochs
 # Embedding files end on number indicating epoch round
 # Results are stored in similar path under the directory results/
-selected_embeddings = 'binary/AFINN/'
+selected_embeddings = 'binary/VADER/'
 ########
 
 # Directory containing embeddings of different epochs
@@ -118,6 +118,7 @@ def plot():
     plt.legend(handles=line_style_handles, loc='lower right')
     plt.gca().add_artist(classifier_legend)
 
+    plt.savefig(path.join(results_dir, 'figure.png'))
     plt.show()
 
 
