@@ -10,3 +10,4 @@ afinn
 textblob
 vaderSentiment
 fjlc
+matplotlib
