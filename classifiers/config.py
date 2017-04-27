@@ -41,6 +41,8 @@ BASELINES = [
     AfinnModel(),
     Vader(threshold=0.1),
     Textblob(subjectivity_threshold=0.1, polarity_threshold=0.5),
+    ComboAverage(name="ComboA", a=0, b=4, c=4, d=2),
+    ComboAverage(name="ComboB", a=3, b=1, c=1, d=1),
     ComboAverage(),
     LexiconClassifier()
 ]
