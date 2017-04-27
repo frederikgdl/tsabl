@@ -3,9 +3,8 @@ from classifiers.models.model import Model
 
 
 class LogRes(Model):
-
-    def __init__(self, c=1, solver='sag', multi_class='multinomial', max_iter=1000):
-        Model.__init__(self, "LogRes")
+    def __init__(self, name="LogRes", c=1, solver='sag', multi_class='multinomial', max_iter=1000):
+        Model.__init__(self, name=name)
 
         # Create classifier
         self.model = linear_model.LogisticRegression(C=c, solver=solver, multi_class=multi_class, max_iter=max_iter)

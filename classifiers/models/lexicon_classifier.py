@@ -4,8 +4,8 @@ from classifiers.models.model import Model
 
 
 class LexiconClassifier(Model):
-    def __init__(self):
-        Model.__init__(self, "Lexicon Classifier")
+    def __init__(self, name="Lexicon Classifier"):
+        Model.__init__(self, name=name)
         self.lexicon = fjlc.LexiconClassifier()
 
     def classify(self, tweet):

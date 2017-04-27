@@ -11,8 +11,8 @@ class ComboAverage(Model):
     The scores from the three methods are normalized to be between -1 and 1, then combined as a weighted average.
     The weights a, b, c can be set as arguments.
     """
-    def __init__(self, a=1, b=1, c=1, d=1):
-        Model.__init__(self, name="Combo Average")
+    def __init__(self, name="Combo Average", a=1, b=1, c=1, d=1):
+        Model.__init__(self, name=name)
         self.afinn = Afinn(emoticons=True)
         self.vader = SentimentIntensityAnalyzer()
 
