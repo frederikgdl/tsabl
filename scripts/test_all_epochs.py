@@ -1,9 +1,13 @@
 #!/usr/bin/env python
-import classifiers.train_and_test as train_and_test
-from classifiers.models.svm import SVM
-from os import path, listdir
-import matplotlib.pyplot as plt
 import logging
+from os import path, listdir
+
+import matplotlib.pyplot as plt
+
+import classifiers.train_and_test as train_and_test
+from classifiers.models.lexicon_classifier import LexiconClassifier
+from classifiers.models.log_res import LogRes
+from classifiers.models.svm import SVM
 
 path_of_this_file = path.dirname(path.realpath(__file__))
 
@@ -15,7 +19,17 @@ logger = None
 verbose = 0
 quiet = False
 
-results = []
+
+# Classifiers to use are defined in this function.
+# By having this in a function, we know that fresh instances are trained and tested every epoch.
+def classifiers():
+    return [SVM(), LogRes(), LexiconClassifier()]
+
+# The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
+metrics = {'ternary_macro_f1_score': 'Macro F1', 'f1_pn_score': 'F1 PN'}
+
+# Results per classifier, per epoch. Key is name of classifier. Value is list of results.
+results = {}
 
 
 def setup_logger():
@@ -47,15 +61,30 @@ def setup_logger():
 
 
 # Plot
+# TODO: Two legends, one for color (classifiers) and one for line style (metric)
 def plot():
     x = list(range(1, 1 + len(embeddings_files)))
-    plt.plot(x, list(map(lambda r: r['ternary_macro_f1_score'], results)), 'b-', label='Macro F1')
-    plt.plot(x, list(map(lambda r: r['f1_pn_score'], results)), 'r--', label='F1 PN')
+    colors = ['r', 'g', 'b', 'k']
+    line_styles = ['-', '--', '.-', '---']
+
+    plot_lines = []
+    for i, classifier in enumerate(classifiers()):
+        color = colors[i % len(colors)]
+        for j, metric in enumerate(metrics.keys()):
+            line_style = line_styles[j % len(line_styles)]
+            label = metrics[metric] + ", " + classifier.name
+            line = plt.plot(x,
+                            list(map(lambda r: r[metric], results[classifier.name])),
+                            line_style,
+                            color=color,
+                            label=label)
+            plot_lines.append(line)
+
     # plt.axis([0, len(embeddings_files), 0, 1])
     plt.xticks(x)
     plt.xlabel('Epoch')
     plt.ylabel('Scores')
-    plt.legend()
+    plt.legend(loc=4)
     plt.show()
 
 
@@ -70,7 +99,7 @@ def main():
         logger.info(embeddings_file)
 
         # Configure test_and_train
-        train_and_test.classifiers = [SVM()]
+        train_and_test.classifiers = classifiers()
         train_and_test.baselines = []
         train_and_test.embedding_file = path.join(embeddings_dir, embeddings_file)
         train_and_test.verbose = -2
@@ -80,8 +109,11 @@ def main():
         train_and_test.main()
 
         # Save results
-        result = train_and_test.classifiers[0].results.clone()
-        results.append(result)
+        for classifier in train_and_test.classifiers:
+            result = classifier.results.clone()
+            if classifier.name not in results:
+                results[classifier.name] = []
+            results[classifier.name].append(result)
 
     plot()
 
