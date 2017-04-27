@@ -11,23 +11,20 @@ from classifiers.models.lexicon_classifier import LexiconClassifier
 from classifiers.models.log_res import LogRes
 from classifiers.models.svm import SVM
 
-path_of_this_file = path.dirname(path.realpath(__file__))
+import scripts.config as config
 
-########
-# Embeddings to test
-# This is the sub-folder of the directory data/embeddings/ that contain embeddings with different epochs
-# Embedding files end on number indicating epoch round
-# Results are stored in similar path under the directory results/
-selected_embeddings = 'binary/VADER/'
-########
 
 # Directory containing embeddings of different epochs
-embeddings_dir = path.join(path_of_this_file, "../data/embeddings/", selected_embeddings)
+embeddings_dir = path.join(config.EMBEDDINGS_DIR, config.SELECTED_EMBEDDINGS)
 embeddings_files = []
 
 # Directory to store results
 # Store results for each epoch
-results_dir = path.join(path_of_this_file, "../results/", selected_embeddings)
+results_dir = path.join(config.RESULT_DIR, config.SELECTED_EMBEDDINGS)
+
+print(embeddings_dir)
+print(results_dir)
+exit()
 
 logger = None
 verbose = 0
