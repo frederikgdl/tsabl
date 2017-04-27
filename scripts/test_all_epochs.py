@@ -50,7 +50,7 @@ def setup_logger():
 def plot():
     x = list(range(1, 1 + len(embeddings_files)))
     plt.plot(x, list(map(lambda r: r['ternary_macro_f1_score'], results)), 'b-', label='Macro F1')
-    plt.plot(x, list(map(lambda r: r['f1_pn_score'], results)), 'r-', label='F1 PN')
+    plt.plot(x, list(map(lambda r: r['f1_pn_score'], results)), 'r--', label='F1 PN')
     # plt.axis([0, len(embeddings_files), 0, 1])
     plt.xticks(x)
     plt.xlabel('Epoch')
