@@ -64,6 +64,9 @@ class Results:
 
         return clone
 
+    def __getitem__(self, item):
+        return self.results[item]
+
     def __add__(self, other):
         return self.apply_operator(other, lambda a, b: a + b)
 
