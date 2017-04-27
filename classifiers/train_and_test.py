@@ -193,8 +193,9 @@ def main():
     save_results(baselines)
 
     # Print results
-    print_results(classifiers)
-    print_results(baselines)
+    if not quiet and verbose >= 0:
+        print_results(classifiers)
+        print_results(baselines)
 
 
 def print_intro(arguments):
