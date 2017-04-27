@@ -13,9 +13,21 @@ from classifiers.models.svm import SVM
 
 path_of_this_file = path.dirname(path.realpath(__file__))
 
+########
+# Embeddings to test
+# This is the sub-folder of the directory data/embeddings/ that contain embeddings with different epochs
+# Embedding files end on number indicating epoch round
+# Results are stored in similar path under the directory results/
+selected_embeddings = 'binary/AFINN/'
+########
+
 # Directory containing embeddings of different epochs
-embeddings_dir = path.join(path_of_this_file, "../data/embeddings/binary_sa_embedding")
+embeddings_dir = path.join(path_of_this_file, "../data/embeddings/", selected_embeddings)
 embeddings_files = []
+
+# Directory to store results
+# Store results for each epoch
+results_dir = path.join(path_of_this_file, "../results/", selected_embeddings)
 
 logger = None
 verbose = 0
@@ -25,7 +37,7 @@ quiet = False
 # Classifiers to use are defined in this function.
 # By having this in a function, we know that fresh instances are trained and tested every epoch.
 def classifiers():
-    return [SVM(), LogRes(), LexiconClassifier()]
+    return [SVM(name="SVM c=1", c=1), LogRes(), LexiconClassifier()]
 
 
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
@@ -125,6 +137,7 @@ def main():
         train_and_test.embedding_file = path.join(embeddings_dir, embeddings_file)
         train_and_test.verbose = -2
         train_and_test.quiet = True
+        train_and_test.results_dir = path.join(results_dir, embeddings_file)
 
         # Run
         train_and_test.main()
