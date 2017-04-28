@@ -22,10 +22,6 @@ embeddings_files = []
 # Store results for each epoch
 results_dir = path.join(config.RESULT_DIR, config.SELECTED_EMBEDDINGS)
 
-print(embeddings_dir)
-print(results_dir)
-exit()
-
 logger = None
 verbose = 0
 quiet = False
