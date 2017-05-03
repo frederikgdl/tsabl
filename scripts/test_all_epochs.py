@@ -110,8 +110,7 @@ def plot():
     plt.gca().add_artist(classifier_legend)
 
     plt.savefig(path.join(results_dir, 'figure.png'))
-    if 'DISPLAY' in environ:
-        plt.show()
+    plt.show()
 
 
 def main():
