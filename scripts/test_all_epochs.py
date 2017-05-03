@@ -53,6 +53,9 @@ def setup_logger():
         logging.disable(logging.ERROR)
         return logger
 
+    if len(logger.handlers) > 0:
+        return logger
+
     # create console handler and set level to debug
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
