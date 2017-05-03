@@ -1,8 +1,19 @@
 from os import path
 
+from classifiers.models.lexicon_classifier import LexiconClassifier
+from classifiers.models.random_uniform import RandomUniform
+from classifiers.models.svm import SVM
+
 RESULT_DIR = path.abspath('results/')
 
 EMBEDDINGS_DIR = path.abspath('data/embeddings/')
+
+
+# Classifiers to use are defined in this function.
+# By having this in a function, we know that fresh instances are trained and tested every epoch.
+def classifiers():
+    return [SVM(name="SVM c=1", c=1), RandomUniform(), LexiconClassifier()]
+
 
 ##########################################################################
 
@@ -25,7 +36,7 @@ METHODS = [
 EMBEDDINGS = [
     "AFINN",
     "ComboA",
-    "ComboB"
+    "ComboB",
     "EMOTICON.150K",
     "EMOTICON_EXT",
     "LexiconClassifier",

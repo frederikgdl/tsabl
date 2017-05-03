@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 import logging
-from os import path, listdir
+from os import path, listdir, environ
 
+import matplotlib
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
+
+# Fix for running this script on a server without graphics.
+# This line must run before importing pyplot!
+if 'DISPLAY' not in environ:
+    matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 import classifiers.train_and_test as train_and_test
-from classifiers.models.lexicon_classifier import LexiconClassifier
-from classifiers.models.log_res import LogRes
-from classifiers.models.svm import SVM
-
 import scripts.config as config
+from scripts.config import classifiers
 
 
 # Directory containing embeddings of different epochs
@@ -25,12 +29,6 @@ results_dir = path.join(config.RESULT_DIR, config.SELECTED_EMBEDDINGS)
 logger = None
 verbose = 0
 quiet = False
-
-
-# Classifiers to use are defined in this function.
-# By having this in a function, we know that fresh instances are trained and tested every epoch.
-def classifiers():
-    return [SVM(name="SVM c=1", c=1), LogRes(), LexiconClassifier()]
 
 
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
@@ -112,7 +110,8 @@ def plot():
     plt.gca().add_artist(classifier_legend)
 
     plt.savefig(path.join(results_dir, 'figure.png'))
-    plt.show()
+    if 'DISPLAY' in environ:
+        plt.show()
 
 
 def main():
