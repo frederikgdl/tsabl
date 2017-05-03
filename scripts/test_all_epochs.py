@@ -17,14 +17,15 @@ import classifiers.train_and_test as train_and_test
 import scripts.config as config
 from scripts.config import classifiers
 
+selected_embeddings = config.SELECTED_EMBEDDINGS
 
 # Directory containing embeddings of different epochs
-embeddings_dir = path.join(config.EMBEDDINGS_DIR, config.SELECTED_EMBEDDINGS)
+embeddings_dir = path.join(config.EMBEDDINGS_DIR, selected_embeddings)
 embeddings_files = []
 
 # Directory to store results
 # Store results for each epoch
-results_dir = path.join(config.RESULT_DIR, config.SELECTED_EMBEDDINGS)
+results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
 logger = None
 verbose = 0
@@ -74,6 +75,10 @@ def plot():
 
     cls = classifiers()
 
+    fig = plt.gcf()
+    fig_title = selected_embeddings.replace('/', '_') + '.png'
+    fig.canvas.set_window_title(fig_title)
+
     plot_lines = []
     for i, classifier in enumerate(cls):
         color = colors[i % len(colors)]
@@ -109,8 +114,9 @@ def plot():
     plt.legend(handles=line_style_handles, loc='lower right')
     plt.gca().add_artist(classifier_legend)
 
-    plt.savefig(path.join(results_dir, 'figure.png'))
+    plt.savefig(path.join(results_dir, fig_title))
     plt.show()
+    plt.clf()
 
 
 def main():
