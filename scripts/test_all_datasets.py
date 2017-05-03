@@ -1,3 +1,4 @@
+from importlib import reload
 from os import path, listdir
 
 from scripts import config
@@ -21,6 +22,8 @@ def main():
 
             print("Doing", method, embedding)
 
+            # Reload reimports test_all_epochs, so its state is reset.
+            reload(test_all_epochs)
             test_all_epochs.selected_embeddings = selected_embeddings
             test_all_epochs.embeddings_dir = embeddings_dir
             test_all_epochs.results_dir = results_dir
