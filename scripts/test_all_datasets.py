@@ -20,6 +20,11 @@ def main():
                 print("Skipping", method, embedding, "because it does not contain enough epoch files")
                 continue
 
+            if path.exists(results_dir) and any([f for f in listdir(results_dir) if f.endswith(".png")]):
+                print("Skipping", method, embedding,
+                      "because a png was found in " + results_dir + ", which means it has been tested already.")
+                continue
+
             print("Doing", method, embedding)
 
             # Reload reimports test_all_epochs, so its state is reset.
