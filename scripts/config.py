@@ -14,6 +14,11 @@ EMBEDDINGS_DIR = path.abspath('data/embeddings/')
 def classifiers():
     return [SVM(name="SVM c=1", c=1), RandomUniform(), LexiconClassifier()]
 
+# The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
+METRICS = {
+    'ternary_macro_f1_score': 'Macro F1',
+    'f1_pn_score': 'F1 PN',
+}
 
 ##########################################################################
 

@@ -31,9 +31,8 @@ logger = None
 verbose = 0
 quiet = False
 
-
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
-metrics = {'ternary_macro_f1_score': 'Macro F1', 'f1_pn_score': 'F1 PN'}
+metrics = config.METRICS
 
 # Results per classifier, per epoch. Key is name of classifier. Value is list of results.
 results = {}
