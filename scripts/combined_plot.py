@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scripts import config
 
 name_of_classifier = "SVM c=1"
-metric = list(config.METRICS.keys())[0]  # Only one metric
+metric = list(config.METRICS.keys())[1]  # Only one metric
 metric_pretty = config.METRICS[metric]
 
 num_epochs = config.NUM_EPOCHS
@@ -34,7 +34,7 @@ def plot(method):
     global fig_number
     fig = plt.figure(fig_number, (10, 6))
     fig_number += 1
-    fig_title = method
+    fig_title = method + " " + metric_pretty
     fig.canvas.set_window_title(fig_title)
 
     ax = plt.subplot(111)
@@ -71,7 +71,7 @@ def plot(method):
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.3, 1.0))
-    plt.savefig(path.join(config.RESULT_DIR, method, fig_title))
+    plt.savefig(path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_')))
     plt.show(block=fig_number == number_of_figures + 1)
 
 
