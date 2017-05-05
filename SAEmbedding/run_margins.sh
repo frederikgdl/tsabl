@@ -7,25 +7,26 @@ VOCAB_FILE=FOO
 TRAIN_FILE_NUM=1
 TRAINING_ROUND=20
 LEARNING_RATE=0.1
-MARGIN=1
 RANDOM_BASE=0.01
 SENTIMENT_ALPHA=0.5
 
 INPUT_DIR='../data/preprocessed/datasets/1M/'
 
-OUTPUT_DIR='../data/embeddings/ternary/'
+OUTPUT_DIR='../data/embeddings/agg_ternary/'
 
 DATA_PREFIX='tweets.'
 
-DATASET='AFINN'
+DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-for MARGIN in 0.5 0.7 0.9 1.1 1.3
+for MARGIN in 0.5 0.7 0.9 1.1 1.3 1.5 1.7 1.9 2.0
 do
     OUTPUT_FILE=${OUTPUT_DIR}'margin-'${MARGIN}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 
-    java -classpath bin sa_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
+    echo "Running with margin "${MARGIN}
+
+    java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
      -trainingRound ${TRAINING_ROUND} -learningRate ${LEARNING_RATE} -margin ${MARGIN} \

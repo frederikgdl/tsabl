@@ -12,19 +12,21 @@ SENTIMENT_ALPHA=0.5
 
 INPUT_DIR='../data/preprocessed/datasets/1M/'
 
-OUTPUT_DIR='../data/embeddings/ternary/'
+OUTPUT_DIR='../data/embeddings/agg_ternary/'
 
 DATA_PREFIX='tweets.'
 
-DATASET='AFINN'
+DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-for EMBEDDING_LENGTH in 50 100 150
+for EMBEDDING_LENGTH in 50 75 100 125 150
 do
     OUTPUT_FILE=${OUTPUT_DIR}'embeddinglen-'${EMBEDDING_LENGTH}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 
-    java -classpath bin sa_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
+    echo "Running with embedding length "${EMBEDDING_LENGTH}
+
+    java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
      -trainingRound ${TRAINING_ROUND} -learningRate ${LEARNING_RATE} -margin ${MARGIN} \

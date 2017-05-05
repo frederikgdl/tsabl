@@ -74,6 +74,16 @@ public class TernaryHybridRanking {
         contextLinear2.forward();
     }
 
+    public void forwardWithDropout(double dropedRatio) {
+        lookup.forward();
+        linear1.forwardWithDropout(dropedRatio);
+        tanh.forward();
+        sentimentLinear2.forward();
+
+        System.arraycopy(tanh.output, 0, contextLinear2.input, 0, hiddenSize);
+        contextLinear2.forward();
+    }
+
     public void backward()
     {
         contextLinear2.backward();
@@ -89,12 +99,33 @@ public class TernaryHybridRanking {
         lookup.backward();
     }
 
+    public void backwardWithDropout() {
+        contextLinear2.backward();
+        sentimentLinear2.backward();
+
+        for(int i = 0; i < hiddenSize; i++)
+        {
+            tanh.outputG[i] += contextLinear2.inputG[i];
+        }
+
+        tanh.backward();
+        linear1.backwardWithDropout();
+        lookup.backward();
+    }
+
     public void update(double learningRate)
     {
         lookup.update(learningRate);
         linear1.update(learningRate / linear1.inputLength);
         sentimentLinear2.update(learningRate / sentimentLinear2.inputLength);
         contextLinear2.update(learningRate / contextLinear2.inputLength);
+    }
+
+    public void updateAdaGrad(double learningRate, int batchsize) {
+        lookup.updateAdaGrad(learningRate, batchsize);
+        linear1.updateAdaGrad(learningRate / linear1.inputLength, batchsize); // divide on input length?
+        sentimentLinear2.updateAdaGrad(learningRate / sentimentLinear2.inputLength, batchsize);
+        contextLinear2.updateAdaGrad(learningRate / contextLinear2.inputLength, batchsize);
     }
 
     public void clearGrad()

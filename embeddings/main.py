@@ -111,7 +111,7 @@ def main():
     hidden_size = config.HIDDEN_SIZE
     embedding_length = config.EMBEDDING_LENGTH
     nb_epochs = config.EPOCHS
-    margin = config.MARGIN
+    margin = float(config.MARGIN)
     batch_size = config.BATCH_SIZE
     dropout_p = config.DROPOUT_P
     alpha = config.ALPHA
@@ -186,16 +186,23 @@ def main():
         # TODO: verify function
         # y_len = y_pred.shape[0]
         # TODO: sizes = 1? not y_len?
-        #y_pos, y_neg = y_pred
+        # y_pos, y_neg = y_pred
         y_pos, y_neg = split(y_pred, [1, 1], 2, axis=1)
-        #y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
+        # y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
         # return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
-        return (1 - alpha) * K.maximum(0., 1. - y_pos + y_neg)
+        # return (1 - alpha) * K.maximum(0., 1. - y_pos + y_neg)
+
+        # Add 0*y_true to add y_true to graph
+        return (1 - alpha) * K.maximum(0., margin - y_pos + y_neg) + 0*y_true
 
     def sentiment_loss_function(y_true, y_pred):
         # TODO: verify function
+        # ([1, -1, 0], [1, 0, -1])
         # y_true is [1, -1, -1] for positive, [-1, 1, -1] for neutral etc.
-        return alpha * K.maximum(0., 1. - K.sum(y_true*y_pred, axis=1))
+        # return alpha * K.maximum(0., 1. - K.sum(y_true*y_pred, axis=1))
+        labels_one, labels_two = split(y_true, [3, 3], 2, axis=1)
+        return alpha * (K.maximum(0., margin - K.sum(labels_one*y_pred, axis=1))
+                        + K.maximum(0., margin - K.sum(labels_two*y_pred, axis=1)))
 
     # Optimizer
     optimizer = Adagrad(lr=adagrad_lr)
