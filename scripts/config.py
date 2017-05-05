@@ -51,3 +51,10 @@ EMBEDDINGS = [
 
 # Skip if number of epoch files is less than this number
 NUM_EPOCHS = 30
+
+
+##########################################################################
+# PLOTTING STUFF
+
+COLORS = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+LINE_STYLES = ['-', '--', '.-', '---']

@@ -72,8 +72,8 @@ def setup_logger():
 # Plot
 def plot():
     x = list(range(1, 1 + len(embeddings_files)))
-    colors = ['r', 'g', 'b', 'k']
-    line_styles = ['-', '--', '.-', '---']
+    colors = config.COLORS
+    line_styles = config.LINE_STYLES
 
     cls = classifiers()
 

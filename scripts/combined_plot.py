@@ -25,7 +25,7 @@ data = {}
 # Plot
 def plot(method):
     x = list(range(1, 1 + num_epochs))
-    colors = ['r', 'g', 'b', 'k']
+    colors = config.COLORS
     line_style = '-'
 
     fig = plt.gcf()
