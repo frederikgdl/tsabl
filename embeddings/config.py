@@ -5,11 +5,11 @@ SEED = 1234
 
 # Embedding options
 
-EPOCHS = 20
+EPOCHS = 30
 
 MARGIN = 1
 
-BATCH_SIZE = 32
+BATCH_SIZE = 30
 
 EMBEDDING_LENGTH = 50
 
