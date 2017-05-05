@@ -62,6 +62,10 @@ def plot(method):
         patch = mpatches.Patch(color=color, label=dataset)
         color_patches.append(patch)
 
+    # Show only every second epoch label
+    for label in ax.xaxis.get_ticklabels()[::2]:
+        label.set_visible(False)
+
     # Shrink current axis by 20%
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
