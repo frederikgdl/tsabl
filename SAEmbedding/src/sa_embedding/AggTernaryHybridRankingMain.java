@@ -31,6 +31,23 @@ public class AggTernaryHybridRankingMain {
         double sentimentAlpha = Double.parseDouble(argsMap.get("-sentimentAlpha"));
         String inputFilePrefix = argsMap.get("-inputFilePrefix");
 
+        // Optional hyperparameters
+        double dropedRatio = 0.0;
+        Boolean adaGrad = false;
+        int batchsize = 1;
+
+        if (argsMap.containsKey("-dropedRatio")) {
+            dropedRatio = Double.parseDouble(argsMap.get("-dropedRatio"));
+        }
+
+        if (argsMap.containsKey("-adaGrad")) {
+            adaGrad = Boolean.parseBoolean(argsMap.get("-adaGrad"));
+        }
+
+        if (argsMap.containsKey("-batchsize")) {
+            batchsize = Integer.parseInt(argsMap.get("-batchsize"));
+        }
+
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
         List<String> neuFiles = new ArrayList<String>();
@@ -63,7 +80,8 @@ public class AggTernaryHybridRankingMain {
 
         TernaryHybridRanking negMain = posMain.cloneWithTiedParams();
 
-        double lossV = 0.0;
+        double lossSent = 0.0;
+        double lossContext = 0.0;
         int lossC = 0;
         for(int round = 0; round < trainRound; round++)
         {
@@ -111,8 +129,15 @@ public class AggTernaryHybridRankingMain {
                         }
                         negMain.input[xWindowSize/2] = randWordIdx;
 
-                        posMain.forward();
-                        negMain.forward();
+                        // Propagate through network
+                        if (dropedRatio > 0) {
+                            posMain.forwardWithDropout(dropedRatio);
+                            negMain.forwardWithDropout(dropedRatio);
+                        } else {
+                            posMain.forward();
+                            negMain.forward();
+                        }
+
 
                         lossC += 1;
 
@@ -125,7 +150,7 @@ public class AggTernaryHybridRankingMain {
                         if(posMain.sentimentLinear2.output[data.goldPol]
                                 < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3] + margin)
                         {
-                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
+                            lossSent += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
 
                             posMain.sentimentLinear2.outputG[data.goldPol] += sentimentAlpha * 1;
@@ -135,7 +160,7 @@ public class AggTernaryHybridRankingMain {
                         if(posMain.sentimentLinear2.output[data.goldPol]
                                 < posMain.sentimentLinear2.output[(data.goldPol + 2) % 3] + margin)
                         {
-                            lossV += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
+                            lossSent += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
 
                             posMain.sentimentLinear2.outputG[data.goldPol] += sentimentAlpha * 1;
@@ -145,16 +170,29 @@ public class AggTernaryHybridRankingMain {
                         // loss function
                         if(posMain.contextLinear2.output[0] < negMain.contextLinear2.output[0] + margin)
                         {
-                            lossV += (1-sentimentAlpha) * (margin + negMain.contextLinear2.output[0] - posMain.contextLinear2.output[0]);
+                            lossContext += (1-sentimentAlpha) * (margin + negMain.contextLinear2.output[0]
+                                    - posMain.contextLinear2.output[0]);
                             posMain.contextLinear2.outputG[0] = (1 - sentimentAlpha) * 1;
                             negMain.contextLinear2.outputG[0] = (1 - sentimentAlpha) * -1;
                         }
 
-                        posMain.backward();
-                        negMain.backward();
+                        // Calculate gradients
+                        if (dropedRatio > 0) {
+                            posMain.backwardWithDropout();
+                            negMain.backwardWithDropout();
+                        } else {
+                            posMain.backward();
+                            negMain.backward();
+                        }
 
-                        posMain.update(learningRate);
-                        negMain.update(learningRate);
+                        // Update parameters
+                        if (adaGrad) {
+                            posMain.updateAdaGrad(learningRate, batchsize);
+                            negMain.updateAdaGrad(learningRate, batchsize);
+                        } else {
+                            posMain.update(learningRate);
+                            negMain.update(learningRate);
+                        }
 
                         posMain.clearGrad();
                         negMain.clearGrad();
@@ -163,21 +201,21 @@ public class AggTernaryHybridRankingMain {
                     if(dataIdx % 50000 == 0)
                     {
                         System.out.println("running " + dataIdx + "/" + trainingDatas.size() +
-                                "\t loss: " + (lossV / lossC) + "\t" + DateFormat.getDateTimeInstance().format(new Date()));
+                                "\t loss: " + ((lossSent + lossContext) / lossC) + " context loss: " +
+                                (lossContext / lossC) + " sentiment loss: " + (lossSent / lossC) + "\t" +
+                                DateFormat.getDateTimeInstance().format(new Date()));
                     }
                 }
-
                 trainingDatas.clear();
             }
-
-            Funcs.dumpEmbedFile(outputFile + "-round-" + round,
-                    "utf8", vocabMap, posMain.lookup.table, xEmbeddingLength);
+            Funcs.dumpEmbedFile(outputFile + "-round-" + round, "utf8",
+                    vocabMap, posMain.lookup.table, xEmbeddingLength);
         }
     }
 
     public static void main(String[] args) {
-
         HashMap<String, String> argsMap = Funcs.parseArgs(args);
+
         for(String key: argsMap.keySet())
         {
             System.out.println(key + "\t" + argsMap.get(key));
@@ -190,5 +228,4 @@ public class AggTernaryHybridRankingMain {
             e.printStackTrace();
         }
     }
-
 }
