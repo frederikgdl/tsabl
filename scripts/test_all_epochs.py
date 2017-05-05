@@ -1,47 +1,38 @@
 #!/usr/bin/env python
 import logging
-from os import path, listdir
+from os import path, listdir, environ
 
+import matplotlib
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
+
+# Fix for running this script on a server without graphics.
+# This line must run before importing pyplot!
+if 'DISPLAY' not in environ:
+    matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 import classifiers.train_and_test as train_and_test
-from classifiers.models.lexicon_classifier import LexiconClassifier
-from classifiers.models.log_res import LogRes
-from classifiers.models.svm import SVM
+import scripts.config as config
+from scripts.config import classifiers
 
-path_of_this_file = path.dirname(path.realpath(__file__))
-
-########
-# Embeddings to test
-# This is the sub-folder of the directory data/embeddings/ that contain embeddings with different epochs
-# Embedding files end on number indicating epoch round
-# Results are stored in similar path under the directory results/
-selected_embeddings = 'binary/VADER/'
-########
+selected_embeddings = config.SELECTED_EMBEDDINGS
 
 # Directory containing embeddings of different epochs
-embeddings_dir = path.join(path_of_this_file, "../data/embeddings/", selected_embeddings)
+embeddings_dir = path.join(config.EMBEDDINGS_DIR, selected_embeddings)
 embeddings_files = []
 
 # Directory to store results
 # Store results for each epoch
-results_dir = path.join(path_of_this_file, "../results/", selected_embeddings)
+results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
 logger = None
 verbose = 0
 quiet = False
 
-
-# Classifiers to use are defined in this function.
-# By having this in a function, we know that fresh instances are trained and tested every epoch.
-def classifiers():
-    return [SVM(name="SVM c=1", c=1), LogRes(), LexiconClassifier()]
-
-
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
-metrics = {'ternary_macro_f1_score': 'Macro F1', 'f1_pn_score': 'F1 PN'}
+metrics = config.METRICS
 
 # Results per classifier, per epoch. Key is name of classifier. Value is list of results.
 results = {}
@@ -59,6 +50,9 @@ def setup_logger():
 
     if quiet:
         logging.disable(logging.ERROR)
+        return logger
+
+    if len(logger.handlers) > 0:
         return logger
 
     # create console handler and set level to debug
@@ -82,6 +76,10 @@ def plot():
     line_styles = ['-', '--', '.-', '---']
 
     cls = classifiers()
+
+    fig = plt.gcf()
+    fig_title = selected_embeddings.replace('/', '_') + '.png'
+    fig.canvas.set_window_title(fig_title)
 
     plot_lines = []
     for i, classifier in enumerate(cls):
@@ -118,8 +116,9 @@ def plot():
     plt.legend(handles=line_style_handles, loc='lower right')
     plt.gca().add_artist(classifier_legend)
 
-    plt.savefig(path.join(results_dir, 'figure.png'))
+    plt.savefig(path.join(results_dir, fig_title))
     plt.show()
+    plt.clf()
 
 
 def main():
