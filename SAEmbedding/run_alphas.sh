@@ -12,7 +12,7 @@ RANDOM_BASE=0.01
 
 INPUT_DIR='../data/preprocessed/datasets/1M/'
 
-OUTPUT_DIR='../data/embeddings/ternary/'
+OUTPUT_DIR='../data/embeddings/agg_ternary/'
 
 DATA_PREFIX='tweets.'
 
