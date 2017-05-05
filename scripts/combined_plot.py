@@ -37,15 +37,17 @@ def plot(method):
     fig_title = method
     fig.canvas.set_window_title(fig_title)
 
+    ax = plt.subplot(111)
+
     plot_lines = []
 
     for i, dataset in enumerate(sorted(data[method].keys())):
         # Each dataset gets a color
         color = colors[i % len(colors)]
-        line = plt.plot(x,
-                        list(data[method][dataset]),
-                        line_style,
-                        color=color)
+        line = ax.plot(x,
+                       list(data[method][dataset]),
+                       line_style,
+                       color=color)
         plot_lines.append(line)
 
     # plt.axis([0, len(embeddings_files), 0, 1])
@@ -60,7 +62,11 @@ def plot(method):
         patch = mpatches.Patch(color=color, label=dataset)
         color_patches.append(patch)
 
-    plt.legend(handles=color_patches, loc='upper right')
+    # Shrink current axis by 20%
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.3, 1.0))
     plt.savefig(path.join(config.RESULT_DIR, method, fig_title))
     plt.show(block=fig_number == number_of_figures + 1)
 
