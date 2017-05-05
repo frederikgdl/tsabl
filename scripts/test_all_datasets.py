@@ -16,8 +16,11 @@ def main():
                 print("Skipping", method, embedding, "because its embeddings_dir does not exist")
                 continue
 
-            if len(listdir(embeddings_dir)) < config.NUM_EPOCHS:
-                print("Skipping", method, embedding, "because it does not contain enough epoch files")
+            epoch_files = len(listdir(embeddings_dir))
+            if epoch_files < config.NUM_EPOCHS:
+                print("Skipping", method, embedding,
+                      "because it does not contain enough epoch files (" + str(
+                          epoch_files) + "/" + str(config.NUM_EPOCHS) + ")")
                 continue
 
             if path.exists(results_dir) and any([f for f in listdir(results_dir) if f.endswith(".png")]):
