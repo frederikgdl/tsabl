@@ -56,5 +56,5 @@ NUM_EPOCHS = 30
 ##########################################################################
 # PLOTTING STUFF
 
-COLORS = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+COLORS = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', '#ffa500']
 LINE_STYLES = ['-', '--', '.-', '---']
