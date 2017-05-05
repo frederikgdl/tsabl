@@ -2,10 +2,10 @@
 
 WINDOW_SIZE=7
 HIDDEN_LENGTH=20
+EMBEDDING_LENGTH=50
 VOCAB_FILE=FOO
 TRAIN_FILE_NUM=1
 TRAINING_ROUND=20
-LEARNING_RATE=0.1
 MARGIN=1
 RANDOM_BASE=0.01
 SENTIMENT_ALPHA=0.5
@@ -20,11 +20,11 @@ DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-for EMBEDDING_LENGTH in 50 75 100 125 150
+for LEARNING_RATE in 0.05 0.2 0.3 0.5 0.7 0.9 1.1
 do
-    OUTPUT_FILE=${OUTPUT_DIR}'embeddinglen-'${EMBEDDING_LENGTH}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
+    OUTPUT_FILE=${OUTPUT_DIR}'learningrate-'${LEARNING_RATE}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 
-    echo "Running with embedding length "${EMBEDDING_LENGTH}
+    echo "Running with learning rate "${LEARNING_RATE}
 
     java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \

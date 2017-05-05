@@ -16,7 +16,7 @@ OUTPUT_DIR='../data/embeddings/ternary/'
 
 DATA_PREFIX='tweets.'
 
-DATASET='AFINN'
+DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
@@ -24,7 +24,9 @@ for SENTIMENT_ALPHA in 0.0 0.2 0.4 0.5 0.6 0.8 1.0
 do
     OUTPUT_FILE=${OUTPUT_DIR}'alpha-'${SENTIMENT_ALPHA}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 
-    java -classpath bin sa_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
+    echo "Running with sentiment alpha "${SENTIMENT_ALPHA}
+
+    java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
      -trainingRound ${TRAINING_ROUND} -learningRate ${LEARNING_RATE} -margin ${MARGIN} \
