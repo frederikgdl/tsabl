@@ -21,6 +21,9 @@ num_epochs = config.NUM_EPOCHS
 # { method: { dataset: [] } }
 data = {}
 
+number_of_figures = len(config.METHODS)
+fig_number = 1
+
 
 # Plot
 def plot(method):
@@ -28,7 +31,9 @@ def plot(method):
     colors = config.COLORS
     line_style = '-'
 
-    fig = plt.gcf()
+    global fig_number
+    fig = plt.figure(fig_number, (10, 6))
+    fig_number += 1
     fig_title = method
     fig.canvas.set_window_title(fig_title)
 
@@ -57,8 +62,7 @@ def plot(method):
 
     plt.legend(handles=color_patches, loc='upper right')
     plt.savefig(path.join(config.RESULT_DIR, method, fig_title))
-    plt.show()
-    plt.clf()
+    plt.show(block=fig_number == number_of_figures + 1)
 
 
 def add_data_value(method, embedding, value):
