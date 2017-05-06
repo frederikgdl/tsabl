@@ -241,8 +241,6 @@ def print_intro():
         print('Neutral file:\t\t{}'.format(config.NEG_DATA_FILE))
     print()
     print('Min frequency:\t\t{}'.format(config.MIN_WORD_FREQUENCY))
-    print('Max number of words:\t{}'.format(config.MAX_NUMBER_WORDS))
-    print('Lowercase:\t\t{}'.format(config.LOWERCASE))
     print()
     print('Number of epochs:\t{}'.format(config.EPOCHS))
     print('Margin:\t\t\t{}'.format(config.MARGIN))
