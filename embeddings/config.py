@@ -1,7 +1,5 @@
 from os import path
 
-SEED = 1234
-
 
 # Embedding options
 
@@ -33,24 +31,13 @@ USE_ADAGRAD = False
 # int or None
 MIN_WORD_FREQUENCY = 5
 
-# int or None
-MAX_NUMBER_WORDS = None
-
-LOWERCASE = True
-
 
 # File options
 
 OUTPUT_FILE = path.abspath('data/embeddings/test_embeddings.txt')
 
-POS_DATA_FILE = path.abspath('data/filtered/emoticon.pos.0.txt')
+POS_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.LexiconClassifier.pos.txt')
 
-NEG_DATA_FILE = path.abspath('data/filtered/emoticon.neg.0.txt')
+NEG_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.LexiconClassifier.neg.txt')
 
-NEU_DATA_FILE = path.abspath('data/filtered/emoticon.neu.0.txt')
-
-# POS_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.pos.txt')
-#
-# NEG_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neg.txt')
-#
-# NEU_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.AFINN.neu.txt')
+NEU_DATA_FILE = path.abspath('data/preprocessed/datasets/1M/tweets.LexiconClassifier.neu.txt')

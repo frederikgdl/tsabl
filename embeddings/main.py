@@ -10,7 +10,6 @@ import keras.backend as K
 
 import embeddings.config as config
 import embeddings.funcs as funcs
-from embeddings.tokenizer import Tokenizer
 
 KERAS_BACKEND = getenv('KERAS_BACKEND')
 if KERAS_BACKEND == 'theano':
@@ -104,8 +103,6 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
 
 def main():
     min_freq = config.MIN_WORD_FREQUENCY
-    max_nb_words = config.MAX_NUMBER_WORDS
-    lowercase = config.LOWERCASE
 
     window_size = config.WINDOW_SIZE
     hidden_size = config.HIDDEN_SIZE
@@ -137,28 +134,26 @@ def main():
         file_paths.append(neu_file)
         sentiment_labels.append('neutral')
 
-    # Read data
     logging.info('Loading tweet data')
     t = time()
-    texts, labels = funcs.get_training_data(file_paths, sentiment_labels)
+    tweets, labels = funcs.get_training_data(file_paths, sentiment_labels)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Shuffling tweet data')
     t = time()
-    texts, labels = funcs.shuffle_data(texts, labels)
+    tweets, labels = funcs.shuffle_data(tweets, labels)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
-    logging.info('Creating vocabulary and one-hot vectors')
+    logging.info('Creating vocabulary')
     t = time()
-    tokenizer = Tokenizer(nb_words=max_nb_words, lower=lowercase, min_freq=min_freq)
-    tokenizer.fit_on_texts(texts)
-    seqs = tokenizer.texts_to_sequences(texts)
-    vocab_map = tokenizer.word_index
+    vocab_map = funcs.get_vocab(tweet_texts=tweets, min_freq=min_freq)
     inverse_vocab_map = {v: k for k, v in vocab_map.items()}
+    vocab_size = len(vocab_map)
+    logging.debug('Done. {}s'.format(str(time() - t)))
 
-    # Add 1 for reserved index 0
-    vocab_size = len(vocab_map) + 1
-    print("vocab_size: {}".format(vocab_size))
+    logging.info('Padding tweets')
+    t = time()
+    tweets = funcs.pad_tweets(tweets)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Converting labels')
@@ -169,7 +164,7 @@ def main():
 
     logging.info('Creating context windows and negative samples')
     t = time()
-    context_windows, labels = funcs.get_context_windows_labels(seqs, labels, window_size)
+    context_windows, labels = funcs.get_context_windows_labels(tweets, labels, window_size, vocab_map)
     negative_samples = funcs.get_negative_samples(context_windows, vocab_size)
     logging.debug('Done. {}s'.format(str(time() - t)))
 
@@ -240,10 +235,10 @@ def print_intro():
     print()
     print('Output file:\t\t{}'.format(config.OUTPUT_FILE))
     print()
-    print('Positive file:\t{}'.format(config.POS_DATA_FILE))
-    print('Negative file:\t{}'.format(config.NEG_DATA_FILE))
+    print('Positive file:\t\t{}'.format(config.POS_DATA_FILE))
+    print('Negative file:\t\t{}'.format(config.NEG_DATA_FILE))
     if config.SENTIMENT_CLASSES == 3:
-        print('Neutral file:\t{}'.format(config.NEG_DATA_FILE))
+        print('Neutral file:\t\t{}'.format(config.NEG_DATA_FILE))
     print()
     print('Min frequency:\t\t{}'.format(config.MIN_WORD_FREQUENCY))
     print('Max number of words:\t{}'.format(config.MAX_NUMBER_WORDS))
@@ -254,12 +249,12 @@ def print_intro():
     print('Batch size:\t\t{}'.format(config.BATCH_SIZE))
     print('Dropout p:\t\t{}'.format(config.DROPOUT_P))
     print('Alpha:\t\t\t{}'.format(config.ALPHA))
-    print('Learning rate:\t{}'.format(config.LEARNING_RATE))
+    print('Learning rate:\t\t{}'.format(config.LEARNING_RATE))
     print('Sentiment classes:\t{}'.format(config.SENTIMENT_CLASSES))
     print('Window size:\t\t{}'.format(config.WINDOW_SIZE))
     print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
     print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
-    print('Using Adagrad:\t{}'.format(config.USE_ADAGRAD))
+    print('Using Adagrad:\t\t{}'.format(config.USE_ADAGRAD))
     print()
 
 

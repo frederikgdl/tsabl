@@ -41,23 +41,34 @@ def get_numeric_labels(labels, length=2):
         return None
 
 
-def get_context_windows_labels(text_sequences, labels, window_size):
-    # TODO: padding?
+def get_context_windows_labels(tweets, labels, window_size, vocab_map):
     """
     Create context windows and labels lists from text sequences
     Ignores texts (tweets) shorter than the window size
-    :param text_sequences: list of text sequences (vectors with word indices)
+    :param tweets: list of tweets
     :param labels: list of labels (ints)
     :param window_size: int with size of context windows
+    :param vocab_map: vocabulary and indexes
     :return: context_windows: list with context windows, each windows a list of size window_size
              new_labels:
     """
     context_windows = []
     new_labels = []
-    for idx, seq in enumerate(text_sequences):
-        if len(seq) < window_size:
+    for idx, tweet in enumerate(tweets):
+        tweet = tweet.split(' ')
+
+        if len(tweet) < window_size:
             continue
 
+        # Convert tweet to list of vocab indexes
+        seq = []
+        for word in tweet:
+            if word in vocab_map:
+                seq.append(vocab_map[word])
+            else:
+                seq.append(vocab_map['<unk>'])
+
+        # Create windows of specified size
         for i in range(len(seq) - window_size + 1):
             window = []
             for j in range(window_size):
@@ -74,10 +85,10 @@ def get_negative_samples(context_windows, vocab_size):
     negative_samples = []
     for window in context_windows:
         neg_sample = list(window)
-        rand_idx = random.randint(1, vocab_size-1)
+        rand_idx = random.randint(0, vocab_size-1)
 
         while rand_idx == middle_idx:
-            rand_idx = random.randint(1, vocab_size-1)
+            rand_idx = random.randint(0, vocab_size-1)
 
         neg_sample[middle_idx] = rand_idx
         negative_samples.append(neg_sample)
@@ -87,3 +98,48 @@ def get_negative_samples(context_windows, vocab_size):
 
 def dump_embed_file(output_file, inverse_vocab_map, embeddings):
     file_ops.dump_embed_file(output_file=output_file, inverse_vocab_map=inverse_vocab_map, embeddings=embeddings)
+
+
+def get_vocab(tweet_texts, min_freq):
+    """
+    Build and return a map of word to a unique index.
+    Words with frequency lower than min_freq are ignored.
+    Higher frequency words are assigned lower indexes.
+    The words in the map define the vocabulary given from the tweets.
+    """
+
+    # Build a word frequency map
+    word_frequency_map = {}
+    for tweet in tweet_texts:
+        for word in tweet.split(' '):
+            if word in word_frequency_map:
+                word_frequency_map[word] += 1
+            else:
+                word_frequency_map[word] = 1
+
+    # Now turn it around: Map every frequency to a list of words of that frequency
+    frequency_map = {}
+    for word in word_frequency_map:
+        freq = word_frequency_map[word]
+        if freq < min_freq:
+            continue
+        if freq not in frequency_map:
+            frequency_map[freq] = []
+        frequency_map[freq].append(word)
+
+    # Now build the vocab/index map
+    # Each word gets assigned an index by frequency. That is, the words with highest frequencies get assigned the
+    # lowest indexes
+    # Special padding words are put in the map
+    vocab_map = {'<unk>': 0, '<s>': 1, '</s>': 2}
+    idx = 3
+    for freq in sorted(frequency_map.keys(), reverse=True):
+        for word in frequency_map[freq]:
+            vocab_map[word] = idx
+            idx += 1
+
+    return vocab_map
+
+
+def pad_tweets(tweets):
+    return ['<s> ' + tweet + ' </s>' for tweet in tweets]
