@@ -17,13 +17,15 @@ WINDOW_SIZE = 7
 
 HIDDEN_SIZE = 20
 
-ADAGRAD_LR = 0.1
+LEARNING_RATE = 0.1
 
 DROPOUT_P = 0
 
 ALPHA = 0.5
 
 SENTIMENT_CLASSES = 3
+
+USE_ADAGRAD = False
 
 
 # Tokenizer options

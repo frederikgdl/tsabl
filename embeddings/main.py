@@ -5,7 +5,7 @@ from time import time
 import numpy as np
 from keras.models import Model
 from keras.layers import Embedding, Dense, Reshape, Input, Dropout, merge
-from keras.optimizers import Adagrad
+from keras.optimizers import Adagrad, SGD
 import keras.backend as K
 
 import embeddings.config as config
@@ -115,8 +115,9 @@ def main():
     batch_size = config.BATCH_SIZE
     dropout_p = config.DROPOUT_P
     alpha = config.ALPHA
-    adagrad_lr = config.ADAGRAD_LR
+    learning_rate = config.LEARNING_RATE
     sentiment_classes = config.SENTIMENT_CLASSES
+    use_adagrad = config.USE_ADAGRAD
 
     if sentiment_classes not in [2, 3]:
         logging.critical('The number of supported sentiment classes is 2 or 3. Number given: {}'
@@ -205,7 +206,10 @@ def main():
                         + K.maximum(0., margin - K.sum(labels_two*y_pred, axis=1)))
 
     # Optimizer
-    optimizer = Adagrad(lr=adagrad_lr)
+    if use_adagrad:
+        optimizer = Adagrad(lr=learning_rate)
+    else:
+        optimizer = SGD(lr=learning_rate)
 
     logging.info('Compiling model')
     t = time()
@@ -249,11 +253,12 @@ def print_intro():
     print('Batch size:\t\t{}'.format(config.BATCH_SIZE))
     print('Dropout p:\t\t{}'.format(config.DROPOUT_P))
     print('Alpha:\t\t\t{}'.format(config.ALPHA))
-    print('Adagrad learning rate:\t{}'.format(config.ADAGRAD_LR))
+    print('Learning rate:\t{}'.format(config.LEARNING_RATE))
     print('Sentiment classes:\t{}'.format(config.SENTIMENT_CLASSES))
     print('Window size:\t\t{}'.format(config.WINDOW_SIZE))
     print('Hidden size:\t\t{}'.format(config.HIDDEN_SIZE))
     print('Embedding length:\t{}'.format(config.EMBEDDING_LENGTH))
+    print('Using Adagrad:\t{}'.format(config.USE_ADAGRAD))
     print()
 
 
