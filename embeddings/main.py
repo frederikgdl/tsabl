@@ -158,6 +158,7 @@ def main():
 
     # Add 1 for reserved index 0
     vocab_size = len(vocab_map) + 1
+    print("vocab_size: {}".format(vocab_size))
     logging.debug('Done. {}s'.format(str(time() - t)))
 
     logging.info('Converting labels')
