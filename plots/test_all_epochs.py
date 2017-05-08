@@ -69,58 +69,6 @@ def setup_logger():
     logger.addHandler(ch)
 
 
-# Plot
-def plot():
-    x = list(range(1, 1 + len(embeddings_files)))
-    colors = config.COLORS
-    line_styles = config.LINE_STYLES
-
-    cls = classifiers()
-
-    fig = plt.gcf()
-    fig_title = selected_embeddings.replace('/', '_') + '.png'
-    fig.canvas.set_window_title(fig_title)
-
-    plot_lines = []
-    for i, classifier in enumerate(cls):
-        color = colors[i % len(colors)]
-        for j, metric in enumerate(metrics.keys()):
-            line_style = line_styles[j % len(line_styles)]
-            line = plt.plot(x,
-                            list(map(lambda r: r[metric], results[classifier.name])),
-                            line_style,
-                            color=color)
-            plot_lines.append(line)
-
-    # plt.axis([0, len(embeddings_files), 0, 1])
-    plt.xticks(x)
-    plt.xlabel('Epoch')
-    plt.ylabel('Scores')
-
-    # Classifier legend (colors)
-    color_patches = []
-    for i, classifier in enumerate(cls):
-        color = colors[i % len(colors)]
-        patch = mpatches.Patch(color=color, label=classifier.name)
-        color_patches.append(patch)
-
-    classifier_legend = plt.legend(handles=color_patches, loc='upper right')
-
-    # Metric legend (line styles)
-    line_style_handles = []
-    for i, metric in enumerate(metrics.keys()):
-        line_style = line_styles[i % len(line_styles)]
-        line = mlines.Line2D([], [], color='k', linestyle=line_style, label=metrics[metric])
-        line_style_handles.append(line)
-
-    plt.legend(handles=line_style_handles, loc='lower right')
-    plt.gca().add_artist(classifier_legend)
-
-    plt.savefig(path.join(results_dir, fig_title))
-    plt.show()
-    plt.clf()
-
-
 def main():
     setup_logger()
 
@@ -148,8 +96,6 @@ def main():
             if classifier.name not in results:
                 results[classifier.name] = []
             results[classifier.name].append(result)
-
-    plot()
 
 
 if __name__ == '__main__':
