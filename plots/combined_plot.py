@@ -5,24 +5,26 @@ import matplotlib.patches as mpatches
 
 # Fix for running this script on a server without graphics.
 # This line must run before importing pyplot!
+from plots.results_data import ResultsData
+
 if 'DISPLAY' not in environ:
     matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
-from scripts import config
+from plots import config
 
-name_of_classifier = "SVM c=1"
+name_of_classifier = "svm c=1"  # Must be lower case
 metric = list(config.METRICS.keys())[1]  # Only one metric
 metric_pretty = config.METRICS[metric]
 
 num_epochs = config.NUM_EPOCHS
 
-# { method: { dataset: [] } }
-data = {}
-
 number_of_figures = len(config.METHODS)
 fig_number = 1
+
+# The global variable 'data' will be set by the main function
+data = None
 
 
 # Plot
@@ -41,11 +43,14 @@ def plot(method):
 
     plot_lines = []
 
-    for i, dataset in enumerate(sorted(data[method].keys())):
+    embeddings = sorted(data[method].keys())
+    for i, embedding in enumerate(embeddings):
         # Each dataset gets a color
         color = colors[i % len(colors)]
+        epoch_results = data[method][embedding][name_of_classifier]
+        f1_scores = list(map(lambda e: e[metric], epoch_results))
         line = ax.plot(x,
-                       list(data[method][dataset]),
+                       f1_scores,
                        line_style,
                        color=color)
         plot_lines.append(line)
@@ -57,9 +62,9 @@ def plot(method):
 
     # Classifier legend (colors)
     color_patches = []
-    for i, dataset in enumerate(sorted(data[method].keys())):
+    for i, embedding in enumerate(embeddings):
         color = colors[i % len(colors)]
-        patch = mpatches.Patch(color=color, label=dataset)
+        patch = mpatches.Patch(color=color, label=embedding)
         color_patches.append(patch)
 
     # Show only every second epoch label
@@ -96,30 +101,10 @@ def load_results(method, embedding, results_dir):
 
 
 def main():
-    for method in config.METHODS:
-        for embedding in config.EMBEDDINGS:
-            selected_embeddings = path.join(method, embedding)
-            results_dir = path.join(config.RESULT_DIR, selected_embeddings)
-
-            if not path.exists(results_dir):
-                print("Skipping", method, embedding, "because its results_dir does not exist")
-                continue
-
-            if len([d for d in listdir(results_dir) if path.isdir(path.join(results_dir, d))]) < num_epochs:
-                print("Skipping", method, embedding, "because its results do not contain enough epoch directories")
-                continue
-
-            if not any([f for f in listdir(results_dir) if f.endswith(".png")]):
-                print("Skipping", method, embedding,
-                      "because no png was found in " + results_dir + ", which means it has not been tested.")
-                continue
-
-            print("Doing", method, embedding)
-
-            load_results(method, embedding, results_dir)
-
-        if method in data:
-            plot(method)
+    global data
+    data = ResultsData(config.METHODS, config.EMBEDDINGS, [name_of_classifier], num_epochs)
+    for method in data.methods:
+        plot(method)
 
 
 if __name__ == "__main__":
