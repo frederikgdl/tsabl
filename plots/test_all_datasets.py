@@ -80,11 +80,6 @@ def main():
                           epoch_files) + "/" + str(config.NUM_EPOCHS) + ")")
                 continue
 
-            if path.exists(results_dir) and any([f for f in listdir(results_dir) if f.endswith(".png")]):
-                print("Skipping", method, embedding,
-                      "because a png was found in " + results_dir + ", which means it has been tested already.")
-                continue
-
             print("Doing", method, embedding)
             test_all_epochs(embeddings_dir, results_dir)
 
