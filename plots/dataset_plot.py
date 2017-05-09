@@ -22,6 +22,12 @@ num_epochs = config.NUM_EPOCHS
 # The global variable 'data' will be set by the main function
 data = None
 
+# A counter that ensures making different figures instead of overwriting one
+fig_number = 1
+
+# The total number of figs. Set by main. Used for 'holding' the last plot
+number_of_figures = -1
+
 
 # Plot
 def plot(method, embedding):
@@ -31,7 +37,9 @@ def plot(method, embedding):
     colors = config.COLORS
     line_styles = config.LINE_STYLES
 
-    fig = plt.gcf()
+    global fig_number
+    fig = plt.figure(fig_number, (10, 6))
+    fig_number += 1
     fig_title = selected_embeddings.replace('/', '_') + '.png'
     fig.canvas.set_window_title(fig_title)
 
@@ -79,17 +87,17 @@ def plot(method, embedding):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
-    plt.legend(handles=line_style_handles, loc='lower right')
-    plt.gca().add_artist(classifier_legend)
+    ax.legend(handles=line_style_handles, loc='lower right')
+    ax.add_artist(classifier_legend)
 
-    plt.savefig(path.join(config.RESULT_DIR, selected_embeddings, fig_title))
-    plt.show()
-    plt.clf()
+    fig.savefig(path.join(config.RESULT_DIR, selected_embeddings, fig_title))
+    plt.show(block=fig_number == number_of_figures + 1)
 
 
 def main():
-    global data
+    global data, number_of_figures
     data = ResultsData(config.METHODS, config.EMBEDDINGS, classifiers, num_epochs)
+    number_of_figures = sum([len(data[method]) for method in data.methods])
     for method in data.methods:
         for embedding in data[method]:
             plot(method, embedding)
