@@ -38,7 +38,7 @@ def plot(method, embedding):
     line_styles = config.LINE_STYLES
 
     global fig_number
-    fig = plt.figure(fig_number, (10, 6))
+    fig = plt.figure(fig_number)
     fig_number += 1
     fig_title = selected_embeddings.replace('/', '_') + '.png'
     fig.canvas.set_window_title(fig_title)
@@ -70,7 +70,7 @@ def plot(method, embedding):
         patch = mpatches.Patch(color=color, label=classifier)
         color_patches.append(patch)
 
-    classifier_legend = plt.legend(handles=color_patches, loc='upper right')
+    classifier_legend = plt.legend(handles=color_patches, loc='upper left', bbox_to_anchor=(0.0, 1.3))
 
     # Metric legend (line styles)
     line_style_handles = []
@@ -85,9 +85,9 @@ def plot(method, embedding):
 
     # Shrink current axis by 20%
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    ax.set_position([box.x0, box.y0, box.width, box.height * 0.8])
 
-    ax.legend(handles=line_style_handles, loc='lower right')
+    ax.legend(handles=line_style_handles, loc='upper right', bbox_to_anchor=(1.0, 1.3))
     ax.add_artist(classifier_legend)
 
     fig.savefig(path.join(config.RESULT_DIR, selected_embeddings, fig_title))
