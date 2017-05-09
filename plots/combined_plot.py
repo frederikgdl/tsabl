@@ -1,4 +1,4 @@
-from os import path, listdir, environ
+from os import path, environ
 
 import matplotlib
 import matplotlib.patches as mpatches
@@ -78,26 +78,6 @@ def plot(method):
     ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.3, 1.0))
     plt.savefig(path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_')))
     plt.show(block=fig_number == number_of_figures + 1)
-
-
-def add_data_value(method, embedding, value):
-    if method not in data:
-        data[method] = {}
-    if embedding not in data[method]:
-        data[method][embedding] = []
-    data[method][embedding].append(value)
-
-
-def load_results(method, embedding, results_dir):
-    # Load results of SVM classifier
-    for epoch in [d for d in listdir(results_dir) if path.isdir(path.join(results_dir, d))]:
-        file_path = path.join(results_dir, epoch, name_of_classifier.lower())
-        with open(file_path) as f:
-            for line in f:
-                result_metric = line.split()[0]
-                value = line.split()[1]
-                if result_metric == metric:
-                    add_data_value(method, embedding, value)
 
 
 def main():
