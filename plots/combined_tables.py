@@ -44,7 +44,8 @@ def create_tables(data):
                 s += str(value) + " & "
             table += s[:-3] + " \\\\\n"
 
-        postfix = "\t\\end{tabular}\n\\end{table}\n"
+        caption = metric_pretty + " scores for " + method + " method."
+        postfix = "\t\\end{tabular}\n\t\\caption{" + caption + "}\n\\end{table}\n"
         table += postfix
 
         print(table)
