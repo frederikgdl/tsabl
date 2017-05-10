@@ -29,6 +29,10 @@ METHODS = [
     "agg_ternary",
 ]
 
+# Embeddings/datasets to train, test and plot.
+# If set to the string 'all', all subdirectories of <method> will be checked.
+EMBEDDINGS = "all"
+"""
 EMBEDDINGS = [
     "AFINN",
     "ComboA",
@@ -39,6 +43,7 @@ EMBEDDINGS = [
     "TEXTBLOB",
     "VADER",
 ]
+"""
 
 # Skip if number of epoch files is less than this number
 NUM_EPOCHS = 30
