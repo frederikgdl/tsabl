@@ -1,4 +1,5 @@
 import logging
+import os
 from os import path, listdir
 
 import classifiers.train_and_test as train_and_test
@@ -64,23 +65,34 @@ def main():
     setup_logger()
 
     for method in config.METHODS:
-        for embedding in config.EMBEDDINGS:
+
+        if not path.exists(path.join(config.EMBEDDINGS_DIR, method)):
+            logger.warning(
+                "Skipping " + method + " because " + path.join(config.EMBEDDINGS_DIR, method) + " does not exist")
+            continue
+
+        logger.info("Doing method " + method)
+        embeddings = config.EMBEDDINGS
+        if embeddings == "all":
+            embeddings = os.listdir(path.join(config.EMBEDDINGS_DIR, method))
+
+        for embedding in embeddings:
             selected_embeddings = path.join(method, embedding)
             embeddings_dir = path.join(config.EMBEDDINGS_DIR, selected_embeddings)
             results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
             if not path.exists(embeddings_dir):
-                print("Skipping", method, embedding, "because its embeddings_dir does not exist")
+                logger.warning("Skipping", method, embedding, "because its embeddings_dir does not exist")
                 continue
 
             epoch_files = len(listdir(embeddings_dir))
             if epoch_files < config.NUM_EPOCHS:
-                print("Skipping", method, embedding,
-                      "because it does not contain enough epoch files (" + str(
-                          epoch_files) + "/" + str(config.NUM_EPOCHS) + ")")
+                msg = "Skipping " + method + " " + embedding + "because it does not contain enough epoch files (" + str(
+                    epoch_files) + "/" + str(config.NUM_EPOCHS) + ")"
+                logger.warning(msg)
                 continue
 
-            print("Doing", method, embedding)
+            logger.info("Doing " + method + " " + embedding)
             test_all_epochs(embeddings_dir, results_dir)
 
 
