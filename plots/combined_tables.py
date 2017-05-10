@@ -37,10 +37,14 @@ def create_tables(data):
 
         table = prefix + header[:-3] + " \\\\\n\\hline\n"
 
+        max_value = -1
+
         for epoch in range(num_epochs):
             s = str(epoch + 1) + " & "
             for embedding in data[method]:
                 value = round(data[method][embedding][name_of_classifier][epoch][metric], specificity)
+                if value > max_value:
+                    max_value = value
                 s += str(value) + " & "
             table += s[:-3] + " \\\\\n"
 
@@ -49,6 +53,7 @@ def create_tables(data):
         postfix = "\t\\end{tabular}\n\t\\caption{" + caption + "}\n\\end{table}\n"
         table += postfix
 
+        table = table.replace(str(max_value), bold(str(max_value)))
         print(table)
 
 
