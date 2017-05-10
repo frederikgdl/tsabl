@@ -74,7 +74,8 @@ def main():
         logger.info("Doing method " + method)
         embeddings = config.EMBEDDINGS
         if embeddings == "all":
-            embeddings = os.listdir(path.join(config.EMBEDDINGS_DIR, method))
+            method_path = path.join(config.EMBEDDINGS_DIR, method)
+            embeddings = [d for d in os.listdir(method_path) if os.path.isdir(os.path.join(method_path, d))]
 
         for embedding in embeddings:
             selected_embeddings = path.join(method, embedding)

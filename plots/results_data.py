@@ -1,3 +1,4 @@
+import os
 from os import path, listdir
 from typing import List
 
@@ -26,7 +27,13 @@ class ResultsData:
 
         # Load results!
         for method in methods:
-            for embedding in embeddings:
+
+            embs = embeddings
+            if embs == "all":
+                method_path = path.join(config.EMBEDDINGS_DIR, method)
+                embs = [d for d in os.listdir(method_path) if os.path.isdir(os.path.join(method_path, d))]
+
+            for embedding in embs:
                 selected_embeddings = path.join(method, embedding)
                 results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
