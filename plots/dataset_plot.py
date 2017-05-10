@@ -50,7 +50,7 @@ def plot(method, embedding):
         color = colors[i % len(colors)]
         for j, metric in enumerate(metrics.keys()):
             line_style = line_styles[j % len(line_styles)]
-            epoch_results = data[method][embedding][classifier]
+            epoch_results = data[method][embedding][classifier][:num_epochs]
             metric_scores = list(map(lambda e: e[metric], epoch_results))
             line = ax.plot(x,
                            metric_scores,
