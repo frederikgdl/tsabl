@@ -46,7 +46,7 @@ EMBEDDINGS = [
 """
 
 # Skip if number of epoch files is less than this number
-NUM_EPOCHS = 30
+NUM_EPOCHS = 20
 
 
 ##########################################################################
