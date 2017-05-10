@@ -32,7 +32,7 @@ def create_tables(data):
 
         # Create header
         header = bold("Epoch") + " & "
-        for embedding in data[method]:
+        for embedding in sorted(data[method].keys()):
             header += bold(embedding) + " & "
 
         table = prefix + header[:-3] + " \\\\\n\\hline\n"
