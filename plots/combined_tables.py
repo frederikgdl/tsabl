@@ -8,6 +8,7 @@ metric_pretty = config.METRICS[metric]
 num_epochs = config.NUM_EPOCHS
 
 column_alignment = "c"
+specificity = 4  # Number of decimals to round values to
 
 
 def bold(text):
@@ -24,22 +25,23 @@ def create_tables(data):
 
         print("% " + method + ": " + ", ".join(data[method].keys()))
 
-        num_columns = len(data[method])
+        num_columns = len(data[method]) + 1
         column_setup = "{" + "|".join([column_alignment] * num_columns) + "}"
 
-        prefix = "\\begin{table}[H]\n\t\\centering\n\t\\begin{tabular}" + column_setup + "\n\\hline\n"
+        prefix = "\\begin{table}[H]\n\t\\centering\n\t\\begin{tabular}" + column_setup + "\n"
 
         # Create header
-        header = "Epoch & "
+        header = bold("Epoch") + " & "
         for embedding in data[method]:
             header += bold(embedding) + " & "
 
-        table = prefix + header[:-3] + " \\\\\n"
+        table = prefix + header[:-3] + " \\\\\n\\hline\n"
 
         for epoch in range(num_epochs):
             s = str(epoch + 1) + " & "
             for embedding in data[method]:
-                s += str(data[method][embedding][name_of_classifier][epoch][metric]) + " & "
+                value = round(data[method][embedding][name_of_classifier][epoch][metric], specificity)
+                s += str(value) + " & "
             table += s[:-3] + " \\\\\n"
 
         postfix = "\t\\end{tabular}\n\\end{table}\n"
