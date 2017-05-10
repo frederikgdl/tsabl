@@ -88,7 +88,7 @@ def main():
 
             epoch_files = len(listdir(embeddings_dir))
             if epoch_files < config.NUM_EPOCHS:
-                msg = "Skipping " + method + " " + embedding + "because it does not contain enough epoch files (" + str(
+                msg = "Skipping " + method + " " + embedding + " because it doesn't contain enough epoch files (" + str(
                     epoch_files) + "/" + str(config.NUM_EPOCHS) + ")"
                 logger.warning(msg)
                 continue
