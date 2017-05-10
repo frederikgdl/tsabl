@@ -93,6 +93,12 @@ def main():
                 logger.warning(msg)
                 continue
 
+            if path.exists(results_dir):
+                num_epoch_results = len([d for d in os.listdir(results_dir) if path.isdir(path.join(results_dir, d))])
+                if num_epoch_results >= config.NUM_EPOCHS:
+                    logger.warning("Skipping " + method + " " + embedding + " because it has already been tested")
+                    continue
+
             logger.info("Doing " + method + " " + embedding)
             test_all_epochs(embeddings_dir, results_dir)
 
