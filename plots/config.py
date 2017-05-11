@@ -34,6 +34,17 @@ METHODS = [
 EMBEDDINGS = "all"
 """
 EMBEDDINGS = [
+#    "alpha-0.0",
+#    "alpha-0.2",
+#    "alpha-0.4",
+#    "alpha-0.5",
+#    "alpha-0.6",
+#    "alpha-0.8",
+#    "alpha-1.0",
+#    "windowsize-3",
+#    "windowsize-5",
+#    "windowsize-7",
+#    "windowsize-9",
     "AFINN",
     "ComboA",
     "ComboB",
