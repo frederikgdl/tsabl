@@ -1,9 +1,9 @@
 from plots.results_data import ResultsData
 from plots import config
 
-name_of_classifier = "svm c=1"  # Must be lower case
-metric = list(config.METRICS.keys())[0]  # Only one metric
-metric_pretty = config.METRICS[metric]
+name_of_classifier = config.CLASSIFIER.lower()
+metric = config.METRIC[0]
+metric_pretty = config.METRIC[1]
 
 num_epochs = config.NUM_EPOCHS
 
