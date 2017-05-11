@@ -76,7 +76,9 @@ def plot(method):
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.3, 1.0))
-    plt.savefig(path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_')))
+    save_path = path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_'))
+    print("Saving to", save_path)
+    plt.savefig(save_path)
     plt.show(block=fig_number == number_of_figures + 1)
 
 
