@@ -73,7 +73,8 @@ class ResultsData:
 
     def load_results(self, method, embedding, classifier, results_dir):
         """Loads results for all epochs of a method + embedding + classifier combination"""
-        for epoch_dir in [d for d in listdir(results_dir) if path.isdir(path.join(results_dir, d))]:
+        for epoch_dir in sorted([d for d in listdir(results_dir)
+                                 if path.isdir(path.join(results_dir, d))], key=lambda x: int(x.split("-")[-1])):
             file_path = path.join(results_dir, epoch_dir, classifier.lower())
             with open(file_path) as f:
                 epoch_results = {}
