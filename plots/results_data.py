@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 from os import path, listdir
 from typing import List
 
@@ -64,9 +65,9 @@ class ResultsData:
     def add_epoch_results(self, method, embedding, classifier, epoch_results):
         """Adds results for a given epoch to the data set"""
         if method not in self.data:
-            self.data[method] = {}
+            self.data[method] = OrderedDict()
         if embedding not in self.data[method]:
-            self.data[method][embedding] = {}
+            self.data[method][embedding] = OrderedDict()
         if classifier not in self.data[method][embedding]:
             self.data[method][embedding][classifier] = []
         self.data[method][embedding][classifier].append(epoch_results)
