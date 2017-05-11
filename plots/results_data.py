@@ -1,3 +1,4 @@
+import os
 from os import path, listdir
 from typing import List
 
@@ -26,7 +27,13 @@ class ResultsData:
 
         # Load results!
         for method in methods:
-            for embedding in embeddings:
+
+            embs = embeddings
+            if embs == "all":
+                method_path = path.join(config.RESULT_DIR, method)
+                embs = [d for d in os.listdir(method_path) if os.path.isdir(os.path.join(method_path, d))]
+
+            for embedding in embs:
                 selected_embeddings = path.join(method, embedding)
                 results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
@@ -66,7 +73,8 @@ class ResultsData:
 
     def load_results(self, method, embedding, classifier, results_dir):
         """Loads results for all epochs of a method + embedding + classifier combination"""
-        for epoch_dir in [d for d in listdir(results_dir) if path.isdir(path.join(results_dir, d))]:
+        for epoch_dir in sorted([d for d in listdir(results_dir)
+                                 if path.isdir(path.join(results_dir, d))], key=lambda x: int(x.split("-")[-1])):
             file_path = path.join(results_dir, epoch_dir, classifier.lower())
             with open(file_path) as f:
                 epoch_results = {}

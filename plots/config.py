@@ -29,6 +29,10 @@ METHODS = [
     "agg_ternary",
 ]
 
+# Embeddings/datasets to train, test and plot.
+# If set to the string 'all', all subdirectories of <method> will be checked.
+EMBEDDINGS = "all"
+"""
 EMBEDDINGS = [
     "AFINN",
     "ComboA",
@@ -39,6 +43,7 @@ EMBEDDINGS = [
     "TEXTBLOB",
     "VADER",
 ]
+"""
 
 # Skip if number of epoch files is less than this number
 NUM_EPOCHS = 30
@@ -49,3 +54,7 @@ NUM_EPOCHS = 30
 
 COLORS = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', '#ffa500']
 LINE_STYLES = ['-', '--', '.-', '---']
+
+# combined_plot.py and combined_tables.py
+METRIC = list(METRICS.items())[0]
+CLASSIFIER = "svm c=1"
