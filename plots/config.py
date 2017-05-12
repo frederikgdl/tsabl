@@ -29,39 +29,70 @@ METHODS = [
     "agg_ternary",
 ]
 
+embedding_sets = {
+    "datasets": [
+        "AFINN",
+        "ComboA",
+        "ComboB",
+        "EMOTICON.150K",
+        "EMOTICON_EXT",
+        "LexiconClassifier",
+        "TEXTBLOB",
+        "VADER",
+    ],
+    "alpha": [
+        "alpha-0.0",
+        "alpha-0.2",
+        "alpha-0.4",
+        "alpha-0.5",
+        "alpha-0.6",
+        "alpha-0.8",
+        "alpha-1.0",
+    ],
+    "windowsize": [
+        "windowsize-3",
+        "windowsize-5",
+        "windowsize-7",
+        "windowsize-9",
+    ],
+    "learningrate": [
+        "learningrate-0.05",
+        "learningrate-0.2",
+        "learningrate-0.3",
+        "learningrate-0.5",
+        "learningrate-0.7",
+        "learningrate-0.9",
+        "learningrate-1.1",
+    ],
+    "margin": [
+        "margin-0.5",
+        "margin-0.7",
+        "margin-0.9",
+        "margin-1.1",
+        "margin-1.3",
+        "margin-1.5",
+        "margin-1.7",
+        "margin-1.9",
+        "margin-2.0",
+    ],
+    "hiddenlength": [
+        "hiddenlength-50",
+        "hiddenlength-75",
+        "hiddenlength-100",
+        "hiddenlength-125",
+        "hiddenlength-150",
+    ]
+}
+
 # Embeddings/datasets to train, test and plot.
-# If set to the string 'all', all subdirectories of <method> will be checked.
-EMBEDDINGS = "all"
-"""
-EMBEDDINGS = [
-#    "alpha-0.0",
-#    "alpha-0.2",
-#    "alpha-0.4",
-#    "alpha-0.5",
-#    "alpha-0.6",
-#    "alpha-0.8",
-#    "alpha-1.0",
-#    "windowsize-3",
-#    "windowsize-5",
-#    "windowsize-7",
-#    "windowsize-9",
-#    "learningrate-0.05",
-#    "learningrate-0.2",
-#    "learningrate-0.3",
-#    "learningrate-0.5",
-#    "learningrate-0.7",
-#    "learningrate-0.9",
-#    "learningrate-1.1",
-    "AFINN",
-    "ComboA",
-    "ComboB",
-    "EMOTICON.150K",
-    "EMOTICON_EXT",
-    "LexiconClassifier",
-    "TEXTBLOB",
-    "VADER",
-]
-"""
+# If set to the string 'all', all subdirectories of <method> will be checked,
+# which might include more than those listed above.
+EMBEDDINGS_KEY = "all"
+
+if EMBEDDINGS_KEY != "all":
+    EMBEDDINGS = embedding_sets[EMBEDDINGS_KEY]
+else:
+    EMBEDDINGS = "all"
 
 # Skip if number of epoch files is less than this number
 NUM_EPOCHS = 30

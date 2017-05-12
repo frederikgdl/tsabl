@@ -36,7 +36,7 @@ def plot(method):
     global fig_number
     fig = plt.figure(fig_number, (10, 6))
     fig_number += 1
-    fig_title = method + " " + metric_pretty
+    fig_title = method + " " + config.EMBEDDINGS_KEY + " " + metric_pretty
     fig.canvas.set_window_title(fig_title)
 
     ax = plt.subplot(111)

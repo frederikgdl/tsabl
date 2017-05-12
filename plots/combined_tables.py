@@ -48,7 +48,7 @@ def create_tables(data):
                 s += str(value) + " & "
             table += s[:-3] + " \\\\\n"
 
-        caption = metric_pretty + " scores for " + method + " method."
+        caption = metric_pretty + " scores for " + method + " method on " + config.EMBEDDINGS_KEY + " embeddings."
         caption = caption.replace("_", "\\_")
         postfix = "\t\\end{tabular}\n\t\\caption{" + caption + "}\n\\end{table}\n"
         table += postfix
