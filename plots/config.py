@@ -56,6 +56,8 @@ embedding_sets = {
         "windowsize-9",
     ],
     "learningrate": [
+        "learningrate-0.001",
+        "learningrate-0.01",
         "learningrate-0.05",
         "learningrate-0.2",
         "learningrate-0.3",
