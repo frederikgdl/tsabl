@@ -21,9 +21,9 @@ class ResultsData:
         # { method: { embedding: { classifier_name: [ { metric: value } ] } } }
         self.data = {}
 
-        self.methods = methods
-        self.embeddings = embeddings
-        self.classifiers = classifiers
+        self.methods = sorted(methods)
+        self.embeddings = sorted(embeddings)
+        self.classifiers = sorted(classifiers)
         self.num_epochs = num_epochs
 
         # Load results!
@@ -32,7 +32,7 @@ class ResultsData:
             embs = embeddings
             if embs == "all":
                 method_path = path.join(config.RESULT_DIR, method)
-                embs = [d for d in os.listdir(method_path) if os.path.isdir(os.path.join(method_path, d))]
+                embs = [d for d in sorted(os.listdir(method_path)) if os.path.isdir(os.path.join(method_path, d))]
 
             for embedding in embs:
                 selected_embeddings = path.join(method, embedding)
@@ -41,7 +41,7 @@ class ResultsData:
                 if not self.filter_tweet(method, embedding, results_dir):
                     continue
 
-                for classifier in classifiers:
+                for classifier in sorted(classifiers):
                     self.load_results(method, embedding, classifier, results_dir)
 
     def __getitem__(self, item):
