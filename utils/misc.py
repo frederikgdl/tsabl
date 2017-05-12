@@ -10,3 +10,10 @@ def sign(x):
     if x < 0:
         return -1
     return 0
+
+
+def sorted_by_suffix(list_of_strings):
+    try:
+        return sorted(list_of_strings, key=lambda x: float(x.split("-")[-1]))
+    except ValueError:
+        return sorted(list_of_strings)

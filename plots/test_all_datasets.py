@@ -5,6 +5,7 @@ from os import path, listdir
 import classifiers.train_and_test as train_and_test
 import plots.config as config
 from plots.config import classifiers
+from utils.misc import sorted_by_suffix
 
 logger = None
 verbose = 0
@@ -44,7 +45,7 @@ def setup_logger():
 
 def test_all_epochs(embeddings_dir, results_dir):
     # Sort by suffix number of files. Turn to int so that '7' is treated as less that '18', for instance.
-    embeddings_files = sorted(listdir(embeddings_dir), key=lambda f: int(f.split("-")[-1]))
+    embeddings_files = sorted_by_suffix(listdir(embeddings_dir))
 
     for embeddings_file in embeddings_files:
         logger.info(embeddings_file)

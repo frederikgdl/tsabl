@@ -1,5 +1,6 @@
 from plots.results_data import ResultsData
 from plots import config
+from utils.misc import sorted_by_suffix
 
 name_of_classifier = config.CLASSIFIER.lower()
 metric = config.METRIC[0]
@@ -32,7 +33,7 @@ def create_tables(data):
 
         # Create header
         header = bold("Epoch") + " & "
-        for embedding in sorted(data[method].keys()):
+        for embedding in sorted_by_suffix(data[method].keys()):
             header += bold(embedding) + " & "
 
         table = prefix + header[:-3] + " \\\\\n\\hline\n"

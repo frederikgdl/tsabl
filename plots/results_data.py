@@ -4,10 +4,10 @@ from os import path, listdir
 from typing import List
 
 from plots import config
+from utils.misc import sorted_by_suffix
 
 
 class ResultsData:
-
     def __init__(self, methods: List[str], embeddings: List[str], classifiers: List[str], num_epochs: int):
         """
         Creates a ResultsData instance that holds results for the given methods, embeddings and classifiers with 
@@ -22,7 +22,7 @@ class ResultsData:
         self.data = {}
 
         self.methods = sorted(methods)
-        self.embeddings = sorted(embeddings)
+        self.embeddings = sorted_by_suffix(embeddings)
         self.classifiers = sorted(classifiers)
         self.num_epochs = num_epochs
 
@@ -32,7 +32,8 @@ class ResultsData:
             embs = embeddings
             if embs == "all":
                 method_path = path.join(config.RESULT_DIR, method)
-                embs = [d for d in sorted(os.listdir(method_path)) if os.path.isdir(os.path.join(method_path, d))]
+                embs = [d for d in sorted_by_suffix(os.listdir(method_path)) if
+                        os.path.isdir(os.path.join(method_path, d))]
 
             for embedding in embs:
                 selected_embeddings = path.join(method, embedding)
@@ -74,8 +75,8 @@ class ResultsData:
 
     def load_results(self, method, embedding, classifier, results_dir):
         """Loads results for all epochs of a method + embedding + classifier combination"""
-        for epoch_dir in sorted([d for d in listdir(results_dir)
-                                 if path.isdir(path.join(results_dir, d))], key=lambda x: int(x.split("-")[-1])):
+        for epoch_dir in sorted_by_suffix([d for d in listdir(results_dir)
+                                           if path.isdir(path.join(results_dir, d))]):
             file_path = path.join(results_dir, epoch_dir, classifier.lower())
             with open(file_path) as f:
                 epoch_results = {}

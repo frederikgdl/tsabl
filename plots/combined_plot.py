@@ -6,6 +6,7 @@ import matplotlib.patches as mpatches
 # Fix for running this script on a server without graphics.
 # This line must run before importing pyplot!
 from plots.results_data import ResultsData
+from utils.misc import sorted_by_suffix
 
 if 'DISPLAY' not in environ:
     matplotlib.use('Agg')
@@ -43,7 +44,7 @@ def plot(method):
 
     plot_lines = []
 
-    embeddings = sorted(data[method].keys())
+    embeddings = sorted_by_suffix(data[method].keys())
     for i, embedding in enumerate(embeddings):
         # Each dataset gets a color
         color = colors[i % len(colors)]
