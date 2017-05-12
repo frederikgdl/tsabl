@@ -67,8 +67,9 @@ def main():
     for method in config.METHODS:
 
         if not path.exists(path.join(config.EMBEDDINGS_DIR, method)):
-            logger.warning(
-                "Skipping " + method + " because " + path.join(config.EMBEDDINGS_DIR, method) + " does not exist")
+            logger.warning("Skipping {0} {1} because {2} does not exist".format(method, embedding,
+                                                                                path.join(config.EMBEDDINGS_DIR,
+                                                                                          method)))
             continue
 
         logger.info("Doing method " + method)
@@ -83,20 +84,23 @@ def main():
             results_dir = path.join(config.RESULT_DIR, selected_embeddings)
 
             if not path.exists(embeddings_dir):
-                logger.warning("Skipping", method, embedding, "because its embeddings_dir does not exist")
+                logger.warning("Skipping {0} {1} because its embeddings dir does not exist".format(method, embedding))
                 continue
 
             epoch_files = len(listdir(embeddings_dir))
             if epoch_files < config.NUM_EPOCHS:
-                msg = "Skipping " + method + " " + embedding + " because it doesn't contain enough epoch files (" + str(
-                    epoch_files) + "/" + str(config.NUM_EPOCHS) + ")"
-                logger.warning(msg)
+                logger.warning(
+                    "Skipping {0} {1} because it does not contain enough epoch files ({2}/{3})".format(method,
+                                                                                                       embedding,
+                                                                                                       epoch_files,
+                                                                                                       config.NUM_EPOCHS
+                                                                                                       ))
                 continue
 
             if path.exists(results_dir):
                 num_epoch_results = len([d for d in os.listdir(results_dir) if path.isdir(path.join(results_dir, d))])
                 if num_epoch_results >= config.NUM_EPOCHS:
-                    logger.warning("Skipping " + method + " " + embedding + " because it has already been tested")
+                    logger.warning("Skipping {0} {1} because it has already been tested".format(method, embedding))
                     continue
 
             logger.info("Doing " + method + " " + embedding)
