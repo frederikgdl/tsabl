@@ -75,12 +75,18 @@ embedding_sets = {
         "margin-1.9",
         "margin-2.0",
     ],
+    "embeddinglen": [
+        "embeddinglen-50",
+        "embeddinglen-75",
+        "embeddinglen-100",
+        "embeddinglen-125",
+        "embeddinglen-150",
+    ],
     "hiddenlength": [
+        "hiddenlength-10",
+        "hiddenlength-30",
         "hiddenlength-50",
-        "hiddenlength-75",
         "hiddenlength-100",
-        "hiddenlength-125",
-        "hiddenlength-150",
     ]
 }
 
