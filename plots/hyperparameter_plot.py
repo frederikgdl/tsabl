@@ -1,6 +1,7 @@
 from os import path, environ, listdir
 
 import matplotlib
+import numpy as np
 
 from plots.results_data import ResultsData
 # Fix for running this script on a server without graphics.
@@ -62,18 +63,20 @@ def plot(hyperparameter):
     global fig_number
     fig = plt.figure(fig_number, (10, 6))
     fig_number += 1
-    fig_title = hyperparameter + ' comparison'
+    fig_title = 'comparison ' + hyperparameter
     fig.canvas.set_window_title(fig_title)
 
     ax = plt.subplot(111)
 
-    x = [float(num) for num in hyperparameter_values]
+    a = np.arange(len(hyperparameter_values))
+    ax.plot(a, avg_scores, line_style, color=color)
 
-    ax.plot(x, avg_scores, line_style, color=color)
-
-    plt.xticks(x)
+    ax.xaxis.set_ticks(a)
+    ax.xaxis.set_ticklabels(hyperparameter_values)
+    #plt.xticks(hyperparameter_values, rotation=30)
     plt.xlabel(HYPERPARAMETERS[hyperparameter])
     plt.ylabel(METRIC_PRETTY)
+    plt.tight_layout()
 
     plt.savefig(path.join(config.RESULT_DIR, METHOD, fig_title.replace(' ', '_') + '.png'))
     plt.show(block=fig_number == number_of_figures + 1)
