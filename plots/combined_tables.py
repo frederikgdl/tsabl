@@ -1,6 +1,7 @@
 from plots.results_data import ResultsData
 from plots import config
 from utils.misc import sorted_by_suffix
+from utils.latex import bold
 
 name_of_classifier = config.CLASSIFIER.lower()
 metric = config.METRIC[0]
@@ -10,10 +11,6 @@ num_epochs = config.NUM_EPOCHS
 
 col_align = "c"
 specificity = 4  # Number of decimals to round values to
-
-
-def bold(text):
-    return "\\textbf{" + str(text) + "}"
 
 
 def create_tables(data):

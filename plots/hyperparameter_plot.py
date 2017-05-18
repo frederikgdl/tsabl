@@ -4,10 +4,11 @@ import matplotlib
 import numpy as np
 
 from plots.results_data import ResultsData
+from utils.misc import sorted_by_suffix
+from utils.latex import bold
+
 # Fix for running this script on a server without graphics.
 # This line must run before importing pyplot!
-from utils.misc import sorted_by_suffix
-
 if 'DISPLAY' not in environ:
     matplotlib.use('Agg')
 
@@ -34,6 +35,9 @@ NUM_EPOCHS = config.NUM_EPOCHS
 number_of_figures = len(HYPERPARAMETERS)
 fig_number = 1
 
+col_align = 'c'
+specificity = 4
+
 
 def get_dir_names(prefix):
     return sorted_by_suffix(
@@ -47,18 +51,42 @@ def get_avg_from_epochs(data, method, embedding, classifier, metric, epoch_start
     return sum(metric_scores) / len(metric_scores)
 
 
-def plot(hyperparameter):
+def print_table(hyperparameter, hyperparameter_values, avg_scores):
+    num_columns = len(hyperparameter_values)
+
+    column_setup = '{l|' + '|'.join([col_align] * num_columns) + '}'
+
+    table = "\\begin{table}[H]\n\t\\centering\n\t\\begin{tabular}" + column_setup + "\n"
+
+    first_row = HYPERPARAMETERS[hyperparameter] + " & "
+    for hyp in hyperparameter_values:
+        first_row += str(hyp) + " & "
+    table += first_row[:-3] + " \\\\\n"
+
+    table += "\\hline\n"
+
+    max_value = -1
+    second_row = METRIC_PRETTY + " & "
+    for value in avg_scores:
+        val = round(value, specificity)
+        if val > max_value:
+            max_value = val
+        second_row += str(val) + " & "
+
+    table += second_row[:-3].replace(str(max_value), bold(max_value)) + " \\\\\n"
+
+    caption = METRIC_PRETTY + " scores for " + hyperparameter
+    caption = caption.replace("_", "\\_")
+    postfix = "\t\\end{tabular}\n\t\\caption{" + caption + "}\n\\end{table}\n"
+    table += postfix
+
+    table = table.replace(str(max_value), bold(str(max_value)))
+    print(table)
+
+
+def plot(hyperparameter, hyperparameter_values, avg_scores):
     color = 'blue'
     line_style = 'o-'
-
-    dir_names = get_dir_names(hyperparameter)
-
-    hyperparameter_values = [dir_name.split("-")[-1] for dir_name in dir_names]
-
-    data = ResultsData([METHOD], dir_names, [CLASSIFIER], NUM_EPOCHS)
-
-    avg_scores = [get_avg_from_epochs(data, METHOD, dir_name, CLASSIFIER, METRIC,
-                                      epoch_start=EPOCH_START, epoch_stop=EPOCH_STOP) for dir_name in dir_names]
 
     global fig_number
     fig = plt.figure(fig_number, (10, 6))
@@ -84,7 +112,14 @@ def plot(hyperparameter):
 
 def main():
     for hyperparameter in list(HYPERPARAMETERS.keys()):
-        plot(hyperparameter)
+        dir_names = get_dir_names(hyperparameter)
+        hyperparameter_values = [dir_name.split("-")[-1] for dir_name in dir_names]
+        data = ResultsData([METHOD], dir_names, [CLASSIFIER], NUM_EPOCHS)
+        avg_scores = [get_avg_from_epochs(data, METHOD, dir_name, CLASSIFIER, METRIC,
+                                          epoch_start=EPOCH_START, epoch_stop=EPOCH_STOP) for dir_name in dir_names]
+
+        plot(hyperparameter, hyperparameter_values, avg_scores)
+        print_table(hyperparameter, hyperparameter_values, avg_scores)
 
 
 if __name__ == '__main__':
