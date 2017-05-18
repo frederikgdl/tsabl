@@ -8,7 +8,7 @@ metric_pretty = config.METRIC[1]
 
 num_epochs = config.NUM_EPOCHS
 
-column_alignment = "c"
+col_align = "c"
 specificity = 4  # Number of decimals to round values to
 
 
@@ -26,22 +26,26 @@ def create_tables(data):
 
         print("% " + method + ": " + ", ".join(data[method].keys()))
 
-        num_columns = len(data[method]) + 1
-        column_setup = "{" + "|".join([column_alignment] * num_columns) + "}"
+        num_columns = len(data[method]) + 2
+        column_setup = "{" + col_align + " " + col_align + "*{" + str(num_columns - 2) + "}{|" + col_align + "}}"
 
         prefix = "\\begin{table}[H]\n\t\\centering\n\t\\begin{tabular}" + column_setup + "\n"
 
         # Create header
-        header = bold("Epoch") + " & "
-        for embedding in sorted_by_suffix(data[method].keys()):
-            header += bold(embedding) + " & "
+        header = "\\multicolumn{" + str(num_columns) + "}{" + col_align + "}{" + bold(config.EMBEDDINGS_KEY) + "} \\\\\n"
+        embeddings = sorted_by_suffix(data[method].keys())
+        header_values = "& & " + " & ".join(list(map(lambda e: e.split("-")[-1], embeddings))) + " \\\\\n"
 
-        table = prefix + header[:-3] + " \\\\\n\\hline\n"
+        hline = "\\hhline{~*{" + str(num_columns - 1) + "}{|-}}\n"
+
+        epochs_header = "\\parbox[t]{2mm}{\\multirow{" + str(num_epochs) + "}{*}{\\rotatebox[origin=c]{90}{\\textbf{Epochs}}}}\n"
+
+        table = prefix + header + header_values + hline + epochs_header
 
         max_value = -1
 
         for epoch in range(num_epochs):
-            s = str(epoch + 1) + " & "
+            s = "& " + str(epoch + 1) + " & "
             for embedding in data[method]:
                 value = round(data[method][embedding][name_of_classifier][epoch][metric], specificity)
                 if value > max_value:
