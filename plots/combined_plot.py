@@ -95,7 +95,7 @@ def plot(method):
     for i, embedding in enumerate(embeddings):
         # Each dataset gets a color
         color = colors[i % len(colors)]
-        epoch_results = data[method][embedding][name_of_classifier]
+        epoch_results = data[method][embedding][name_of_classifier][:num_epochs]
         f1_scores = list(map(lambda e: e[metric], epoch_results))
         line = ax.plot(x,
                        f1_scores,
