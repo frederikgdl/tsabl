@@ -1,6 +1,8 @@
 from os import path
 from classifiers.models.afinn import AfinnModel
 from classifiers.models.combo_average import ComboAverage
+from classifiers.models.emoticon import Emoticon
+from classifiers.models.emoticon_ext import EmoticonExt
 from classifiers.models.lexicon_classifier import LexiconClassifier
 from classifiers.models.log_res import LogRes
 from classifiers.models.random_uniform import RandomUniform
@@ -39,6 +41,8 @@ BASELINES = [
     RandomUniform(),
     RandomWeighted(),
     AfinnModel(),
+    Emoticon(),
+    EmoticonExt(),
     Vader(threshold=0.1),
     Textblob(subjectivity_threshold=0.1, polarity_threshold=0.5),
     ComboAverage(name="ComboA", a=0, b=4, c=4, d=2),
