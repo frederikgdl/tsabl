@@ -43,6 +43,13 @@ def ternary_recall(predictions, labels, target_value):
     return recall_score(y_true=prepared_labels, y_pred=prepared_predictions)
 
 
+def avgrec_score(predictions, labels):
+    recall_pos = ternary_recall(predictions, labels, POSITIVE)
+    recall_neg = ternary_recall(predictions, labels, NEGATIVE)
+    recall_neu = ternary_recall(predictions, labels, NEUTRAL)
+    return (recall_pos + recall_neg + recall_neu) / 3
+
+
 # Prepares lists of labels or predictions for further scoring
 # Sets the values with the target value to 1, the rest to -1
 # This way we can consider only one target value at a time

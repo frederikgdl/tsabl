@@ -31,6 +31,8 @@ class Results:
         self.results["neutral_recall"] = metrics.ternary_recall(predictions, truth, 0)
         self.results["neutral_f1_score"] = metrics.ternary_f1_score(predictions, truth, 0)
 
+        self.results["avgrec_score"] = metrics.avgrec_score(predictions, truth)
+
     def __str__(self):
         """
         Return string representation of results
