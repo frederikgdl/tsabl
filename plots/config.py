@@ -24,8 +24,8 @@ METRICS['f1_pn_score'] = 'F1 PN'
 
 # test_all_datasets
 METHODS = [
-    "binary",
-    "ternary",
+    #"binary",
+    #"ternary",
     "agg_ternary",
 ]
 
@@ -70,6 +70,7 @@ embedding_sets = {
         "margin-0.5",
         "margin-0.7",
         "margin-0.9",
+        "margin-1.0",
         "margin-1.1",
         "margin-1.3",
         "margin-1.5",
@@ -86,6 +87,7 @@ embedding_sets = {
     ],
     "hiddenlength": [
         "hiddenlength-10",
+        "hiddenlength-20",
         "hiddenlength-30",
         "hiddenlength-50",
         "hiddenlength-100",
@@ -95,7 +97,7 @@ embedding_sets = {
 # Embeddings/datasets to train, test and plot.
 # If set to the string 'all', all subdirectories of <method> will be checked,
 # which might include more than those listed above.
-EMBEDDINGS_KEY = "all"
+EMBEDDINGS_KEY = "datasets"
 
 if EMBEDDINGS_KEY != "all":
     EMBEDDINGS = embedding_sets[EMBEDDINGS_KEY]
