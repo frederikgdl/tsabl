@@ -1,4 +1,4 @@
-package sa_embedding;
+package ternary_embedding;
 
 import java.util.Random;
 
@@ -7,9 +7,9 @@ import duyuNN.*;
 /*
  * This class implements the window ranking approach which uses sentiment of sentences
  * for learning sentiment embedding
- * This is suitable for binary class situation.
+ * Extended for three-way classification
  */
-public class BinaryHybridRanking{
+public class TernaryHybridRanking {
     public LookupLayer lookup;
     public LinearLayer linear1;
     public TanhLayer tanh;
@@ -17,7 +17,7 @@ public class BinaryHybridRanking{
 
     public LinearLayer contextLinear2;
 
-    public BinaryHybridRanking()
+    public TernaryHybridRanking()
     {
     }
 
@@ -28,7 +28,7 @@ public class BinaryHybridRanking{
     public int hiddenSize;
     public int embeddingLength;
 
-    public BinaryHybridRanking(
+    public TernaryHybridRanking(
             int xWindowSize,
             int xVocabSize,
             int xHiddenSize,
@@ -42,7 +42,7 @@ public class BinaryHybridRanking{
         lookup = new LookupLayer(embeddingLength, vocabSize, windowSize);
         linear1 = new LinearLayer(windowSize * embeddingLength, hiddenSize);
         tanh = new TanhLayer(hiddenSize);
-        sentimentLinear2 = new LinearLayer(hiddenSize, 2);
+        sentimentLinear2 = new LinearLayer(hiddenSize, 3); // positive, negative and neutral
 
         lookup.link(linear1);
         linear1.link(tanh);
@@ -74,6 +74,16 @@ public class BinaryHybridRanking{
         contextLinear2.forward();
     }
 
+    public void forwardWithDropout(double dropedRatio) {
+        lookup.forward();
+        linear1.forwardWithDropout(dropedRatio);
+        tanh.forward();
+        sentimentLinear2.forward();
+
+        System.arraycopy(tanh.output, 0, contextLinear2.input, 0, hiddenSize);
+        contextLinear2.forward();
+    }
+
     public void backward()
     {
         contextLinear2.backward();
@@ -89,12 +99,33 @@ public class BinaryHybridRanking{
         lookup.backward();
     }
 
+    public void backwardWithDropout() {
+        contextLinear2.backward();
+        sentimentLinear2.backward();
+
+        for(int i = 0; i < hiddenSize; i++)
+        {
+            tanh.outputG[i] += contextLinear2.inputG[i];
+        }
+
+        tanh.backward();
+        linear1.backwardWithDropout();
+        lookup.backward();
+    }
+
     public void update(double learningRate)
     {
         lookup.update(learningRate);
         linear1.update(learningRate / linear1.inputLength);
         sentimentLinear2.update(learningRate / sentimentLinear2.inputLength);
         contextLinear2.update(learningRate / contextLinear2.inputLength);
+    }
+
+    public void updateAdaGrad(double learningRate, int batchsize) {
+        lookup.updateAdaGrad(learningRate, batchsize);
+        linear1.updateAdaGrad(learningRate / linear1.inputLength, batchsize); // divide on input length?
+        sentimentLinear2.updateAdaGrad(learningRate / sentimentLinear2.inputLength, batchsize);
+        contextLinear2.updateAdaGrad(learningRate / contextLinear2.inputLength, batchsize);
     }
 
     public void clearGrad()
@@ -106,9 +137,9 @@ public class BinaryHybridRanking{
         contextLinear2.clearGrad();
     }
 
-    public BinaryHybridRanking cloneWithTiedParams() throws Exception
+    public TernaryHybridRanking cloneWithTiedParams() throws Exception
     {
-        BinaryHybridRanking clone = new BinaryHybridRanking();
+        TernaryHybridRanking clone = new TernaryHybridRanking();
         clone.windowSize = windowSize;
         clone.vocabSize = vocabSize;
         clone.hiddenSize = hiddenSize;

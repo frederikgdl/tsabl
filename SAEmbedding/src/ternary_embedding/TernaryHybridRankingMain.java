@@ -1,4 +1,4 @@
-package sa_embedding;
+package ternary_embedding;
 
 import java.text.DateFormat;
 
@@ -13,7 +13,7 @@ import java.util.Random;
 import funcs.Data;
 import funcs.Funcs;
 
-public class AggTernaryHybridRankingMain {
+public class TernaryHybridRankingMain {
     public static void train(HashMap<String, String> argsMap) throws Exception
     {
         int xWindowSize = Integer.parseInt(argsMap.get("-windowSize"));
@@ -33,16 +33,16 @@ public class AggTernaryHybridRankingMain {
 
         // Optional hyperparameters
         double dropedRatio = 0.0;
-        Boolean adaGrad = false;
+        // Boolean adaGrad = false;
         int batchsize = 1;
 
         if (argsMap.containsKey("-dropedRatio")) {
             dropedRatio = Double.parseDouble(argsMap.get("-dropedRatio"));
         }
 
-        if (argsMap.containsKey("-adaGrad")) {
-            adaGrad = Boolean.parseBoolean(argsMap.get("-adaGrad"));
-        }
+//        if (argsMap.containsKey("-adaGrad")) {
+//            adaGrad = Boolean.parseBoolean(argsMap.get("-adaGrad"));
+//        }
 
         if (argsMap.containsKey("-batchsize")) {
             batchsize = Integer.parseInt(argsMap.get("-batchsize"));
@@ -51,12 +51,7 @@ public class AggTernaryHybridRankingMain {
         List<String> posFiles = new ArrayList<String>();
         List<String> negFiles = new ArrayList<String>();
         List<String> neuFiles = new ArrayList<String>();
-//        for(int i = 0; i < trainFileNum; i++)
-//        {
-//            posFiles.add(inputDir + "emoticon.pos." + i + ".txt");
-//            negFiles.add(inputDir + "emoticon.neg." + i + ".txt");
-//            neuFiles.add(inputDir + "emoticon.neu." + i + ".txt");
-//        }
+
         posFiles.add(inputDir + inputFilePrefix + ".pos.txt");
         negFiles.add(inputDir + inputFilePrefix + ".neg.txt");
         neuFiles.add(inputDir + inputFilePrefix + ".neu.txt");
@@ -186,13 +181,15 @@ public class AggTernaryHybridRankingMain {
                         }
 
                         // Update parameters
-                        if (adaGrad) {
-                            posMain.updateAdaGrad(learningRate, batchsize);
-                            negMain.updateAdaGrad(learningRate, batchsize);
-                        } else {
-                            posMain.update(learningRate);
-                            negMain.update(learningRate);
-                        }
+//                        if (adaGrad) {
+//                            posMain.updateAdaGrad(learningRate, batchsize);
+//                            negMain.updateAdaGrad(learningRate, batchsize);
+//                        } else {
+//                            posMain.update(learningRate);
+//                            negMain.update(learningRate);
+//                        }
+                        posMain.update(learningRate);
+                        negMain.update(learningRate);
 
                         posMain.clearGrad();
                         negMain.clearGrad();
@@ -201,8 +198,8 @@ public class AggTernaryHybridRankingMain {
                     if(dataIdx % 50000 == 0)
                     {
                         System.out.println("running " + dataIdx + "/" + trainingDatas.size() +
-                                "\t loss: " + ((lossSent + lossContext) / lossC) + " context loss: " +
-                                (lossContext / lossC) + " sentiment loss: " + (lossSent / lossC) + "\t" +
+                                "\t loss: " + ((lossSent + lossContext) / lossC) + "\t context loss: " +
+                                (lossContext / lossC) + "\t sentiment loss: " + (lossSent / lossC) + "\t" +
                                 DateFormat.getDateTimeInstance().format(new Date()));
                     }
                 }

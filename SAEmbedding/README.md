@@ -1,5 +1,10 @@
-# SAEmbedding - Tang 2016
-Implementation of Tang 2016 in Java
+# SAEmbedding - Tang et al. 2016
+Implementation of models by Tang et al. 2016 and Ternary Sentiment Embedding Model in Java.
+
+Packages duyuNN, funcs and sa_embedding collected from <http://ir.hit.edu.cn/~dytang/>.
+
+Package ternary_embedding contains implementation of Ternary Sentiment Embedding Model.
+
 
 ## Setup
 1. Make sure you have java, javac and ant installed.

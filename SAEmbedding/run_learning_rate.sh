@@ -12,7 +12,7 @@ SENTIMENT_ALPHA=0.5
 
 INPUT_DIR='../data/preprocessed/datasets/1M/'
 
-OUTPUT_DIR='../data/embeddings/agg_ternary/'
+OUTPUT_DIR='../data/embeddings/ternary/'
 
 DATA_PREFIX='tweets.'
 
@@ -26,7 +26,7 @@ do
 
     echo "Running with learning rate "${LEARNING_RATE}
 
-    java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
+    java -classpath bin ternary_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
      -trainingRound ${TRAINING_ROUND} -learningRate ${LEARNING_RATE} -margin ${MARGIN} \
