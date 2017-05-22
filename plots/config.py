@@ -13,7 +13,7 @@ EMBEDDINGS_DIR = path.abspath('data/embeddings/')
 # Classifiers to use are defined in this function.
 # By having this in a function, we know that fresh instances are trained and tested every epoch.
 def classifiers():
-    return [SVM(name="SVM c=1", c=1), RandomUniform(), LexiconClassifier()]
+    return [SVM(name="SVM c=6e-3 dual=False", c=6e-3, dual=False), RandomUniform(), LexiconClassifier()]
 
 # The metrics to graph. The keys must match the keys of Model.Result. The values are pretty labels.
 METRICS = OrderedDict()
