@@ -11,7 +11,7 @@ from classifiers.models.svm import SVM
 from classifiers.models.textblob import Textblob
 from classifiers.models.vader import Vader
 
-SUFFIX = "sswe/sswe-u.txt"
+SUFFIX = "agg_ternary/LexiconClassifier/embeddings-100-LexiconClassifier-round-19"
 
 # File options
 EMBEDDING_FILE = path.abspath("data/embeddings/" + SUFFIX)
@@ -33,8 +33,31 @@ MODELS_DIR = path.abspath("models")
 RESULTS_DIR = path.abspath("results/" + SUFFIX)
 
 CLASSIFIERS = [
-    SVM(),
-    LogRes()
+    SVM(name="SVM c=6e-3 dual=False", c=6e-3, dual=False),
+    # SVM(name="SVM c=1e-3 dual=False", c=1e-3, dual=False),
+    # SVM(name="SVM c=1e-2 dual=False", c=1e-2, dual=False),
+    # SVM(name="SVM c=1e-1 dual=False", c=1e-1, dual=False),
+    # SVM(name="SVM c=1 dual=False", c=1, dual=False),
+    # SVM(name="SVM c=1e1 dual=False", c=1e1, dual=False),
+    # SVM(name="SVM c=1e2 dual=False", c=1e2, dual=False),
+    # SVM(name="SVM c=1e3 dual=False", c=1e3, dual=False),
+    # SVM(name="SVM c=2e-3 dual=False", c=2e-3, dual=False),
+    # SVM(name="SVM c=3e-3 dual=False", c=3e-3, dual=False),
+    # SVM(name="SVM c=4e-3 dual=False", c=4e-3, dual=False),
+    # SVM(name="SVM c=5e-3 dual=False", c=5e-3, dual=False),
+    # SVM(name="SVM c=6e-3 dual=False", c=6e-3, dual=False),
+    # SVM(name="SVM c=7e-3 dual=False", c=7e-3, dual=False),
+    # SVM(name="SVM c=8e-3 dual=False", c=8e-3, dual=False),
+    # SVM(name="SVM c=9e-3 dual=False", c=9e-3, dual=False),
+    # SVM(name="SVM c=2e-2 dual=False", c=2e-2, dual=False),
+    # SVM(name="SVM c=3e-2 dual=False", c=3e-2, dual=False),
+    # SVM(name="SVM c=4e-2 dual=False", c=4e-2, dual=False),
+    # SVM(name="SVM c=5e-2 dual=False", c=5e-2, dual=False),
+    # SVM(name="SVM c=6e-2 dual=False", c=6e-2, dual=False),
+    # SVM(name="SVM c=7e-2 dual=False", c=7e-2, dual=False),
+    # SVM(name="SVM c=8e-2 dual=False", c=8e-2, dual=False),
+    # SVM(name="SVM c=9e-2 dual=False", c=9e-2, dual=False),
+    # LogRes()
 ]
 
 BASELINES = [
