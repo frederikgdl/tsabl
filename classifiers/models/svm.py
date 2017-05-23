@@ -1,5 +1,6 @@
 from classifiers.models.model import Model
 from sklearn import svm
+from sklearn.base import clone
 
 
 class SVM(Model):
@@ -30,3 +31,6 @@ class SVM(Model):
     def predict(self, tweets, embeddings_train_scaled):
         self.predictions = self.model.predict(embeddings_train_scaled)
         return self.predictions
+
+    def reset(self):
+        self.model = clone(self.model)

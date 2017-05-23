@@ -96,9 +96,12 @@ def train_baselines(tweets, tweet_embeddings, labels):
 def do_k_fold_validation(k, tweets, tweet_embeddings, labels):
     kfold = KFoldValidator(k, tweets, tweet_embeddings, labels)
     for classifier in classifiers:
+        logger.info("Running k-fold validation for " + str(classifier.name) + " classifier on training data")
+        t = time()
         res = kfold.run(classifier)
         file_ops.write_to_file(str(res),
                                path.join(config.RESULTS_DIR, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
+        logger.debug("Done. " + str(time() - t) + "s")
     for baseline in baselines:
         kfold.run(baseline)
 
