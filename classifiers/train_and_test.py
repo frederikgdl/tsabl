@@ -100,7 +100,7 @@ def do_k_fold_validation(k, tweets, tweet_embeddings, labels):
         t = time()
         res = kfold.run(classifier)
         file_ops.write_to_file(str(res),
-                               path.join(config.RESULTS_DIR, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
+                               path.join(results_dir, classifier.name.lower() + ".kfold" + str(k) + ".txt"))
         logger.debug("Done. " + str(time() - t) + "s")
     for baseline in baselines:
         kfold.run(baseline)
@@ -108,7 +108,7 @@ def do_k_fold_validation(k, tweets, tweet_embeddings, labels):
 
 def load_classifier_models():
     for classifier in classifiers:
-        model_file = path.join(config.MODELS_DIR, classifier.name + ".pickle")
+        model_file = path.join(models_dir, classifier.name + ".pickle")
         logger.info("Loading " + classifier.name + " model from " + model_file)
         t = time()
         classifier.load_model(model_file)
@@ -119,7 +119,7 @@ def save_classifier_models():
     for classifier in classifiers:
         logger.info("Saving " + classifier.name + " model")
         t = time()
-        classifier.save_model(path.join(config.MODELS_DIR, classifier.name + ".pickle"))
+        classifier.save_model(path.join(models_dir, classifier.name + ".pickle"))
         logger.debug("Done. " + str(time() - t) + "s")
 
 
@@ -213,12 +213,12 @@ def print_intro(arguments):
     print()
     print('config.py settings:')
     print()
-    print('{:24}'.format('Word embedding file:'), config.EMBEDDING_FILE)
-    print('{:24}'.format('Training data file:'), config.TRAIN_FILE)
-    print('{:24}'.format('Test data file:'), config.TEST_FILE)
+    print('{:24}'.format('Word embedding file:'), embedding_file)
+    print('{:24}'.format('Training data file:'), train_file)
+    print('{:24}'.format('Test data file:'), test_file)
     print()
-    print('{:24}'.format('Model directory:'), config.MODELS_DIR)
-    print('{:24}'.format('Results directory:'), config.RESULTS_DIR)
+    print('{:24}'.format('Model directory:'), models_dir)
+    print('{:24}'.format('Results directory:'), results_dir)
     print()
 
 
