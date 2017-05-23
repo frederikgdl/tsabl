@@ -70,7 +70,7 @@ def read_labeled_file(file_path):
 
     with open(file_path, 'r') as f:
         for line in f:
-            line = line.strip().split(' ')
+            line = line.strip().split()
             data.append(' '.join(line[:-1]))
             labels.append(line[-1])
 
