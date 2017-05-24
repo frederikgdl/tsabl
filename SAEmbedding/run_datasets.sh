@@ -13,17 +13,16 @@ SENTIMENT_ALPHA=0.2
 
 INPUT_DIR='../data/preprocessed/datasets/1M/'
 
-OUTPUT_DIR='../data/embeddings/agg_ternary/'
+OUTPUT_DIR='../data/embeddings/ternary/'
 
 DATA_PREFIX='tweets.'
 
-# 'AFINN' 'ComboA' 'ComboB' 'EMOTICON_EXT' 'EMOTICON.150K' 'LexiconClassifier' 'TEXTBLOB' 'VADER'
-for DATASET in 'VADER'
+for DATASET in 'AFINN' 'ComboA' 'ComboB' 'EMOTICON_EXT' 'EMOTICON.150K' 'LexiconClassifier' 'TEXTBLOB' 'VADER'
 do
     INPUT_PREFIX=${DATA_PREFIX}${DATASET}
     OUTPUT_FILE=${OUTPUT_DIR}${DATASET}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 
-    java -classpath bin sa_embedding.AggTernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
+    java -classpath bin ternary_embedding.TernaryHybridRankingMain -windowSize ${WINDOW_SIZE} \
      -hiddenLength ${HIDDEN_LENGTH} -embeddingLength ${EMBEDDING_LENGTH} \
      -inputDir ${INPUT_DIR} -vocabFile ${VOCAB_FILE} -trainFileNum ${TRAIN_FILE_NUM} \
      -trainingRound ${TRAINING_ROUND} -learningRate ${LEARNING_RATE} -margin ${MARGIN} \
