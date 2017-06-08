@@ -75,6 +75,14 @@ def print_table(method):
     print(table)
 
 
+def legend_label(embedding):
+    split_embedding = embedding.split("-")
+    first = config.pretty[split_embedding[0]]
+    if len(split_embedding) == 1:
+        return first
+    return first + " " + split_embedding[1]
+
+
 # Plot
 def plot(method):
     x = list(range(1, 1 + num_epochs))
@@ -82,7 +90,7 @@ def plot(method):
     line_style = '-'
 
     global fig_number
-    fig = plt.figure(fig_number, (10, 6))
+    fig = plt.figure(fig_number, (12, 5))
     fig_number += 1
     fig_title = method + " " + config.EMBEDDINGS_KEY + " " + metric_pretty
     fig.canvas.set_window_title(fig_title)
@@ -112,7 +120,7 @@ def plot(method):
     color_patches = []
     for i, embedding in enumerate(embeddings):
         color = colors[i % len(colors)]
-        patch = mpatches.Patch(color=color, label=embedding)
+        patch = mpatches.Patch(color=color, label=legend_label(embedding))
         color_patches.append(patch)
 
     # Show only every second epoch label

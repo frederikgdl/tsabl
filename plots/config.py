@@ -94,6 +94,23 @@ embedding_sets = {
     ]
 }
 
+pretty = {
+    "alpha": "Alpha",
+    "windowsize": "Window Size",
+    "learningrate": "Learning Rate",
+    "margin": "Margin",
+    "embeddinglen": "Embedding Length",
+    "hiddenlength": "Hidden Layer Length",
+    "AFINN": "AFINN",
+    "ComboA": "Combo A",
+    "ComboB": "Combo B",
+    "EMOTICON.150K": "Emoticon",
+    "EMOTICON_EXT": "Emoticon Ext.",
+    "LexiconClassifier": "FJLC",
+    "TEXTBLOB": "TextBlob",
+    "VADER": "VADER",
+}
+
 # Embeddings/datasets to train, test and plot.
 # If set to the string 'all', all subdirectories of <method> will be checked,
 # which might include more than those listed above.
