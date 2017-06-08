@@ -131,7 +131,7 @@ def plot(method):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
-    ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.3, 1.0))
+    ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.2, 1.0))
     save_path = path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_'))
     print("Saving to", save_path)
     plt.savefig(save_path)
