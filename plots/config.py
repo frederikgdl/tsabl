@@ -5,7 +5,7 @@ from classifiers.models.lexicon_classifier import LexiconClassifier
 from classifiers.models.random_uniform import RandomUniform
 from classifiers.models.svm import SVM
 
-RESULT_DIR = path.abspath('results/')
+RESULT_DIR = path.abspath('results/dev')
 
 EMBEDDINGS_DIR = path.abspath('data/embeddings/')
 
@@ -42,6 +42,7 @@ embedding_sets = {
     ],
     "alpha": [
         "alpha-0.0",
+        "alpha-0.1",
         "alpha-0.2",
         "alpha-0.4",
         "alpha-0.5",
@@ -77,6 +78,10 @@ embedding_sets = {
         "margin-1.7",
         "margin-1.9",
         "margin-2.0",
+        "margin-3.0",
+        "margin-4.0",
+        "margin-5.0",
+        "margin-10.0",
     ],
     "embeddinglen": [
         "embeddinglen-50",
@@ -100,7 +105,7 @@ pretty = {
     "learningrate": "Learning Rate",
     "margin": "Margin",
     "embeddinglen": "Embedding Length",
-    "hiddenlength": "Hidden Layer Length",
+    "hiddenlength": "Hidden Layer Size",
     "AFINN": "AFINN",
     "ComboA": "Combo A",
     "ComboB": "Combo B",

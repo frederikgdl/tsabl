@@ -45,13 +45,13 @@ def print_table(method):
     prefix = "\\begin{table}[H]\n\t\\centering\n\t\\begin{tabular}" + column_setup + "\n"
 
     # Create header
-    header = "\\multicolumn{" + str(num_columns) + "}{" + col_align + "}{" + bold(config.EMBEDDINGS_KEY) + "} \\\\\n"
+    header = "\\multicolumn{" + str(num_columns) + "}{" + col_align + "}{" + config.EMBEDDINGS_KEY + "} \\\\\n"
     embeddings = sorted_by_suffix(data[method].keys())
     header_values = "& & " + " & ".join(list(map(lambda e: e.split("-")[-1], embeddings))) + " \\\\\n"
 
     hline = "\\hhline{~*{" + str(num_columns - 1) + "}{|-}}\n"
 
-    epochs_header = "\\parbox[t]{2mm}{\\multirow{" + str(num_epochs) + "}{*}{\\rotatebox[origin=c]{90}{\\textbf{Epochs}}}}\n"
+    epochs_header = "\\parbox[t]{2mm}{\\multirow{" + str(num_epochs) + "}{*}{\\rotatebox[origin=c]{90}{Epoch}}}\n"
 
     table = prefix + header + header_values + hline + epochs_header
 
@@ -131,10 +131,10 @@ def plot(method):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
-    ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.2, 1.0))
+    ax.legend(handles=color_patches, loc='upper right', bbox_to_anchor=(1.22, 1.0))
     save_path = path.join(config.RESULT_DIR, method, fig_title.replace(' ', '_'))
-    print("Saving to", save_path)
-    plt.savefig(save_path)
+    print("Saving to", save_path + ".png")
+    plt.savefig(save_path, bbox_inches='tight')
     plt.show(block=fig_number == number_of_figures + 1)
 
 
