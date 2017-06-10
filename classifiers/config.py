@@ -11,11 +11,11 @@ from classifiers.models.svm import SVM
 from classifiers.models.textblob import Textblob
 from classifiers.models.vader import Vader
 
-SUFFIX = "agg_ternary/LexiconClassifier/embeddings-100-LexiconClassifier-round-19"
+
+SUFFIX = "ternary/LexiconClassifier/embeddings-100-LexiconClassifier-round-19"
 
 # File options
 EMBEDDING_FILE = path.abspath("data/embeddings/" + SUFFIX)
-# EMBEDDING_FILE = path.abspath("data/embeddings/embeddings.txt")
 TRAIN_FILE = path.abspath("data/preprocessed/twitter-2013train-A.txt")
 TEST_FILE = path.abspath("data/preprocessed/twitter-2013test-A.txt")
 

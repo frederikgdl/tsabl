@@ -7,6 +7,7 @@ import plots.config as config
 from plots.config import classifiers
 from utils.misc import sorted_by_suffix
 
+
 logger = None
 verbose = 0
 quiet = False

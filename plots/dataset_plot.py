@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 
 from plots import config
 
-classifiers = ["SVM c=1", 'Lexicon Classifier', 'RandomUniform']
+
+classifiers = ["SVM c=6e-3 dual=False"]  # , 'Lexicon Classifier', 'RandomUniform']
 metrics = config.METRICS
 num_epochs = config.NUM_EPOCHS
 

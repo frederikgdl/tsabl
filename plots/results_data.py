@@ -13,7 +13,7 @@ class ResultsData:
         Creates a ResultsData instance that holds results for the given methods, embeddings and classifiers with 
         a certain number of epochs trained.
         
-        :param methods:     List of methods to collect results from ("binary", "ternary", "agg_ternary", ...)
+        :param methods:     List of methods to collect results from ("binary", "ternary", ...)
         :param embeddings:  List of embeddings/params to collect results from ("TextBlob", "AFINN", "windowsize=1", ...)
         :param classifiers: Names of classifiers to collect results from ("SVM c=1", "lexicon classifier", ...)
         :param num_epochs:  The minimum number of epochs a method+embedding combination must have been trained for.

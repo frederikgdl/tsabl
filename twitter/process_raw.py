@@ -7,6 +7,7 @@ from time import time
 from utils import file_ops
 from twitter.api import TwitterApi
 
+
 twitter_api = TwitterApi()
 
 

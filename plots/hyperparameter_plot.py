@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 from plots import config
 
+
 HYPERPARAMETERS = {'alpha': 'Alpha',
                    'embeddinglen': 'Word embedding length',
                    'hiddenlength': 'Size of hidden layers',
@@ -23,7 +24,7 @@ HYPERPARAMETERS = {'alpha': 'Alpha',
                    'margin': 'Margin',
                    'windowsize': 'Size of context window'}
 
-METHOD = 'agg_ternary'
+METHOD = 'ternary'
 RESULTS_DIR = path.join(config.RESULT_DIR, METHOD)
 CLASSIFIER = 'SVM c=1'
 METRIC = 'ternary_macro_f1_score'
@@ -96,12 +97,13 @@ def plot(hyperparameter, hyperparameter_values, avg_scores):
 
     ax = plt.subplot(111)
 
-    a = np.arange(len(hyperparameter_values))
+    a = np.arange(len(hyperparameter_values))  # Evenly spaced x values
+    # a = [float(x) for x in hyperparameter_values]  # Absolute x values
     ax.plot(a, avg_scores, line_style, color=color)
 
     ax.xaxis.set_ticks(a)
     ax.xaxis.set_ticklabels(hyperparameter_values)
-    #plt.xticks(hyperparameter_values, rotation=30)
+    # plt.xticks(hyperparameter_values, rotation=30)
     plt.xlabel(HYPERPARAMETERS[hyperparameter])
     plt.ylabel(METRIC_PRETTY)
     plt.tight_layout()

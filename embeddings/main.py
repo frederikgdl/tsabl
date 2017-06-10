@@ -11,6 +11,7 @@ import keras.backend as K
 import embeddings.config as config
 import embeddings.funcs as funcs
 
+
 KERAS_BACKEND = getenv('KERAS_BACKEND')
 if KERAS_BACKEND == 'theano':
     import theano.tensor as T
@@ -37,7 +38,6 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
 
     # Activation function for htanh layers
     def htanh(x):
-        # return K.min(K.max(x, -1, keepdims=True), 1)
         return K.clip(x, -1, 1)
 
     # Input
@@ -56,7 +56,6 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     linear_layer = Dense(hidden_size, activation='linear', init=init_hidden_layer)
 
     # hTanh layer
-    # TODO: tanh vs hTanh
     tanh_layer = Dense(hidden_size, activation=htanh, init=init_hidden_layer)
 
     # Context linear 2
@@ -83,15 +82,11 @@ def create_model(window_size, vocab_size, embedding_length, hidden_size, dropout
     # Context linear 2
     neg_context_layer = Dense(1, activation='linear', weights=context_layer.get_weights())
 
-    # Sentiment linear 2
-    # neg_sentiment_layer = Dense(2, activation='linear', weights=sentiment_layer.get_weights())
-
     neg_embeddings = embedding_layer(neg_input)
     neg_reshaped_embeddings = reshaped_embedding_layer(neg_embeddings)
     neg_lin_output = Dropout(dropout_p)(neg_linear_layer(neg_reshaped_embeddings))
     neg_tanh_output = Dropout(dropout_p)(neg_tanh_layer(neg_lin_output))
     neg_context_output = neg_context_layer(neg_tanh_output)
-    # neg_sentiment_output = neg_sentiment_layer(neg_tanh_output)
 
     merged_context_output = merge([context_output, neg_context_output], mode='concat', concat_axis=-1,
                                   name='merged_context_output')
@@ -180,23 +175,14 @@ def main():
 
     # Loss functions
     def context_loss_function(y_true, y_pred):
-        # TODO: verify function
-        # y_len = y_pred.shape[0]
-        # TODO: sizes = 1? not y_len?
-        # y_pos, y_neg = y_pred
+        # Get the two context scores
         y_pos, y_neg = split(y_pred, [1, 1], 2, axis=1)
-        # y_pos, y_neg = T.split(y_pred, [1, 1], 2, axis=1)
-        # return K.sum(K.maximum(0., 1. - y_pos + y_neg), axis=-1)
-        # return (1 - alpha) * K.maximum(0., 1. - y_pos + y_neg)
-
-        # Add 0*y_true to add y_true to graph
+        # Add 0*y_true to include in total graph
         return (1 - alpha) * K.maximum(0., margin - y_pos + y_neg) + 0*y_true
 
     def sentiment_loss_function(y_true, y_pred):
-        # TODO: verify function
-        # ([1, -1, 0], [1, 0, -1])
-        # y_true is [1, -1, -1] for positive, [-1, 1, -1] for neutral etc.
-        # return alpha * K.maximum(0., 1. - K.sum(y_true*y_pred, axis=1))
+        # y_true is [1, -1, -1] for positive, [-1, 1, -1] for neutral, [-1, -1, 1] for negative.
+        # Multiplied with sentiment scores in loss function.
         labels_one, labels_two = split(y_true, [3, 3], 2, axis=1)
         return alpha * (K.maximum(0., margin - K.sum(labels_one*y_pred, axis=1))
                         + K.maximum(0., margin - K.sum(labels_two*y_pred, axis=1)))

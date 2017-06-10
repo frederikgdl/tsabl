@@ -20,7 +20,7 @@ DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-for WINDOW_SIZE in 3 5 7 9
+for WINDOW_SIZE in 1 2 3 5 7 9
 do
     OUTPUT_FILE=${OUTPUT_DIR}'windowsize-'${WINDOW_SIZE}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 

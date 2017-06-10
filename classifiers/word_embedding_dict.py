@@ -35,7 +35,7 @@ class WordEmbeddingDict:
     # Tweet is list of strings
     # Default mode is average of vectors
     #
-    # TODO Implement more sentence embedding methods
+    # TODO: Implement more sentence embedding methods
     #
     def get_tweet_embedding(self, tweet, mode="avg"):
         if isinstance(tweet, list):

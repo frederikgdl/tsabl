@@ -20,7 +20,7 @@ DATASET='LexiconClassifier'
 
 INPUT_PREFIX=${DATA_PREFIX}${DATASET}
 
-for MARGIN in 0.5 0.7 0.9 1.1 1.3 1.5 1.7 1.9 2.0
+for MARGIN in 0.5 0.7 0.9 1.1 1.3 1.5 1.7 1.9 2.0 3.0 4.0 5.0 10.0
 do
     OUTPUT_FILE=${OUTPUT_DIR}'margin-'${MARGIN}'/embeddings-'${EMBEDDING_LENGTH}'-'${DATASET}
 

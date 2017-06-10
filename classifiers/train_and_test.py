@@ -10,6 +10,7 @@ from classifiers.k_fold import KFoldValidator
 from classifiers.word_embedding_dict import WordEmbeddingDict
 from utils import file_ops
 
+
 embedding_file = config.EMBEDDING_FILE
 train_file = config.TRAIN_FILE
 test_file = config.TEST_FILE

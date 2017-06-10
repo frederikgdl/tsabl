@@ -33,16 +33,11 @@ public class TernaryHybridRankingMain {
 
         // Optional hyperparameters
         double dropedRatio = 0.0;
-        // Boolean adaGrad = false;
         int batchsize = 1;
 
         if (argsMap.containsKey("-dropedRatio")) {
             dropedRatio = Double.parseDouble(argsMap.get("-dropedRatio"));
         }
-
-//        if (argsMap.containsKey("-adaGrad")) {
-//            adaGrad = Boolean.parseBoolean(argsMap.get("-adaGrad"));
-//        }
 
         if (argsMap.containsKey("-batchsize")) {
             batchsize = Integer.parseInt(argsMap.get("-batchsize"));
@@ -141,12 +136,14 @@ public class TernaryHybridRankingMain {
                             negMain.sentimentLinear2.outputG[k] = 0;// remain this part as zero.
                         }
 
+                        // Sentiment Loss
                         if(posMain.sentimentLinear2.output[data.goldPol]
                                 < posMain.sentimentLinear2.output[(data.goldPol + 1) % 3] + margin)
                         {
                             lossSent += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 1) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
 
+                            // Set the derivative of the loss directly
                             posMain.sentimentLinear2.outputG[data.goldPol] += sentimentAlpha * 1;
                             posMain.sentimentLinear2.outputG[(data.goldPol + 1) % 3] = sentimentAlpha * -1;
                         }
@@ -157,15 +154,18 @@ public class TernaryHybridRankingMain {
                             lossSent += sentimentAlpha * (margin + posMain.sentimentLinear2.output[(data.goldPol + 2) % 3]
                                     - posMain.sentimentLinear2.output[data.goldPol]);
 
+                            // Set the derivative of the loss directly
                             posMain.sentimentLinear2.outputG[data.goldPol] += sentimentAlpha * 1;
                             posMain.sentimentLinear2.outputG[(data.goldPol + 2) % 3] = sentimentAlpha * -1;
                         }
 
-                        // loss function
+                        // Context loss
                         if(posMain.contextLinear2.output[0] < negMain.contextLinear2.output[0] + margin)
                         {
                             lossContext += (1-sentimentAlpha) * (margin + negMain.contextLinear2.output[0]
                                     - posMain.contextLinear2.output[0]);
+
+                            // Set the derivative of the loss directly
                             posMain.contextLinear2.outputG[0] = (1 - sentimentAlpha) * 1;
                             negMain.contextLinear2.outputG[0] = (1 - sentimentAlpha) * -1;
                         }
@@ -179,14 +179,6 @@ public class TernaryHybridRankingMain {
                             negMain.backward();
                         }
 
-                        // Update parameters
-//                        if (adaGrad) {
-//                            posMain.updateAdaGrad(learningRate, batchsize);
-//                            negMain.updateAdaGrad(learningRate, batchsize);
-//                        } else {
-//                            posMain.update(learningRate);
-//                            negMain.update(learningRate);
-//                        }
                         posMain.update(learningRate);
                         negMain.update(learningRate);
 

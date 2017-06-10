@@ -5,6 +5,7 @@ from classifiers.models.lexicon_classifier import LexiconClassifier
 from classifiers.models.random_uniform import RandomUniform
 from classifiers.models.svm import SVM
 
+
 RESULT_DIR = path.abspath('results/')
 
 EMBEDDINGS_DIR = path.abspath('data/embeddings/')
@@ -25,8 +26,7 @@ METRICS['f1_pn_score'] = 'F1 PN'
 # test_all_datasets
 METHODS = [
     #"binary",
-    #"ternary",
-    "agg_ternary",
+    "ternary",
 ]
 
 embedding_sets = {
@@ -42,6 +42,7 @@ embedding_sets = {
     ],
     "alpha": [
         "alpha-0.0",
+        "alpha-0.1",
         "alpha-0.2",
         "alpha-0.4",
         "alpha-0.5",
@@ -50,6 +51,8 @@ embedding_sets = {
         "alpha-1.0",
     ],
     "windowsize": [
+        "windowsize-1",
+        "windowsize-2",
         "windowsize-3",
         "windowsize-5",
         "windowsize-7",
@@ -77,6 +80,10 @@ embedding_sets = {
         "margin-1.7",
         "margin-1.9",
         "margin-2.0",
+        "margin-3.0",
+        "margin-4.0",
+        "margin-5.0",
+        "margin-10.0",
     ],
     "embeddinglen": [
         "embeddinglen-50",

@@ -6,6 +6,7 @@ from plots.results_data import ResultsData
 from utils.latex import bold
 from utils.misc import sorted_by_suffix
 
+
 # Fix for running this script on a server without graphics.
 # This line must run before importing pyplot!
 if 'DISPLAY' not in environ:
@@ -33,7 +34,7 @@ specificity = 4  # Number of decimals to round values to
 
 def print_table(method):
     """
-    Creates a table corresponding to combined_plot for each 'method' (binary, ternary, agg_ternary)
+    Creates a table corresponding to combined_plot for each 'method' (binary, ternary)
     PS! Works only for one classifier!
     :param method: Method   
     """
